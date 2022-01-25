@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <opencv4/opencv2/core.hpp>
+#include <opencv4/opencv2/highgui.hpp>
+
 
 MainWindow::MainWindow(int updateRate, QWidget *parent):
     QMainWindow(parent)

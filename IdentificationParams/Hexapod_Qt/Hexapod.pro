@@ -50,9 +50,8 @@ FORMS += \
 
 DISTFILES +=
 
-INCLUDEPATH =+ "/usr/local/include/"
+INCLUDEPATH =+ "/usr/local/include/opencv4"
 
-LIBS += 'pkg-config --libs opencv4'
 
 RESOURCES += \
     Images.qrc \
