@@ -29,8 +29,8 @@ void Tests::Tests_unitaire(){
   */
 
   // mise a jour des chronometres
-  timerSendMsg_.update();
-  timerPulse_.update();
+  // timerSendMsg_.update();
+  // timerPulse_.update();
 
   //----------------------------------SECTION MOTEUR-------------------------------------------//
 
@@ -111,12 +111,12 @@ void Tests::Tests_unitaire(){
   //pid_x.run();
 }
 
-// Private Functions
-void Tests::myPrivateFunction(){
+// // Private Functions
+// void Tests::myPrivateFunction(){
 
-}
+// }
 
-// Protected Functions
-void Tests::myProtectedFunction(){
+// // Protected Functions
+// void Tests::myProtectedFunction(){
 
-}
+// }
