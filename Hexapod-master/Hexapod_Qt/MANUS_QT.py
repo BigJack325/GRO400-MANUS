@@ -1,4 +1,6 @@
+from codecs import ignore_errors
 from textwrap import indent
+from turtle import delay
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
                              QLineEdit, QPushButton, QSpinBox, QWidget,
@@ -20,6 +22,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.updateTimer = QTimer()
         self.msgBuffer_ = ""
+        self.counter = 0
 
         self.centralWidget = QWidget(self)
         self.gridLayout = QGridLayout(self.centralWidget)
@@ -276,31 +279,36 @@ class Ui_MainWindow(QMainWindow):
 
         self.serialCom_ = SerialProtocol(portName)
         self.connectSerialPortRead()
-        print(self.connectSerialPortRead())
 
     def connectSerialPortRead(self):
         self.serialCom_.newMessage.connect(self.receiveFromSerial)
 
     def receiveFromSerial(self,msg):
+        if self.counter == 1:
+            self.msgBuffer_ += msg
+        print(msg)
 
-        self.msgBuffer_ += msg
-        # print(self.msgBuffer_)
         if self.msgBuffer_.endswith("\n") and self.msgBuffer_.startswith("{"):
-            print(self.msgBuffer_)
+            # print(self.msgBuffer_)
             jsondata = json.loads(self.msgBuffer_)
             jsondataString = json.dumps(jsondata,indent=2)
             self.Json_Browser.setText(jsondataString)
      
             for key in jsondata.keys():
                 if self.JsonKey.text() == key:
-                    time = jsondata['time']
-                    self.series_.append(time, float(jsondata[key]))
+                    self.series_.append(jsondata['time'], float(jsondata[key]))
                     self.graph.removeSeries(self.series_)
                     self.graph.addSeries(self.series_)
+                    self.graph.legend().hide()
+                    self.graph.setTitle(str(key))
                     self.graph.createDefaultAxes()
                     self.graphView.setChart(self.graph)
- 
+                
+            if self.JsonKey.text() not in jsondata.keys():
+                self.series_.clear()
+            
             self.msgBuffer_ = ""
+        self.counter = 1
 
     def cleanUp(self):
 
@@ -332,7 +340,7 @@ class SerialProtocol(QComboBox):
             self.serial_.write(msg.decode('utf-8', 'ignore'))
 
     def readReceivedMsg(self):
-        self.newMessage.emit(str(self.serial_.readLine(), encoding='utf-8'))
+        self.newMessage.emit(str(self.serial_.readAll(), encoding='utf-8', errors='ignore'))
     
     def serialQuit(self):
         if self.serial_ != None:
@@ -343,6 +351,7 @@ class SerialProtocol(QComboBox):
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
+    
     ui = Ui_MainWindow()
     ui.show()
 

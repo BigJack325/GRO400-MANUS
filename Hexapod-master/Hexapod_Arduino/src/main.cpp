@@ -7,6 +7,7 @@
 /*------------------------------ Librairies ---------------------------------*/
 #include <LibS3GRO.h>
 #include <ArduinoJson.h>
+
 /*------------------------------ Constantes ---------------------------------*/
 using namespace std;
 
@@ -18,7 +19,7 @@ using namespace std;
 
 /*---------------------------- variables globales ---------------------------*/
 
-MegaServo servo_;                                 // objet servomoteur
+//MegaServo servo_;                                 // objet servomoteur
 //IMU9DOF imu_;                                     // objet imu central inertielle
 
 volatile bool shouldSend_ =             false;    // drapeau prêt à envoyer un message
@@ -84,9 +85,9 @@ void digitalWrite(uint8_t pin, uint8_t val);
 /*---------------------------- fonctions "Main" -----------------------------*/
 
 void setup() {
-  Serial.begin(BAUD);               // initialisation de la communication serielle
+  Serial.begin(BAUD);              // initialisation de la communication serielle
   //imu_.init();                      // initialisation de la centrale inertielle
-  
+  Serial.flush();
   // Chronometre envoie message
   timerSendMsg_.setDelay(UPDATE_PERIODE);
   timerSendMsg_.setCallback(timerCallback);
@@ -147,9 +148,9 @@ void sendMsg(){
 
   doc["time"]      = (millis()/1000.0);
   doc["pulsePWM"]  = pulsePWM_;
-  doc["cur_vel"]   = cur_vel;
-  doc["cur_pos"]   = cur_pos;
-  doc["cur_angle"] = cur_angle;
+  // doc["cur_vel"]   = cur_vel;
+  // doc["cur_pos"]   = cur_pos;
+  // doc["cur_angle"] = cur_angle;
 
   // Serialisation
   serializeJson(doc, Serial);
