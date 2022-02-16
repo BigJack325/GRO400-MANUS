@@ -11,7 +11,7 @@
 using namespace std;
 
 #define BAUD                            115200    // Frequence de transmission serielle
-#define UPDATE_PERIODE                  100       // Periode (ms) d'envoie d'etat general
+#define UPDATE_PERIODE                  100     // Periode (ms) d'envoie d'etat general
 
 //-----------------------------PIN SERVO-----------------------------------
 #define MAGPIN                          32        // Port numerique pour electroaimant J-18

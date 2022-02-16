@@ -1,16 +1,17 @@
+from textwrap import indent
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
                              QLineEdit, QPushButton, QSpinBox, QWidget,
                               QFrame, QComboBox, QGraphicsView, QPlainTextEdit, QDoubleSpinBox, QTextBrowser)
 from PyQt5.QtCore import QRect,QIODevice, QCoreApplication, pyqtSignal, Qt, QTimer
 from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtChart import QChartView
+from PyQt5.QtChart import QChart,QChartView,QLineSeries
 import sys, os, json
 # import cv2
 
 SCRIPT_DIR = os.path.dirname(__file__)+os.path.sep
 BAUD_RATE = 115200
-SERIAL_UPDATE_RATE = 1000 # Ms
+SERIAL_UPDATE_RATE = 1000# Ms
 
 class Ui_MainWindow(QMainWindow):
 
@@ -61,7 +62,9 @@ class Ui_MainWindow(QMainWindow):
 
         self.Graph_label = QLabel(self.widget)
         self.JsonKey = QLineEdit(self.widget)
-        self.graph = QChartView(self.widget)
+        self.graph = QChart()
+        self.graphView = QChartView(self.widget)
+        self.series_ = QLineSeries()
 
         self.Donnees_label = QLabel(self.widget)
         self.pulseButton = QPushButton(self.widget)
@@ -87,8 +90,7 @@ class Ui_MainWindow(QMainWindow):
     def setupUi(self):
         self.setObjectName("MainWindow")
         self.resize(983, 790)
-        # MainWindow.setAcceptDrops(False)
-
+ 
         self.centralWidget.setObjectName("centralWidget")
         self.gridLayout.setContentsMargins(9, 9, 11, 9)
         self.gridLayout.setSpacing(6)
@@ -171,8 +173,8 @@ class Ui_MainWindow(QMainWindow):
         self.Graph_label.setObjectName("Graph_label")
         self.JsonKey.setGeometry(QRect(810, 250, 101, 31))
         self.JsonKey.setObjectName("JsonKey")
-        self.graph.setGeometry(QRect(620, 30, 341, 211))
-        self.graph.setObjectName("graph")
+        self.graphView.setGeometry(QRect(620, 30, 341, 211))
+        self.graphView.setObjectName("graph")
 
         self.Donnees_label.setGeometry(QRect(660, 250, 121, 28))
         self.Donnees_label.setObjectName("Donnees_label")
@@ -234,7 +236,7 @@ class Ui_MainWindow(QMainWindow):
     def retranslateUi(self):
         _translate = QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "MANUS"))
-        self.JsonKey.setText(_translate("MainWindow", "potVex"))
+        self.JsonKey.setText(_translate("MainWindow", "time"))
         self.Distance_label.setText(_translate("MainWindow", "Distance(m)"))
         self.Map_label.setText(_translate("MainWindow", "Map:"))
         self.BackButton.setText(_translate("MainWindow", "BACK"))
@@ -280,68 +282,25 @@ class Ui_MainWindow(QMainWindow):
         self.serialCom_.newMessage.connect(self.receiveFromSerial)
 
     def receiveFromSerial(self,msg):
-        
+
         self.msgBuffer_ += msg
-        print(self.msgBuffer_)
-        # if self.msgBuffer_.endswith('\n'):
-            # print(self.msgBuffer_)
-        data = json.load(self.msgBuffer_())
-
-    #     // Passage ASCII vers structure Json
-        # self.jsonResponse.fromJson(self.msgBuffer_.encode('utf-8'))
-
-
-    #     // Analyse du message Json
-        # if not self.jsonResponse.isEmpty():
+        # print(self.msgBuffer_)
+        if self.msgBuffer_.endswith("\n") and self.msgBuffer_.startswith("{"):
+            print(self.msgBuffer_)
+            jsondata = json.loads(self.msgBuffer_)
+            jsondataString = json.dumps(jsondata,indent=2)
+            self.Json_Browser.setText(jsondataString)
+     
+            for key in jsondata.keys():
+                if self.JsonKey.text() == key:
+                    time = jsondata['time']
+                    self.series_.append(time, float(jsondata[key]))
+                    self.graph.removeSeries(self.series_)
+                    self.graph.addSeries(self.series_)
+                    self.graph.createDefaultAxes()
+                    self.graphView.setChart(self.graph)
  
-    #         QJsonObject jsonObj = jsonResponse.object();
-    #         QString buff = jsonResponse.toJson(QJsonDocument::Indented);
-
-    #         // Affichage des messages Json
-    #         ui->textBrowser->setText(buff.mid(2,buff.length()-4));
-    #         //ui->Etat->setText(jsonObj["Etat"].toString());
-
-    #         positionVoiture = covertisseurMagique*jsonObj["cur_pos"].toDouble();
-    #         anglePendule = -1*(jsonObj["cur_angle"].toDouble()+45);
-    #         angleSapin = -1*(jsonObj["cur_angle"].toDouble());
-    #         sapinLacher = jsonObj["sapin_lacher"].toBool();
-    #         etat = jsonObj["Etat"].toDouble();
-    #         casZero     = jsonObj["casZero"].toBool();
-    #         vitesse_angulaire = jsonObj["vitesse_angulaire"].toDouble();
-    #         son = jsonObj["son"].toDouble();
-
-    #         if(game_on == true)
-    #         {
-    #             this->moveMario();
-    #         }
-
-    #         if(etat == 100.0)
-    #         {
-    #             game_on = true;
-    #         }
-
-    #         // Affichage des donnees dans le graph
-    #         if(jsonObj.contains(JsonKey_)){
-    #             double time = jsonObj["time"].toDouble();
-    #             series_.append(time, jsonObj[JsonKey_].toDouble());
-    #             // Mise en forme du graphique (non optimal)
-    #             chart_.removeSeries(&series_);
-    #             chart_.addSeries(&series_);
-    #             chart_.createDefaultAxes();
-    #         }
-
-    #         // Fonction de reception de message (vide pour l'instant)
-    #         msgReceived_ = msgBuffer_;
-    #         onMessageReceived(msgReceived_);
-
-    #         // Si les donnees doivent etre enregistrees
-    #         if(record){
-    #             writer_->write(jsonObj);
-    #         }
-    #     }
-    #     // Reinitialisation du message tampon
-    #     msgBuffer_ = "";
-    # }
+            self.msgBuffer_ = ""
 
     def cleanUp(self):
 
@@ -361,6 +320,8 @@ class SerialProtocol(QComboBox):
         if self.serial_.open(QIODevice.ReadWrite):
             self.serial_.setBaudRate(BAUD_RATE)
             self.serial_.readyRead.connect(self.readReceivedMsg)
+            self.clear()
+
             print("Serial Ready")
         else:
             raise IOError("Cannot connect to device on port {}".format(portName))
@@ -371,8 +332,7 @@ class SerialProtocol(QComboBox):
             self.serial_.write(msg.decode('utf-8', 'ignore'))
 
     def readReceivedMsg(self):
-
-        self.newMessage.emit(str(self.serial_.readAll()))
+        self.newMessage.emit(str(self.serial_.readLine(), encoding='utf-8'))
     
     def serialQuit(self):
         if self.serial_ != None:
