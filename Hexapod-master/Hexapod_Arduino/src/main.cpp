@@ -61,8 +61,10 @@ float cur_pos =                         0.0;      //Permet de savoir la position
 float cur_vel =                         0.0;      //Permet de savoir la vitesse en temps réelle du pendule
 float cur_angle =                       0.0;      //Permet de savoir l'angle en temps réelle du pendule
 float pwm_correction  =                 0.0;
-int i =                                   0;      
-
+int i =                                   0;   
+int cur_x = 0;   
+int cur_y = 0;
+String receivedMessage_;
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
@@ -87,7 +89,6 @@ void digitalWrite(uint8_t pin, uint8_t val);
 void setup() {
   Serial.begin(BAUD);              // initialisation de la communication serielle
   //imu_.init();                      // initialisation de la centrale inertielle
-  Serial.flush();
   // Chronometre envoie message
   timerSendMsg_.setDelay(UPDATE_PERIODE);
   timerSendMsg_.setCallback(timerCallback);
@@ -118,6 +119,7 @@ void loop() {
   // Mise à jour des chronometres
   timerSendMsg_.update();
   timerPulse_.update();
+
 }
 
 /*---------------------------Definition de fonctions ------------------------*/
@@ -148,10 +150,30 @@ void sendMsg(){
 
   doc["time"]      = (millis()/1000.0);
   doc["pulsePWM"]  = pulsePWM_;
-  // doc["cur_vel"]   = cur_vel;
-  // doc["cur_pos"]   = cur_pos;
-  // doc["cur_angle"] = cur_angle;
-
+  doc["cur_x"] = cur_x;
+  doc["cur_y"] = cur_y;
+  doc["cur_angle"] = cur_angle;
+  doc["cur_vel"]   = cur_vel;
+  doc["Servo_1"] = 101;
+  doc["Servo_2"] = 102;
+  doc["Servo_3"] = 103;
+  doc["Servo_4"] = 104;
+  doc["Servo_5"] = 105;
+  doc["Servo_6"] = 106;
+  doc["Servo_7"] = 107;
+  doc["Servo_8"] = 108;
+  doc["Servo_9"] = 109;
+  doc["Servo_10"] = 110;
+  doc["Servo_11"] = 111;
+  doc["Servo_12"] = 112;
+  doc["Servo_13"] = 113;
+  doc["Servo_14"] = 114;
+  doc["Servo_15"] = 115;
+  doc["Servo_16"] = 116;
+  doc["Servo_17"] = 117;
+  doc["Servo_18"] = 118;
+  doc["Servo_19"] = 119;
+ 
   // Serialisation
   serializeJson(doc, Serial);
   // Envoit
@@ -160,38 +182,39 @@ void sendMsg(){
 }
 
 void readMsg(){
-  // Lecture du message Json
-  StaticJsonDocument<500> doc;
-  JsonVariant parse_msg;
-
-  // Lecture sur le port Seriel
-  DeserializationError error = deserializeJson(doc, Serial);
+  while (Serial.available()>0){
+    receivedMessage_ = Serial.readString();
+    Serial.println(receivedMessage_);
+  }
   shouldRead_ = false;
+  // Lecture du message Json
+  // StaticJsonDocument<500> doc;
+  // JsonVariant parse_msg;
 
-  // Si erreur dans le message
-  if (error) {
-    //Serial.print("deserialize() failed: ");
-    //Serial.println(error.c_str());
-    return;
-  }
-  
-  //À LAISSER DANS LA PREMIÈRE FENETRE QT------------------------------------------------------------À FAIRE-------------------------------------
+  // // Lecture sur le port Seriel
+  // DeserializationError error = deserializeJson(doc, Serial);
+  // shouldRead_ = false;
 
+  // // Si erreur dans le message
+  // if (error) {
+  //   //Serial.print("deserialize() failed: ");
+  //   //Serial.println(error.c_str());
+  //   return;
+  // }
   // Analyse des éléments du message message
-  parse_msg = doc["pulsePWM"];
-  if(!parse_msg.isNull()){
-     pulsePWM_ = doc["pulsePWM"].as<float>();
-  }
+  // parse_msg = doc["pulsePWM"];
+  // if(!parse_msg.isNull()){
+  //    pulsePWM_ = doc["pulsePWM"].as<float>();
+  // }
 
-  parse_msg = doc["pulseTime"];
-  if(!parse_msg.isNull()){
-     pulseTime_ = doc["pulseTime"].as<float>();
-  }
+  // parse_msg = doc["pulseTime"];
+  // if(!parse_msg.isNull()){
+  //    pulseTime_ = doc["pulseTime"].as<float>();
+  // }
 
-  parse_msg = doc["pulse"];
-  if(!parse_msg.isNull()){
-     shouldPulse_ = doc["pulse"];
-  }
-
-  //-----------------------AJOUTER FONCTIONS DE MOUVEMENT ICI-----------------------------------------------------
+  // parse_msg = doc["pulse"];
+  // if(!parse_msg.isNull()){
+  //    shouldPulse_ = doc["pulse"];
+  // }
 }
+  //-----------------------AJOUTER FONCTIONS DE MOUVEMENT ICI-----------------------------------------------------

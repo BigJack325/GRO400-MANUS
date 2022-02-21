@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>983</width>
+    <height>795</height>
+   </rect>
+  </property>
+  <property name="acceptDrops">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string>MANUS</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>9</number>
+    </property>
+    <property name="topMargin">
+     <number>9</number>
+    </property>
+    <property name="bottomMargin">
+     <number>9</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QWidget" name="widget" native="true">
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <widget class="QLineEdit" name="JsonKey">
+       <property name="geometry">
+        <rect>
+         <x>810</x>
+         <y>250</y>
+         <width>101</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>potVex</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_4">
+       <property name="geometry">
+        <rect>
+         <x>450</x>
+         <y>550</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Distance_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>80</y>
+         <width>94</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Distance(m)</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Map_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>440</y>
+         <width>218</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Map:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="BackButton">
+       <property name="geometry">
+        <rect>
+         <x>760</x>
+         <y>590</y>
+         <width>81</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>BACK</string>
+       </property>
+      </widget>
+      <widget class="Line" name="line_3">
+       <property name="geometry">
+        <rect>
+         <x>600</x>
+         <y>20</y>
+         <width>20</width>
+         <height>751</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_11">
+       <property name="geometry">
+        <rect>
+         <x>500</x>
+         <y>580</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_9">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>580</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_3">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>550</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_12">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>580</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBoxPort">
+       <property name="geometry">
+        <rect>
+         <x>121</x>
+         <y>17</y>
+         <width>124</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_8">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>580</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_16">
+       <property name="geometry">
+        <rect>
+         <x>450</x>
+         <y>620</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="ProneButton">
+       <property name="geometry">
+        <rect>
+         <x>760</x>
+         <y>510</y>
+         <width>81</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>PRONE</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QGraphicsView" name="Map">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>460</y>
+         <width>261</width>
+         <height>261</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_5">
+       <property name="geometry">
+        <rect>
+         <x>490</x>
+         <y>530</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="RightButton">
+       <property name="geometry">
+        <rect>
+         <x>860</x>
+         <y>510</y>
+         <width>81</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>RIGHT</string>
+       </property>
+      </widget>
+      <widget class="QChartView" name="graph">
+       <property name="geometry">
+        <rect>
+         <x>620</x>
+         <y>30</y>
+         <width>341</width>
+         <height>211</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_7">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>580</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Cam_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>150</y>
+         <width>218</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Cam:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="StartButton">
+       <property name="geometry">
+        <rect>
+         <x>820</x>
+         <y>330</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Start</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_2">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>540</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_17">
+       <property name="geometry">
+        <rect>
+         <x>490</x>
+         <y>640</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Port_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>17</y>
+         <width>94</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Port:</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="LeftButton">
+       <property name="geometry">
+        <rect>
+         <x>660</x>
+         <y>510</y>
+         <width>81</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>LEFT</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_14">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>630</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pulseButton">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>110</y>
+         <width>225</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Commande de pulse</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_19">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>520</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Donnees_label">
+       <property name="geometry">
+        <rect>
+         <x>660</x>
+         <y>250</y>
+         <width>121</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Donnees brutes:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_18">
+       <property name="geometry">
+        <rect>
+         <x>530</x>
+         <y>650</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="Stop">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>330</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Sans Serif</family>
+         <pointsize>9</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+         <underline>false</underline>
+         <strikeout>false</strikeout>
+        </font>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="PWR_label">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>50</y>
+         <width>94</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Tension [-1,1]</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_15">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>620</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_10">
+       <property name="geometry">
+        <rect>
+         <x>450</x>
+         <y>580</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_6">
+       <property name="geometry">
+        <rect>
+         <x>530</x>
+         <y>510</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QSpinBox" name="DistanceBox">
+       <property name="geometry">
+        <rect>
+         <x>121</x>
+         <y>80</y>
+         <width>124</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="keyboardTracking">
+        <bool>false</bool>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>5000</number>
+       </property>
+       <property name="singleStep">
+        <number>25</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Cam">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>170</y>
+         <width>261</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Json_label">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>10</y>
+         <width>218</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Messages Json de l'Arduino:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="PWMBox">
+       <property name="geometry">
+        <rect>
+         <x>121</x>
+         <y>50</y>
+         <width>124</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="minimum">
+        <double>-1.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="FrontButton">
+       <property name="geometry">
+        <rect>
+         <x>760</x>
+         <y>430</y>
+         <width>81</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>FRONT</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Graph_label">
+       <property name="geometry">
+        <rect>
+         <x>620</x>
+         <y>10</y>
+         <width>218</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Graphique:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_13">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>640</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Servo_1">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>520</y>
+         <width>41</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPlainTextEdit" name="plainTextEdit">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>250</y>
+         <width>311</width>
+         <height>151</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTextBrowser" name="Json_Browser">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>30</y>
+         <width>311</width>
+         <height>201</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Hexapod_Pic">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>410</y>
+         <width>321</width>
+         <height>361</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>../../../../.designer/.designer/backup/hexapod.jpg</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Distances_label">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>230</y>
+         <width>218</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Distances:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="RotateLeftButton">
+       <property name="geometry">
+        <rect>
+         <x>660</x>
+         <y>430</y>
+         <width>81</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ROTATE L</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="RotateRightButton">
+       <property name="geometry">
+        <rect>
+         <x>860</x>
+         <y>430</y>
+         <width>81</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ROTATE R</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="Manual_mode">
+       <property name="geometry">
+        <rect>
+         <x>860</x>
+         <y>670</y>
+         <width>101</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Manual Mode</string>
+       </property>
+      </widget>
+      <zorder>Hexapod_Pic</zorder>
+      <zorder>JsonKey</zorder>
+      <zorder>Servo_4</zorder>
+      <zorder>Distance_label</zorder>
+      <zorder>Map_label</zorder>
+      <zorder>BackButton</zorder>
+      <zorder>line_3</zorder>
+      <zorder>Servo_11</zorder>
+      <zorder>Servo_9</zorder>
+      <zorder>Servo_3</zorder>
+      <zorder>Servo_12</zorder>
+      <zorder>comboBoxPort</zorder>
+      <zorder>Servo_8</zorder>
+      <zorder>Servo_16</zorder>
+      <zorder>ProneButton</zorder>
+      <zorder>Map</zorder>
+      <zorder>Servo_5</zorder>
+      <zorder>RightButton</zorder>
+      <zorder>graph</zorder>
+      <zorder>Servo_7</zorder>
+      <zorder>Cam_label</zorder>
+      <zorder>StartButton</zorder>
+      <zorder>Servo_2</zorder>
+      <zorder>Servo_17</zorder>
+      <zorder>Port_label</zorder>
+      <zorder>LeftButton</zorder>
+      <zorder>Servo_14</zorder>
+      <zorder>pulseButton</zorder>
+      <zorder>Servo_19</zorder>
+      <zorder>Donnees_label</zorder>
+      <zorder>Servo_18</zorder>
+      <zorder>Stop</zorder>
+      <zorder>PWR_label</zorder>
+      <zorder>Servo_15</zorder>
+      <zorder>Servo_10</zorder>
+      <zorder>Servo_6</zorder>
+      <zorder>DistanceBox</zorder>
+      <zorder>Cam</zorder>
+      <zorder>Json_label</zorder>
+      <zorder>PWMBox</zorder>
+      <zorder>FrontButton</zorder>
+      <zorder>Graph_label</zorder>
+      <zorder>Servo_13</zorder>
+      <zorder>Servo_1</zorder>
+      <zorder>plainTextEdit</zorder>
+      <zorder>Json_Browser</zorder>
+      <zorder>Distances_label</zorder>
+      <zorder>RotateLeftButton</zorder>
+      <zorder>RotateRightButton</zorder>
+      <zorder>Manual_mode</zorder>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">QtCharts</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
