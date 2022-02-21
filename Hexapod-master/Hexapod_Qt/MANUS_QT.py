@@ -5,21 +5,21 @@ from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
                              QLineEdit, QPushButton, QSpinBox, QWidget,
                               QFrame, QComboBox, QGraphicsView, QGraphicsItem, QGraphicsScene,
                                QGraphicsPixmapItem, QPlainTextEdit, QDoubleSpinBox, QTextBrowser, QCheckBox)
-from PyQt5.QtCore import QRect,QIODevice, QCoreApplication, pyqtSignal, Qt, QTimer
+from PyQt5.QtCore import QRect,QIODevice, QCoreApplication, pyqtSignal, Qt, QTimer, QSize
 from PyQt5.QtMultimedia import QMediaPlayer
-from PyQt5.QtGui import QPixmap, QFont, QBrush, QImage, QKeyEvent
+from PyQt5.QtGui import QPixmap, QFont, QBrush, QImage, QKeyEvent, QIcon
 from PyQt5.QtChart import QChart,QChartView,QLineSeries
 import sys, os, json, math
 # import cv2
 
 SCRIPT_DIR = os.path.dirname(__file__)+os.path.sep
 SCRIPT_IMAGES = SCRIPT_DIR + "Images"+os.path.sep
+SCRIPT_BUTTONS = SCRIPT_IMAGES+ "Buttons"+os.path.sep
 BAUD_RATE = 115200
 UI_UPDATE_RATE = 1000# Ms
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
-MANUAL_ROTATION_ANGLE = 20
 
 
 class Ui_MainWindow(QMainWindow):
@@ -45,11 +45,23 @@ class Ui_MainWindow(QMainWindow):
             self.Servo[idx] = QLineEdit(self.widget)
 
         self.RightButton = QPushButton(self.widget)
+        self.RightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Right.png"))
+        self.RightButton.setIconSize(QSize(61,61))
         self.RotateRightButton = QPushButton(self.widget)
+        self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Rotate_Right.png"))
+        self.RotateRightButton.setIconSize(QSize(61,61))
         self.LeftButton = QPushButton(self.widget)
+        self.LeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Left.png"))
+        self.LeftButton.setIconSize(QSize(61,61))
         self.RotateLeftButton = QPushButton(self.widget)
+        self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Rotate_Left.png"))
+        self.RotateLeftButton.setIconSize(QSize(61,61))
         self.FrontButton = QPushButton(self.widget)
+        self.FrontButton.setIcon(QIcon(SCRIPT_BUTTONS+"Front.png"))
+        self.FrontButton.setIconSize(QSize(61,61))
         self.BackButton = QPushButton(self.widget)
+        self.BackButton.setIcon(QIcon(SCRIPT_BUTTONS+"Back.png"))
+        self.BackButton.setIconSize(QSize(61,61))
         self.ProneButton = QPushButton(self.widget)
 
         self.Port_label = QLabel(self.widget)
@@ -59,27 +71,23 @@ class Ui_MainWindow(QMainWindow):
         self.MapView = Map(self.widget)
 
         self.Graph_label = QLabel(self.widget)
-        self.JsonKey = QLineEdit(self.widget)
         self.graph = QChart()
         self.graphView = QChartView(self.widget)
         self.series_ = QLineSeries()
 
         self.Donnees_label = QLabel(self.widget)
-        self.pulseButton = QPushButton(self.widget)
+        self.JsonKey = QLineEdit(self.widget)
 
         self.StartButton = QPushButton(self.widget)
         self.StopButton = QPushButton(self.widget)
-
-        self.Distance_label = QLabel(self.widget)
-        self.DistanceBox = QSpinBox(self.widget)
 
         self.Cam_label = QLabel(self.widget)
         self.Cam = QLabel(self.widget)
         self.CamDistance_label = QLabel(self.widget)
         self.CamDistanceText = QPlainTextEdit(self.widget)
 
-        self.PWR_label = QLabel(self.widget)
-        self.PWMBox = QDoubleSpinBox(self.widget)
+        self.Angle_label = QLabel(self.widget)
+        self.AngleBox = QDoubleSpinBox(self.widget)
 
         self.Json_label = QLabel(self.widget)
         self.Json_Browser = QTextBrowser(self.widget)
@@ -98,40 +106,40 @@ class Ui_MainWindow(QMainWindow):
         self.line.setFrameShape(QFrame.VLine)
         self.line.setFrameShadow(QFrame.Sunken)
 
-        self.Hexapod_Pic.setGeometry(QRect(285, 410, 321, 361))
-        self.Hexapod_Pic.setPixmap(QPixmap(SCRIPT_IMAGES+"hexapod.jpg"))
+        self.Hexapod_Pic.setGeometry(QRect(285, 400, 321, 361))
+        self.Hexapod_Pic.setPixmap(QPixmap(SCRIPT_IMAGES+"hexapod.png"))
         self.Hexapod_Pic.setScaledContents(True)
 
-        self.Servo[1].setGeometry(QRect(400, 550, 41, 25))
+        self.Servo[1].setGeometry(QRect(400, 560, 41, 25))
         self.Servo[2].setGeometry(QRect(350, 540, 41, 25))
-        self.Servo[3].setGeometry(QRect(310, 520, 41, 25))
-        self.Servo[4].setGeometry(QRect(450, 550, 41, 25))
-        self.Servo[5].setGeometry(QRect(490, 530, 41, 25))
-        self.Servo[6].setGeometry(QRect(530, 510, 41, 25))
-        self.Servo[7].setGeometry(QRect(400, 580, 41, 25))
-        self.Servo[8].setGeometry(QRect(350, 580, 41, 25))
-        self.Servo[9].setGeometry(QRect(300, 580, 41, 25))       
-        self.Servo[10].setGeometry(QRect(450, 580, 41, 25))
-        self.Servo[11].setGeometry(QRect(500, 580, 41, 25))
-        self.Servo[12].setGeometry(QRect(550, 580, 41, 25))
-        self.Servo[13].setGeometry(QRect(400, 620, 41, 25))
-        self.Servo[14].setGeometry(QRect(350, 630, 41, 25))
-        self.Servo[15].setGeometry(QRect(300, 640, 41, 25))        
-        self.Servo[16].setGeometry(QRect(450, 620, 41, 25))
-        self.Servo[17].setGeometry(QRect(490, 640, 41, 25))
-        self.Servo[18].setGeometry(QRect(530, 650, 41, 25))
-        self.Servo[19].setGeometry(QRect(420, 520, 41, 25))
+        self.Servo[3].setGeometry(QRect(300, 520, 41, 25))
+        self.Servo[4].setGeometry(QRect(450, 560, 41, 25))
+        self.Servo[5].setGeometry(QRect(500, 540, 41, 25))
+        self.Servo[6].setGeometry(QRect(550, 520, 41, 25))
+        self.Servo[7].setGeometry(QRect(400, 610, 41, 25))
+        self.Servo[8].setGeometry(QRect(350, 610, 41, 25))
+        self.Servo[9].setGeometry(QRect(300, 610, 41, 25))       
+        self.Servo[10].setGeometry(QRect(450, 610, 41, 25))
+        self.Servo[11].setGeometry(QRect(500, 610, 41, 25))
+        self.Servo[12].setGeometry(QRect(550, 610, 41, 25))
+        self.Servo[13].setGeometry(QRect(400, 660, 41, 25))
+        self.Servo[14].setGeometry(QRect(350, 680, 41, 25))
+        self.Servo[15].setGeometry(QRect(300, 700, 41, 25))        
+        self.Servo[16].setGeometry(QRect(450, 660, 41, 25))
+        self.Servo[17].setGeometry(QRect(500, 680, 41, 25))
+        self.Servo[18].setGeometry(QRect(550, 700, 41, 25))
+        self.Servo[19].setGeometry(QRect(425, 520, 41, 25))
 
         for idx in range(1,NUM_SERVOS+1):
             self.Servo[idx].setReadOnly(True)        
 
-        self.RightButton.setGeometry(QRect(860, 510, 81, 61))
-        self.RotateRightButton.setGeometry(QRect(860, 430, 81, 61))
-        self.LeftButton.setGeometry(QRect(660, 510, 81, 61))
-        self.RotateLeftButton.setGeometry(QRect(660, 430, 81, 61))
-        self.FrontButton.setGeometry(QRect(760, 430, 81, 61))
-        self.BackButton.setGeometry(QRect(760, 590, 81, 61))
-        self.ProneButton.setGeometry(QRect(760, 510, 81, 61))
+        self.RightButton.setGeometry(QRect(840, 510, 61, 61))
+        self.RotateRightButton.setGeometry(QRect(840, 430, 61, 61))
+        self.LeftButton.setGeometry(QRect(680, 510, 61, 61))
+        self.RotateLeftButton.setGeometry(QRect(680, 430, 61, 61))
+        self.FrontButton.setGeometry(QRect(760, 430, 61, 61))
+        self.BackButton.setGeometry(QRect(760, 590, 61, 61))
+        self.ProneButton.setGeometry(QRect(760, 510, 61, 61))
         
         self.Port_label.setGeometry(QRect(20, 17, 94, 22))
         self.comboBoxPort.setGeometry(QRect(121, 17, 124, 22))
@@ -140,13 +148,11 @@ class Ui_MainWindow(QMainWindow):
         self.MapView.setEnabled(True)
         self.MapView.setGeometry(QRect(0, 460, 261, 261))
 
+        self.Donnees_label.setGeometry(QRect(660, 250, 121, 28))
+        self.JsonKey.setGeometry(QRect(810, 250, 101, 31))
 
         self.Graph_label.setGeometry(QRect(620, 10, 218, 22))
-        self.JsonKey.setGeometry(QRect(810, 250, 101, 31))
         self.graphView.setGeometry(QRect(620, 30, 341, 211))
-
-        self.Donnees_label.setGeometry(QRect(660, 250, 121, 28))
-        self.pulseButton.setGeometry(QRect(20, 110, 225, 28))
 
         self.StartButton.setGeometry(QRect(820, 330, 131, 31))
         self.StopButton.setGeometry(QRect(640, 330, 131, 31))
@@ -154,22 +160,17 @@ class Ui_MainWindow(QMainWindow):
         font.setBold(True)
         self.StopButton.setFont(font)
 
-        self.Distance_label.setGeometry(QRect(20, 80, 94, 22))
-        self.DistanceBox.setGeometry(QRect(121, 80, 124, 22))
-        self.DistanceBox.setMinimum(0)
-        self.DistanceBox.setMaximum(5000)
-        self.DistanceBox.setSingleStep(1)
-
         self.Cam_label.setGeometry(QRect(0, 150, 218, 22))
         self.Cam.setGeometry(QRect(10, 170, 261, 261))
         self.CamDistance_label.setGeometry(QRect(280, 230, 218, 22))
         self.CamDistanceText.setGeometry(QRect(280, 250, 311, 151))
 
-        self.PWR_label.setGeometry(QRect(20, 50, 94, 22))
-        self.PWMBox.setGeometry(QRect(121, 50, 124, 22))
-        self.PWMBox.setMinimum(-1.0)
-        self.PWMBox.setMaximum(1.0)
-        self.PWMBox.setSingleStep(0.1)
+        self.Angle_label.setGeometry(QRect(615, 680, 94, 22))
+        self.AngleBox.setGeometry(QRect(710, 680, 124, 22))
+        self.AngleBox.setMinimum(0)
+        self.AngleBox.setMaximum(180)
+        self.AngleBox.setDecimals(0)
+        self.AngleBox.setSingleStep(1)
 
         self.Json_label.setGeometry(QRect(270, 10, 218, 22))
         self.Json_Browser.setGeometry(QRect(280, 30, 311, 201))
@@ -193,25 +194,17 @@ class Ui_MainWindow(QMainWindow):
         _translate = QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "MANUS"))
         self.JsonKey.setText(_translate("MainWindow", "time"))
-        self.Distance_label.setText(_translate("MainWindow", "Distance(m)"))
         self.Map_label.setText(_translate("MainWindow", "Map:"))
-        self.BackButton.setText(_translate("MainWindow", "BACK"))
         self.ProneButton.setText(_translate("MainWindow", "PRONE"))
-        self.RightButton.setText(_translate("MainWindow", "RIGHT"))
         self.Cam_label.setText(_translate("MainWindow", "Cam:"))
         self.StartButton.setText(_translate("MainWindow", "Start"))
         self.Port_label.setText(_translate("MainWindow", "Port:"))
-        self.LeftButton.setText(_translate("MainWindow", "LEFT"))
-        self.pulseButton.setText(_translate("MainWindow", "Commande de pulse"))
         self.Donnees_label.setText(_translate("MainWindow", "Donnees brutes:"))
         self.StopButton.setText(_translate("MainWindow", "Stop"))
-        self.PWR_label.setText(_translate("MainWindow", "Tension [-1,1]"))
+        self.Angle_label.setText(_translate("MainWindow", "Angle[0,180]"))
         self.Json_label.setText(_translate("MainWindow", "Messages Json de l\'Arduino:"))
-        self.FrontButton.setText(_translate("MainWindow", "FRONT"))
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
-        self.RotateLeftButton.setText(_translate("MainWindow", "ROTATE L"))
-        self.RotateRightButton.setText(_translate("MainWindow", "ROTATE R"))
         self.Manual_mode.setText(_translate("MainWindow", "Manual Mode"))
 
     def portCensus(self):
@@ -244,22 +237,22 @@ class Ui_MainWindow(QMainWindow):
         self.StopButton.clicked.connect(lambda: self.serialCom_.sendMessage("STOP"))
 
         # self.RightButton.clicked.connect(lambda: self.serialCom_.sendMessage("RIGHT"))
-        self.RightButton.clicked.connect(lambda: self.MapView.manual_map_movement("RIGHT"))
+        self.RightButton.clicked.connect(lambda: self.MapView.manual_map_movement("RIGHT",0))
 
         # self.LeftButton.clicked.connect(lambda: self.serialCom_.sendMessage("LEFT"))
-        self.LeftButton.clicked.connect(lambda: self.MapView.manual_map_movement("LEFT"))
+        self.LeftButton.clicked.connect(lambda: self.MapView.manual_map_movement("LEFT",0))
 
         # self.FrontButton.clicked.connect(lambda: self.serialCom_.sendMessage("FRONT"))
-        self.FrontButton.clicked.connect(lambda: self.MapView.manual_map_movement("FRONT"))
+        self.FrontButton.clicked.connect(lambda: self.MapView.manual_map_movement("FRONT",0))
 
         # self.BackButton.clicked.connect(lambda: self.serialCom_.sendMessage("BACK"))
-        self.BackButton.clicked.connect(lambda: self.MapView.manual_map_movement("BACK"))
+        self.BackButton.clicked.connect(lambda: self.MapView.manual_map_movement("BACK",0))
 
         # self.RotateLeftButton.clicked.connect(lambda: self.serialCom_.sendMessage("RLEFT"))
-        self.RotateLeftButton.clicked.connect(lambda: self.MapView.manual_map_movement("RLEFT"))
+        self.RotateLeftButton.clicked.connect(lambda: self.MapView.manual_map_movement("RLEFT",int(self.AngleBox.text())))
 
         # self.RotateRightButton.clicked.connect(lambda: self.serialCom_.sendMessage("RRIGHT"))
-        self.RotateRightButton.clicked.connect(lambda: self.MapView.manual_map_movement("RRIGHT"))
+        self.RotateRightButton.clicked.connect(lambda: self.MapView.manual_map_movement("RRIGHT",int(self.AngleBox.text())))
 
     def connectMotorLabels(self):
         if self.jsondata is not None:
@@ -385,7 +378,9 @@ class SerialProtocol(QComboBox):
 class Robot(QGraphicsPixmapItem):
     def __init__(self):
         super().__init__()
-        self.setPixmap(QPixmap(SCRIPT_IMAGES+"hexapod_map.png"))
+        pixmap = QPixmap(SCRIPT_IMAGES+"hexapod.png")
+        pixmap_resized = pixmap.scaled(66,73,Qt.KeepAspectRatio)
+        self.setPixmap(pixmap_resized)
         self.setPos(120, 120)
         self.setTransformOriginPoint(33,51.5)#image is 66 by 103 pixel
         self.angle = 0
@@ -409,7 +404,7 @@ class Robot(QGraphicsPixmapItem):
         self.setRotation(self.angle)
 
     def keyPressEvent(self, event:QKeyEvent):
-        print('lol')
+        # print('lol')
 
         if event.key() == Qt.Key_Left:
             if self.pos().x()>0:
@@ -447,7 +442,7 @@ class Map(QGraphicsView):
             self.hexapod.move(jsondata["cur_x"],jsondata["cur_y"])
             self.hexapod.rotate(jsondata["cur_angle"])
 
-    def manual_map_movement(self,key):
+    def manual_map_movement(self,key,angle):
 
         if key == "RIGHT":
             self.hexapod.move(MANUAL_SIDE_MOVEMENT,0)
@@ -458,10 +453,10 @@ class Map(QGraphicsView):
         if key == "BACK":
             self.hexapod.move(0,MANUAL_VERTICAL_MOVEMENT)
         if key == "RLEFT":
-            self.hexapod.rotate(-MANUAL_ROTATION_ANGLE)
+            self.hexapod.rotate(-angle)
 
         if key == "RRIGHT":
-            self.hexapod.rotate(MANUAL_ROTATION_ANGLE)
+            self.hexapod.rotate(angle)
 
 class Target(QGraphicsPixmapItem):
     pass
