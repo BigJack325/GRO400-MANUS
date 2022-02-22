@@ -32,13 +32,13 @@
 
 - Clone or download the repository;
 - Connect the hexapod's microcontroller (Arduino) to your computer;
-- Open the file ```main.cpp``` in the *./Code/Hexapod-Master/Hexapod_Arduino/src/main* folder, and build the code into the microcontroller with your favorite IDE;
+- Open the file ```main.cpp``` in the *./Hexapod-Master/Hexapod_Arduino/src/main* folder, and build the code into the microcontroller with your favorite IDE;
 - Disconnect the microcontroller and connect the on-board computer (Raspberry Pi) instead (or connect remotely);
 - Verify your Python version (3.5 and above);
 - Run the file ```MANUS_QT``` in the *./Hexapod-Master/Hexapod_Qt/MANUS_QT* folder;
 - Initialize the serial communication.
 
-#### <a id="SetupContrib"></a>Setup for Users
+#### <a id="SetupContrib"></a>Setup for Contributors
 
 ## <a id="Documentation"></a>Documentation
 
