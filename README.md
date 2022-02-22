@@ -33,8 +33,8 @@
 - Clone or download the repository;
 - Connect the hexapod's microcontroller (Arduino) to your computer;
 - Open the file ```main.cpp``` in the *./Hexapod-Master/Hexapod_Arduino/src* folder, and build the code into the microcontroller with your favorite IDE;
-- Disconnect the microcontroller and connect the on-board computer (Raspberry Pi) instead (or connect remotely);
-- Verify your Python version (3.5 and above);
+- Disconnect the microcontroller from the computer and connect to the on-board computer (Raspberry Pi);
+- Verify your Python version (3.5 and above) and verify if the OpenCv and PyQt5 librairies are present in the Raspberry Pi with ``Import``` command ;
 - Run the file ```MANUS_QT``` in the *./Hexapod-Master/Hexapod_Qt* folder;
 - Initialize the serial communication.
 
