@@ -313,9 +313,9 @@ class Ui_MainWindow(QMainWindow):
         self.serialCom_.newMessage.connect(self.receiveFromSerial)
 
     def receiveFromSerial(self,msg):
-        if self.counter == 1:
-            self.msgBuffer_ += msg
-        # print(msg)
+        # if self.counter == 1:
+        self.msgBuffer_ += msg
+        print(msg)
 
         if self.msgBuffer_.endswith("\n") and self.msgBuffer_.startswith("{"):
             self.jsondata = json.loads(self.msgBuffer_)
@@ -336,7 +336,7 @@ class Ui_MainWindow(QMainWindow):
                 self.series_.clear()
             
             self.msgBuffer_ = ""
-        self.counter = 1
+        # self.counter = 1
 
     def cleanUp(self):
 
@@ -355,10 +355,12 @@ class SerialProtocol(QComboBox):
 
         if self.serial_.open(QIODevice.ReadWrite):
             self.serial_.setBaudRate(BAUD_RATE)
+            while self.serial_.waitForReadyRead(100):
+                self.serial_.clear()
             self.serial_.readyRead.connect(self.readReceivedMsg)
-            self.clear()
-
             print("Serial Ready")
+            self.serial_.clear()
+            
         else:
             raise IOError("Cannot connect to device on port {}".format(portName))
 
@@ -369,7 +371,9 @@ class SerialProtocol(QComboBox):
             # self.serial_.write(msg.decode('utf-8', 'ignore'))
 
     def readReceivedMsg(self):
+
         self.newMessage.emit(str(self.serial_.readAll(), encoding='utf-8', errors='ignore'))
+
     
     def serialQuit(self):
         if self.serial_ != None:

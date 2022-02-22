@@ -59,7 +59,7 @@ float Potentio_zero =                   0.0;      //permet de savoir la valeur i
 float angle_pendule =                   0.0;      //Permet de savoir l'agle actuelle du pendule
 float cur_pos =                         0.0;      //Permet de savoir la position en temps réelle du pendule
 float cur_vel =                         0.0;      //Permet de savoir la vitesse en temps réelle du pendule
-float cur_angle =                       0.0;      //Permet de savoir l'angle en temps réelle du pendule
+int cur_angle =                       0;      //Permet de savoir l'angle en temps réelle du pendule
 float pwm_correction  =                 0.0;
 int i =                                   0;   
 int cur_x = 0;   
@@ -103,6 +103,8 @@ void setup() {
 // Boucle principale (infinie) 
 void loop() {
 
+  Serial.flush();
+  
   if(shouldRead_){
     readMsg();
   }
@@ -182,39 +184,35 @@ void sendMsg(){
 }
 
 void readMsg(){
-  while (Serial.available()>0){
-    receivedMessage_ = Serial.readString();
-    Serial.println(receivedMessage_);
-  }
-  shouldRead_ = false;
+
   // Lecture du message Json
-  // StaticJsonDocument<500> doc;
-  // JsonVariant parse_msg;
+  StaticJsonDocument<500> doc;
+  JsonVariant parse_msg;
 
-  // // Lecture sur le port Seriel
-  // DeserializationError error = deserializeJson(doc, Serial);
-  // shouldRead_ = false;
+  // Lecture sur le port Seriel
+  DeserializationError error = deserializeJson(doc, Serial);
+  shouldRead_ = false;
 
-  // // Si erreur dans le message
-  // if (error) {
-  //   //Serial.print("deserialize() failed: ");
-  //   //Serial.println(error.c_str());
-  //   return;
-  // }
-  // Analyse des éléments du message message
-  // parse_msg = doc["pulsePWM"];
-  // if(!parse_msg.isNull()){
-  //    pulsePWM_ = doc["pulsePWM"].as<float>();
-  // }
+  // Si erreur dans le message
+  if (error) {
+    //Serial.print("deserialize() failed: ");
+    //Serial.println(error.c_str());
+    return;
+  }
+  // Analyse des éléments du message
+  parse_msg = doc["pulsePWM"];
+  if(!parse_msg.isNull()){
+     pulsePWM_ = doc["pulsePWM"].as<float>();
+  }
 
-  // parse_msg = doc["pulseTime"];
-  // if(!parse_msg.isNull()){
-  //    pulseTime_ = doc["pulseTime"].as<float>();
-  // }
+  parse_msg = doc["pulseTime"];
+  if(!parse_msg.isNull()){
+     pulseTime_ = doc["pulseTime"].as<float>();
+  }
 
-  // parse_msg = doc["pulse"];
-  // if(!parse_msg.isNull()){
-  //    shouldPulse_ = doc["pulse"];
-  // }
+  parse_msg = doc["pulse"];
+  if(!parse_msg.isNull()){
+     shouldPulse_ = doc["pulse"];
+  }
 }
   //-----------------------AJOUTER FONCTIONS DE MOUVEMENT ICI-----------------------------------------------------
