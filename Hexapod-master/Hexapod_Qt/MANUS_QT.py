@@ -1,16 +1,18 @@
 
 from cmath import cos, pi, sin
+import encodings
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
                              QLineEdit, QPushButton, QSpinBox, QWidget,
                               QFrame, QComboBox, QGraphicsView, QGraphicsItem, QGraphicsScene,
-                               QGraphicsPixmapItem, QPlainTextEdit, QDoubleSpinBox, QTextBrowser, QCheckBox)
+                               QGraphicsPixmapItem, QPlainTextEdit, QDoubleSpinBox, QTextBrowser, QCheckBox, QAbstractButton)
 from PyQt5.QtCore import QRect,QIODevice, QCoreApplication, pyqtSignal, Qt, QTimer, QSize
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtGui import QPixmap, QFont, QBrush, QImage, QKeyEvent, QIcon
 from PyQt5.QtChart import QChart,QChartView,QLineSeries
 import sys, os, json, math
 # import cv2
+
 
 SCRIPT_DIR = os.path.dirname(__file__)+os.path.sep
 SCRIPT_IMAGES = SCRIPT_DIR + "Images"+os.path.sep
@@ -47,21 +49,39 @@ class Ui_MainWindow(QMainWindow):
         self.RightButton = QPushButton(self.widget)
         self.RightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Right.png"))
         self.RightButton.setIconSize(QSize(61,61))
+        self.RightButton.setAutoRepeat(True)
+        self.RightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
+        self.RightButton.setAutoRepeatInterval(1000)#mseconds
         self.RotateRightButton = QPushButton(self.widget)
-        self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Rotate_Right.png"))
+        self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateR.png"))
         self.RotateRightButton.setIconSize(QSize(61,61))
+        self.RotateRightButton.setAutoRepeat(True)
+        self.RotateRightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
+        self.RotateRightButton.setAutoRepeatInterval(1000)#mseconds
         self.LeftButton = QPushButton(self.widget)
         self.LeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Left.png"))
         self.LeftButton.setIconSize(QSize(61,61))
+        self.LeftButton.setAutoRepeat(True)
+        self.LeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds        
+        self.LeftButton.setAutoRepeatInterval(1000)#mseconds
         self.RotateLeftButton = QPushButton(self.widget)
-        self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Rotate_Left.png"))
+        self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateL.png"))
         self.RotateLeftButton.setIconSize(QSize(61,61))
+        self.RotateLeftButton.setAutoRepeat(True)
+        self.RotateLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
+        self.RotateLeftButton.setAutoRepeatInterval(1000)#mseconds
         self.FrontButton = QPushButton(self.widget)
         self.FrontButton.setIcon(QIcon(SCRIPT_BUTTONS+"Front.png"))
         self.FrontButton.setIconSize(QSize(61,61))
+        self.FrontButton.setAutoRepeat(True)
+        self.FrontButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
+        self.FrontButton.setAutoRepeatInterval(1000)#mseconds
         self.BackButton = QPushButton(self.widget)
         self.BackButton.setIcon(QIcon(SCRIPT_BUTTONS+"Back.png"))
         self.BackButton.setIconSize(QSize(61,61))
+        self.BackButton.setAutoRepeat(True)
+        self.BackButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
+        self.BackButton.setAutoRepeatInterval(1000)#mseconds
         self.ProneButton = QPushButton(self.widget)
 
         self.Port_label = QLabel(self.widget)
@@ -170,6 +190,7 @@ class Ui_MainWindow(QMainWindow):
         self.AngleBox.setMinimum(0)
         self.AngleBox.setMaximum(180)
         self.AngleBox.setDecimals(0)
+        self.AngleBox.setValue(10)
         self.AngleBox.setSingleStep(1)
 
         self.Json_label.setGeometry(QRect(270, 10, 218, 22))
@@ -201,7 +222,7 @@ class Ui_MainWindow(QMainWindow):
         self.Port_label.setText(_translate("MainWindow", "Port:"))
         self.Donnees_label.setText(_translate("MainWindow", "Donnees brutes:"))
         self.StopButton.setText(_translate("MainWindow", "Stop"))
-        self.Angle_label.setText(_translate("MainWindow", "Angle[0,180]"))
+        self.Angle_label.setText(_translate("MainWindow", "Angle[0,360]"))
         self.Json_label.setText(_translate("MainWindow", "Messages Json de l\'Arduino:"))
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
@@ -233,26 +254,98 @@ class Ui_MainWindow(QMainWindow):
 
     def connectButtons(self):
 
-        self.StartButton.clicked.connect(lambda: self.serialCom_.sendMessage("START"))
-        self.StopButton.clicked.connect(lambda: self.serialCom_.sendMessage("STOP"))
+        self.StartButton.pressed.connect(lambda: self.ManualMessage("START"))
+        self.StopButton.pressed.connect(lambda: self.ManualMessage("STOP"))
+        self.RightButton.pressed.connect(lambda: self.ManualMessage("RIGHT"))
+        self.LeftButton.pressed.connect(lambda: self.ManualMessage("LEFT"))
+        self.FrontButton.pressed.connect(lambda: self.ManualMessage("FRONT"))
+        self.BackButton.pressed.connect(lambda: self.ManualMessage("BACK"))
+        self.RotateLeftButton.pressed.connect(lambda: self.ManualMessage("RLEFT"))
+        self.RotateRightButton.pressed.connect(lambda: self.ManualMessage("RRIGHT"))
 
-        # self.RightButton.clicked.connect(lambda: self.serialCom_.sendMessage("RIGHT"))
-        self.RightButton.clicked.connect(lambda: self.MapView.manual_map_movement("RIGHT",0))
+        self.RightButton.pressed.connect(lambda: self.changeButtonIcon("RIGHT",1))
+        self.LeftButton.pressed.connect(lambda: self.changeButtonIcon("LEFT",1))
+        self.FrontButton.pressed.connect(lambda: self.changeButtonIcon("FRONT",1))
+        self.BackButton.pressed.connect(lambda: self.changeButtonIcon("BACK",1))
+        self.RotateLeftButton.pressed.connect(lambda: self.changeButtonIcon("RLEFT",1))
+        self.RotateRightButton.pressed.connect(lambda: self.changeButtonIcon("RRIGHT",1))
 
-        # self.LeftButton.clicked.connect(lambda: self.serialCom_.sendMessage("LEFT"))
-        self.LeftButton.clicked.connect(lambda: self.MapView.manual_map_movement("LEFT",0))
+        self.RightButton.released.connect(lambda: self.changeButtonIcon("RIGHT",0))
+        self.LeftButton.released.connect(lambda: self.changeButtonIcon("LEFT",0))
+        self.FrontButton.released.connect(lambda: self.changeButtonIcon("FRONT",0))
+        self.BackButton.released.connect(lambda: self.changeButtonIcon("BACK",0))
+        self.RotateLeftButton.released.connect(lambda: self.changeButtonIcon("RLEFT",0))
+        self.RotateRightButton.released.connect(lambda: self.changeButtonIcon("RRIGHT",0))
 
-        # self.FrontButton.clicked.connect(lambda: self.serialCom_.sendMessage("FRONT"))
-        self.FrontButton.clicked.connect(lambda: self.MapView.manual_map_movement("FRONT",0))
+        self.RightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RIGHT",0))
+        self.LeftButton.pressed.connect(lambda: self.MapView.manual_map_movement("LEFT",0))
+        self.FrontButton.pressed.connect(lambda: self.MapView.manual_map_movement("FRONT",0))
+        self.BackButton.pressed.connect(lambda: self.MapView.manual_map_movement("BACK",0))
+        self.RotateLeftButton.pressed.connect(lambda: self.MapView.manual_map_movement("RLEFT",int(self.AngleBox.text())))
+        self.RotateRightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RRIGHT",int(self.AngleBox.text())))
 
-        # self.BackButton.clicked.connect(lambda: self.serialCom_.sendMessage("BACK"))
-        self.BackButton.clicked.connect(lambda: self.MapView.manual_map_movement("BACK",0))
+    def changeButtonIcon(self,button,state):
+        if button == "RIGHT" and state == 1:
+            self.RightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Right_pressed.png"))
+            self.RightButton.setIconSize(QSize(61,61))
+        elif button == "RIGHT" and state == 0:
+            self.RightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Right.png"))
+            self.RightButton.setIconSize(QSize(61,61))
+        elif button == "LEFT" and state == 1:
+            self.LeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Left_pressed.png"))
+            self.LeftButton.setIconSize(QSize(61,61))
+        elif button == "LEFT" and state == 0:
+            self.LeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Left.png"))
+            self.LeftButton.setIconSize(QSize(61,61))
+        elif button == "FRONT" and state == 1:
+            self.FrontButton.setIcon(QIcon(SCRIPT_BUTTONS+"Front_pressed.png"))
+            self.FrontButton.setIconSize(QSize(61,61))
+        elif button == "FRONT" and state == 0:
+            self.FrontButton.setIcon(QIcon(SCRIPT_BUTTONS+"Front.png"))
+            self.FrontButton.setIconSize(QSize(61,61))
+        elif button == "BACK" and state == 1:
+            self.BackButton.setIcon(QIcon(SCRIPT_BUTTONS+"Back_pressed.png"))
+            self.BackButton.setIconSize(QSize(61,61))
+        elif button == "BACK" and state == 0:
+            self.BackButton.setIcon(QIcon(SCRIPT_BUTTONS+"Back.png"))
+            self.BackButton.setIconSize(QSize(61,61))
+        elif button == "RLEFT" and state == 1:
+            self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateL_pressed.png"))
+            self.RotateLeftButton.setIconSize(QSize(61,61))
+        elif button == "RLEFT" and state == 0:
+            self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateL.png"))
+            self.RotateLeftButton.setIconSize(QSize(61,61))
+        elif button == "RRIGHT" and state == 1:
+            self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateR_pressed.png"))
+            self.RotateRightButton.setIconSize(QSize(61,61))
+        elif button == "RRIGHT" and state == 0:
+            self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateR.png"))
+            self.RotateRightButton.setIconSize(QSize(61,61))
+        
 
-        # self.RotateLeftButton.clicked.connect(lambda: self.serialCom_.sendMessage("RLEFT"))
-        self.RotateLeftButton.clicked.connect(lambda: self.MapView.manual_map_movement("RLEFT",int(self.AngleBox.text())))
 
-        # self.RotateRightButton.clicked.connect(lambda: self.serialCom_.sendMessage("RRIGHT"))
-        self.RotateRightButton.clicked.connect(lambda: self.MapView.manual_map_movement("RRIGHT",int(self.AngleBox.text())))
+    def ManualMessage(self,msg):
+        if msg == "START":
+            msg_array = {"START":1,"STOP":0}
+        elif msg == "STOP":
+            msg_array = {"START":0,"STOP":1}
+        elif msg == "RIGHT":
+            msg_array = {"RIGHT":1}
+        elif msg == "LEFT":
+            msg_array = {"LEFT":1}
+        elif msg == "FRONT":
+            msg_array = {"FRONT":1}
+        elif msg == "BACK":
+            msg_array = {"BACK":1}
+        elif msg == "RLEFT":
+            msg_array = {"RLEFT":1}
+        elif msg == "RRIGHT":
+            msg_array = {"RRIGHT":1}
+        
+        
+        data_out = json.dumps(msg_array)
+        self.serialCom_.sendMessage(data_out)
+
 
     def connectMotorLabels(self):
         if self.jsondata is not None:
@@ -313,9 +406,8 @@ class Ui_MainWindow(QMainWindow):
         self.serialCom_.newMessage.connect(self.receiveFromSerial)
 
     def receiveFromSerial(self,msg):
-        # if self.counter == 1:
         self.msgBuffer_ += msg
-        print(msg)
+        # print(msg)
 
         if self.msgBuffer_.endswith("\n") and self.msgBuffer_.startswith("{"):
             self.jsondata = json.loads(self.msgBuffer_)
@@ -336,7 +428,6 @@ class Ui_MainWindow(QMainWindow):
                 self.series_.clear()
             
             self.msgBuffer_ = ""
-        # self.counter = 1
 
     def cleanUp(self):
 
@@ -367,8 +458,7 @@ class SerialProtocol(QComboBox):
 
     def sendMessage(self,msg):
         if self.serial_.isOpen:
-            pass
-            # self.serial_.write(msg.decode('utf-8', 'ignore'))
+            self.serial_.write(msg.encode())
 
     def readReceivedMsg(self):
 

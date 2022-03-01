@@ -62,14 +62,11 @@ float cur_vel =                         0.0;      //Permet de savoir la vitesse 
 int cur_angle =                       0;      //Permet de savoir l'angle en temps réelle du pendule
 float pwm_correction  =                 0.0;
 int i =                                   0;   
-int cur_x = 0;   
+int cur_x = 0;
 int cur_y = 0;
-String receivedMessage_;
 
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
-void startPulse();
-void endPulse();
 void sendMsg(); 
 void readMsg();
 void serialEvent();
@@ -88,22 +85,17 @@ void digitalWrite(uint8_t pin, uint8_t val);
 
 void setup() {
   Serial.begin(BAUD);              // initialisation de la communication serielle
-  //imu_.init();                      // initialisation de la centrale inertielle
+
   // Chronometre envoie message
   timerSendMsg_.setDelay(UPDATE_PERIODE);
   timerSendMsg_.setCallback(timerCallback);
   timerSendMsg_.enable();
-
-  // Chronometre duration pulse
-  timerPulse_.setCallback(endPulse);
 
 }
 
 
 // Boucle principale (infinie) 
 void loop() {
-
-  Serial.flush();
   
   if(shouldRead_){
     readMsg();
@@ -111,16 +103,12 @@ void loop() {
   if(shouldSend_){
     sendMsg();
   }
-  if(shouldPulse_){
-    startPulse();
-  }
 
 //----------------------FAIRE SWITCH CASE ICI-------------------------------
 
 
-  // Mise à jour des chronometres
+  // Mise à jour du chronomètre
   timerSendMsg_.update();
-  timerPulse_.update();
 
 }
 
@@ -129,21 +117,6 @@ void loop() {
 void serialEvent(){shouldRead_ = true;}
 
 void timerCallback(){shouldSend_ = true;}
-
-void startPulse(){
-  /* Demarrage d'un pulse */
-  timerPulse_.setDelay(pulseTime_);
-  timerPulse_.enable();
-  timerPulse_.setRepetition(1);
-  shouldPulse_ = false;
-  isInPulse_ = true;
-}
-
-void endPulse(){
-  /* Rappel du chronometre */
-  timerPulse_.disable();
-  isInPulse_ = false;
-}
 
 void sendMsg(){
   /* Envoit du message Json sur le port seriel */
@@ -193,10 +166,11 @@ void readMsg(){
   DeserializationError error = deserializeJson(doc, Serial);
   shouldRead_ = false;
 
+
   // Si erreur dans le message
   if (error) {
-    //Serial.print("deserialize() failed: ");
-    //Serial.println(error.c_str());
+    Serial.print("deserialize() failed: ");
+    Serial.println(error.c_str());
     return;
   }
   // Analyse des éléments du message
@@ -205,14 +179,6 @@ void readMsg(){
      pulsePWM_ = doc["pulsePWM"].as<float>();
   }
 
-  parse_msg = doc["pulseTime"];
-  if(!parse_msg.isNull()){
-     pulseTime_ = doc["pulseTime"].as<float>();
-  }
-
-  parse_msg = doc["pulse"];
-  if(!parse_msg.isNull()){
-     shouldPulse_ = doc["pulse"];
-  }
+  Serial.println("FUCK");
 }
   //-----------------------AJOUTER FONCTIONS DE MOUVEMENT ICI-----------------------------------------------------
