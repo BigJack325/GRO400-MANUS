@@ -97,6 +97,11 @@ Under this section, you will find external links and descriptions of the project
 
 #### <a id="Current"></a>Current sensor
 
+- Brand Name : ROBOJAX
+- Model : ACS712
+- ASIN :B07YP4693C
+- Information / Resources : [Amazon Webpage](https://www.amazon.ca/gp/product/B07YP4693C/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&psc=1)
+
 #### <a id="DCDC"></a>DC/DC Converter
 
 - Brand Name : Tyenaza
