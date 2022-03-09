@@ -19,7 +19,8 @@ using namespace std;
 
 /*---------------------------- variables globales ---------------------------*/
 
-//MegaServo servo_;                                 // objet servomoteur
+//MegaServo servo_;
+MegaServo servo_z;                                // objet servomoteur
 //IMU9DOF imu_;                                     // objet imu central inertielle
 
 volatile bool shouldSend_ =             false;    // drapeau prêt à envoyer un message
@@ -65,6 +66,13 @@ int i =                                   0;
 int cur_x = 0;
 int cur_y = 0;
 
+
+/*-------------------------Code Maxence Test--------------------------------*/
+
+int AngleIncrement = 0;
+int InitialAngle = 90;
+int ActualAngle;
+
 /*------------------------- Prototypes de fonctions -------------------------*/
 void timerCallback();
 void sendMsg(); 
@@ -72,14 +80,12 @@ void readMsg();
 void serialEvent();
 void digitalWrite(uint8_t pin, uint8_t val);
 
-
+int SmoothMovement(MegaServo servo, int Speed, int Angle);
 // Caller les fonctions ICI 
 //ex:
 // double Calculangle();
 // float reduce_angle();
 // double vitesse();
-
-
 
 /*---------------------------- fonctions "Main" -----------------------------*/
 
@@ -91,24 +97,36 @@ void setup() {
   timerSendMsg_.setCallback(timerCallback);
   timerSendMsg_.enable();
 
+
+
+servo_z.attach(22);
+
+servo_z.write(InitialAngle);// met la position du moteur à 90 deg
+ActualAngle = servo_z.read();
+
 }
 
 
 // Boucle principale (infinie) 
 void loop() {
   
-  if(shouldRead_){
-    readMsg();
-  }
-  if(shouldSend_){
-    sendMsg();
-  }
-
+  
+  // if(shouldRead_){
+  //   readMsg();
+  // }
+  // if(shouldSend_){
+  //   sendMsg();
+  // }
+  
 //----------------------FAIRE SWITCH CASE ICI-------------------------------
+  SmoothMovement(servo_z, 5, 135);
 
+  SmoothMovement(servo_z, 5, 90);
 
   // Mise à jour du chronomètre
   timerSendMsg_.update();
+
+  
 
 }
 
@@ -179,5 +197,65 @@ void readMsg(){
      pulsePWM_ = doc["pulsePWM"].as<float>();
   }
 
+}
+
+int SmoothMovement(MegaServo servo, int Speed, int Angle) //Speed : incrmeent de l'angle 
+{
+  int Time = millis();
+  bool FirstLoop = false;
+  int GapToAngle = Angle;
+  int PreviousTime = 0;
+  int Direction = Angle - servo.read();
+  Serial.println("Yoooo0");
+  for (AngleIncrement = 1; GapToAngle >= 0; AngleIncrement++)
+  {
+    ActualAngle = servo.read();
+    if((Time-PreviousTime <= 30 || FirstLoop == false) && GapToAngle != 0)
+    {
+      FirstLoop = true;
+      if(GapToAngle < Speed)
+      {
+        ActualAngle = Angle;
+        servo.write(ActualAngle);
+        GapToAngle = abs(ActualAngle-Angle);
+        PreviousTime = Time;
+        break;
+      }
+      else if(AngleIncrement<Speed && Direction > 0) //A garder si ca ne marche pas
+      {
+        ActualAngle += AngleIncrement;
+        servo.write(ActualAngle);
+        GapToAngle = abs(ActualAngle-Angle);
+        PreviousTime = Time;
+      }
+      else if(AngleIncrement<Speed && Direction < 0)
+      {
+        ActualAngle -= AngleIncrement;
+        servo.write(ActualAngle);
+        GapToAngle = abs(ActualAngle-Angle);
+        PreviousTime = Time;
+      }
+      else if(servo.read() < Angle && Direction > 0)
+      {
+        ActualAngle += Speed;
+        servo.write(ActualAngle);
+        GapToAngle = abs(ActualAngle-Angle);
+        PreviousTime = Time;
+      }
+      else if(servo.read() > Angle && Direction < 0)
+      {
+        ActualAngle -= Speed;
+        servo.write(ActualAngle);
+        GapToAngle = abs(ActualAngle-Angle);
+        PreviousTime = Time;
+      }
+      else{}
+    }
+    else
+    {
+      break;
+    }
+  }
+  return 1;
 }
   //-----------------------AJOUTER FONCTIONS DE MOUVEMENT ICI-----------------------------------------------------
