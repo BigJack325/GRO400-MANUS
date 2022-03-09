@@ -179,6 +179,5 @@ void readMsg(){
      pulsePWM_ = doc["pulsePWM"].as<float>();
   }
 
-  Serial.println("FUCK");
 }
   //-----------------------AJOUTER FONCTIONS DE MOUVEMENT ICI-----------------------------------------------------
