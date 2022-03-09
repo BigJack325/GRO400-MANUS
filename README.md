@@ -41,6 +41,9 @@
 #### <a id="SetupContrib"></a>Setup for Contributors
 
 ## <a id="Documentation"></a>Documentation
+Numéro des pattes du robot:
+
+![image](https://user-images.githubusercontent.com/48064854/157461089-29b9c986-7b21-4e5e-ab9f-475070c11a30.png)
 
 ## <a id="Operation"></a>Robot Operation
 
@@ -100,5 +103,4 @@ Under this section, you will find external links and descriptions of the project
 - Model : Tyenazad03xwg94zo
 - ASIN :
 - Information / Resources : [Amazon Webpage](https://www.amazon.ca/gp/product/B097QT54C7/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&amp&psc=1)
-#### <h2>Info complémentaire</h2>
--![image](https://user-images.githubusercontent.com/48064854/157461089-29b9c986-7b21-4e5e-ab9f-475070c11a30.png)
+
