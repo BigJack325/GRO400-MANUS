@@ -43,7 +43,7 @@
 ## <a id="Documentation"></a>Documentation
 Numéro des pattes du robot:
 
-![image](https://user-images.githubusercontent.com/48064854/157461089-29b9c986-7b21-4e5e-ab9f-475070c11a30.png)
+![image](https://user-images.githubusercontent.com/48064854/157464345-55dbc51c-fd1a-4533-8910-a199ca5e8740.png)
 
 ## <a id="Operation"></a>Robot Operation
 
@@ -104,3 +104,9 @@ Under this section, you will find external links and descriptions of the project
 - ASIN :
 - Information / Resources : [Amazon Webpage](https://www.amazon.ca/gp/product/B097QT54C7/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&amp&psc=1)
 
+#### <a id="Camera"></a>Pi Camera
+
+- Brand Name : Keyestudio
+- Model : 8541582798
+- ASIN :
+- Information / Resources : [Amazon Webpage](https://www.amazon.ca/gp/product/B073RCXGQS/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
