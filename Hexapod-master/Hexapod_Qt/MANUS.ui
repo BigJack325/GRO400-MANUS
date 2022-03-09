@@ -27,7 +27,7 @@
     <property name="bottomMargin">
      <number>9</number>
     </property>
-    <item row="0" column="0">
+    <item row="0" column="1">
      <widget class="QWidget" name="widget" native="true">
       <property name="font">
        <font>
@@ -145,8 +145,8 @@
       <widget class="QComboBox" name="comboBoxPort">
        <property name="geometry">
         <rect>
-         <x>121</x>
-         <y>17</y>
+         <x>800</x>
+         <y>300</y>
          <width>124</width>
          <height>22</height>
         </rect>
@@ -260,8 +260,8 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>150</y>
-         <width>218</width>
+         <y>170</y>
+         <width>31</width>
          <height>22</height>
         </rect>
        </property>
@@ -276,7 +276,7 @@
        <property name="geometry">
         <rect>
          <x>820</x>
-         <y>330</y>
+         <y>360</y>
          <width>131</width>
          <height>31</height>
         </rect>
@@ -329,8 +329,8 @@
       <widget class="QLabel" name="Port_label">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>17</y>
+         <x>660</x>
+         <y>300</y>
          <width>94</width>
          <height>22</height>
         </rect>
@@ -399,7 +399,7 @@
        <property name="geometry">
         <rect>
          <x>640</x>
-         <y>330</y>
+         <y>360</y>
          <width>131</width>
          <height>31</height>
         </rect>
@@ -477,9 +477,9 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>170</y>
+         <y>190</y>
          <width>261</width>
-         <height>261</height>
+         <height>251</height>
         </rect>
        </property>
        <property name="autoFillBackground">
@@ -495,7 +495,7 @@
       <widget class="QLabel" name="Json_label">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>310</x>
          <y>10</y>
          <width>218</width>
          <height>22</height>
@@ -582,9 +582,9 @@
       <widget class="QPlainTextEdit" name="DistanceTextEdit">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>310</x>
          <y>250</y>
-         <width>311</width>
+         <width>281</width>
          <height>151</height>
         </rect>
        </property>
@@ -592,9 +592,9 @@
       <widget class="QTextBrowser" name="Json_Browser">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>310</x>
          <y>30</y>
-         <width>311</width>
+         <width>281</width>
          <height>201</height>
         </rect>
        </property>
@@ -622,7 +622,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>GRO400-MANUS/Hexapod-master/Hexapod_Qt/Images/hexapod.png</pixmap>
+        <pixmap>../../../../.designer/backup/GRO400-MANUS/Hexapod-master/Hexapod_Qt/Images/hexapod.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -631,7 +631,7 @@
       <widget class="QLabel" name="Distances_label">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>310</x>
          <y>230</y>
          <width>218</width>
          <height>22</height>
@@ -683,6 +683,256 @@
         <string>Manual Mode</string>
        </property>
       </widget>
+      <widget class="QSlider" name="Lower_H_Slider">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>50</y>
+         <width>160</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="Lower_S_Slider">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>70</y>
+         <width>160</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="Lower_V_Slider">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>90</y>
+         <width>160</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="Upper_H_Slider">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>110</y>
+         <width>160</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="Upper_S_Slider">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>130</y>
+         <width>160</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="Upper_V_Slider">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>150</y>
+         <width>160</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="HSVMask_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>10</y>
+         <width>71</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>HSV Mask:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Lower_H_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>50</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>L-H:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Lower_S_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>70</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>L-S:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Lower_V_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>90</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>L-V:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Upper_H_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>110</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>U-H:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Upper_S_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>130</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>U-S:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="Upper_V_label">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>150</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>U-V:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Lower_H_Value">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>50</y>
+         <width>41</width>
+         <height>16</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Lower_S_Value">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>70</y>
+         <width>41</width>
+         <height>16</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Lower_V_Value">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>90</y>
+         <width>41</width>
+         <height>16</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Upper_H_Value">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>110</y>
+         <width>41</width>
+         <height>16</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Upper_S_Value">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>130</y>
+         <width>41</width>
+         <height>16</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="Upper_V_Value">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>150</y>
+         <width>41</width>
+         <height>16</height>
+        </rect>
+       </property>
+      </widget>
       <zorder>Hexapod_Pic</zorder>
       <zorder>JsonKey</zorder>
       <zorder>Servo_4</zorder>
@@ -730,6 +980,25 @@
       <zorder>RotateLeftButton</zorder>
       <zorder>RotateRightButton</zorder>
       <zorder>Manual_mode</zorder>
+      <zorder>Lower_H_Slider</zorder>
+      <zorder>Lower_S_Slider</zorder>
+      <zorder>Lower_V_Slider</zorder>
+      <zorder>Upper_H_Slider</zorder>
+      <zorder>Upper_S_Slider</zorder>
+      <zorder>Upper_V_Slider</zorder>
+      <zorder>HSVMask_label</zorder>
+      <zorder>Lower_H_label</zorder>
+      <zorder>Lower_S_label</zorder>
+      <zorder>Lower_V_label</zorder>
+      <zorder>Upper_H_label</zorder>
+      <zorder>Upper_S_label</zorder>
+      <zorder>Upper_V_label</zorder>
+      <zorder>Lower_H_Value</zorder>
+      <zorder>Lower_S_Value</zorder>
+      <zorder>Lower_V_Value</zorder>
+      <zorder>Upper_H_Value</zorder>
+      <zorder>Upper_S_Value</zorder>
+      <zorder>Upper_V_Value</zorder>
      </widget>
     </item>
    </layout>

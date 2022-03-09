@@ -1,27 +1,36 @@
-
 from cmath import cos, pi, sin
 import encodings
+import cv2
+import numpy as np
+import imutils
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
-                             QLineEdit, QPushButton, QSpinBox, QWidget,
+                             QLineEdit, QPushButton, QWidget,
                               QFrame, QComboBox, QGraphicsView, QGraphicsItem, QGraphicsScene,
-                               QGraphicsPixmapItem, QPlainTextEdit, QDoubleSpinBox, QTextBrowser, QCheckBox, QAbstractButton)
+                               QGraphicsPixmapItem, QPlainTextEdit, QDoubleSpinBox, QTextBrowser, QCheckBox, QSlider)
 from PyQt5.QtCore import QRect,QIODevice, QCoreApplication, pyqtSignal, Qt, QTimer, QSize
-from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtGui import QPixmap, QFont, QBrush, QImage, QKeyEvent, QIcon
 from PyQt5.QtChart import QChart,QChartView,QLineSeries
 import sys, os, json, math
-# import cv2
 
 
 SCRIPT_DIR = os.path.dirname(__file__)+os.path.sep
-SCRIPT_IMAGES = SCRIPT_DIR + "Images"+os.path.sep
+SCRIPT_IMAGES = SCRIPT_DIR + "Qt_Images"+os.path.sep
 SCRIPT_BUTTONS = SCRIPT_IMAGES+ "Buttons"+os.path.sep
 BAUD_RATE = 115200
 UI_UPDATE_RATE = 1000# Ms
+CAM_UPDATE_RATE = 20
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
+
+print(SCRIPT_IMAGES)
+
+GREEN = (0, 255, 0)
+RED = (0, 0, 255)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+YELLOW = (0, 255, 255)
 
 
 class Ui_MainWindow(QMainWindow):
@@ -102,9 +111,17 @@ class Ui_MainWindow(QMainWindow):
         self.StopButton = QPushButton(self.widget)
 
         self.Cam_label = QLabel(self.widget)
-        self.Cam = QLabel(self.widget)
+        self.Cam = VideoTracking(self.widget)
         self.CamDistance_label = QLabel(self.widget)
         self.CamDistanceText = QPlainTextEdit(self.widget)
+
+        self.HSVMask_label = QLabel(self.widget)
+        self.Lower_H_label = QLabel(self.widget)
+        self.Lower_S_label = QLabel(self.widget)
+        self.Lower_V_label = QLabel(self.widget)
+        self.Upper_H_label = QLabel(self.widget)
+        self.Upper_S_label = QLabel(self.widget)
+        self.Upper_V_label = QLabel(self.widget)
 
         self.Angle_label = QLabel(self.widget)
         self.AngleBox = QDoubleSpinBox(self.widget)
@@ -161,8 +178,8 @@ class Ui_MainWindow(QMainWindow):
         self.BackButton.setGeometry(QRect(760, 590, 61, 61))
         self.ProneButton.setGeometry(QRect(760, 510, 61, 61))
         
-        self.Port_label.setGeometry(QRect(20, 17, 94, 22))
-        self.comboBoxPort.setGeometry(QRect(121, 17, 124, 22))
+        self.Port_label.setGeometry(QRect(660, 300, 94, 22))
+        self.comboBoxPort.setGeometry(QRect(800, 300, 124, 22))
 
         self.Map_label.setGeometry(QRect(0, 440, 218, 22))
         self.MapView.setEnabled(True)
@@ -174,16 +191,26 @@ class Ui_MainWindow(QMainWindow):
         self.Graph_label.setGeometry(QRect(620, 10, 218, 22))
         self.graphView.setGeometry(QRect(620, 30, 341, 211))
 
-        self.StartButton.setGeometry(QRect(820, 330, 131, 31))
-        self.StopButton.setGeometry(QRect(640, 330, 131, 31))
+        self.StartButton.setGeometry(QRect(820, 360, 131, 31))
+        self.StopButton.setGeometry(QRect(640, 360, 131, 31))
         font = QFont()
         font.setBold(True)
         self.StopButton.setFont(font)
 
-        self.Cam_label.setGeometry(QRect(0, 150, 218, 22))
-        self.Cam.setGeometry(QRect(10, 170, 261, 261))
-        self.CamDistance_label.setGeometry(QRect(280, 230, 218, 22))
-        self.CamDistanceText.setGeometry(QRect(280, 250, 311, 151))
+        self.Cam_label.setGeometry(QRect(0, 175, 50, 22))
+        self.Cam.setGeometry(QRect(0, 190, 261, 261))
+        self.CamDistance_label.setGeometry(QRect(310, 230, 218, 22))
+        self.CamDistanceText.setGeometry(QRect(310, 250, 281, 151))
+
+        self.HSVMask_label.setGeometry(QRect(0, 10, 71, 22))
+        self.Lower_H_label.setGeometry(QRect(0, 50, 71, 16))
+        self.Lower_S_label.setGeometry(QRect(0, 70, 71, 16))
+        self.Lower_V_label.setGeometry(QRect(0, 90, 71, 16))
+        self.Upper_H_label.setGeometry(QRect(0, 110, 71, 16))
+        self.Upper_S_label.setGeometry(QRect(0, 130, 71, 16))
+        self.Upper_V_label.setGeometry(QRect(0, 150, 71, 16))
+
+
 
         self.Angle_label.setGeometry(QRect(615, 680, 94, 22))
         self.AngleBox.setGeometry(QRect(710, 680, 124, 22))
@@ -193,8 +220,8 @@ class Ui_MainWindow(QMainWindow):
         self.AngleBox.setValue(10)
         self.AngleBox.setSingleStep(1)
 
-        self.Json_label.setGeometry(QRect(270, 10, 218, 22))
-        self.Json_Browser.setGeometry(QRect(280, 30, 311, 201))
+        self.Json_label.setGeometry(QRect(310, 10, 218, 22))
+        self.Json_Browser.setGeometry(QRect(310, 30, 281, 201))
         font = QFont()
         font.setPointSize(9)
         self.Json_Browser.setFont(font)
@@ -227,6 +254,13 @@ class Ui_MainWindow(QMainWindow):
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
         self.Manual_mode.setText(_translate("MainWindow", "Manual Mode"))
+        self.HSVMask_label.setText(_translate("MainWindow", "HSV Mask:"))
+        self.Lower_H_label.setText(_translate("MainWindow", "L-H:"))
+        self.Lower_S_label.setText(_translate("MainWindow", "L-S:"))
+        self.Lower_V_label.setText(_translate("MainWindow", "L-V:"))
+        self.Upper_H_label.setText(_translate("MainWindow", "U-H:"))
+        self.Upper_S_label.setText(_translate("MainWindow", "U-S:"))
+        self.Upper_V_label.setText(_translate("MainWindow", "U-V:"))
 
     def portCensus(self):
         self.comboBoxPort.clear()
@@ -254,6 +288,7 @@ class Ui_MainWindow(QMainWindow):
 
     def connectButtons(self):
 
+        #Send message to Arduino for manual movement
         self.StartButton.pressed.connect(lambda: self.ManualMessage("START"))
         self.StopButton.pressed.connect(lambda: self.ManualMessage("STOP"))
         self.RightButton.pressed.connect(lambda: self.ManualMessage("RIGHT"))
@@ -263,6 +298,7 @@ class Ui_MainWindow(QMainWindow):
         self.RotateLeftButton.pressed.connect(lambda: self.ManualMessage("RLEFT"))
         self.RotateRightButton.pressed.connect(lambda: self.ManualMessage("RRIGHT"))
 
+        # Change button image when pressed
         self.RightButton.pressed.connect(lambda: self.changeButtonIcon("RIGHT",1))
         self.LeftButton.pressed.connect(lambda: self.changeButtonIcon("LEFT",1))
         self.FrontButton.pressed.connect(lambda: self.changeButtonIcon("FRONT",1))
@@ -270,6 +306,7 @@ class Ui_MainWindow(QMainWindow):
         self.RotateLeftButton.pressed.connect(lambda: self.changeButtonIcon("RLEFT",1))
         self.RotateRightButton.pressed.connect(lambda: self.changeButtonIcon("RRIGHT",1))
 
+        # Change button image when released
         self.RightButton.released.connect(lambda: self.changeButtonIcon("RIGHT",0))
         self.LeftButton.released.connect(lambda: self.changeButtonIcon("LEFT",0))
         self.FrontButton.released.connect(lambda: self.changeButtonIcon("FRONT",0))
@@ -277,6 +314,7 @@ class Ui_MainWindow(QMainWindow):
         self.RotateLeftButton.released.connect(lambda: self.changeButtonIcon("RLEFT",0))
         self.RotateRightButton.released.connect(lambda: self.changeButtonIcon("RRIGHT",0))
 
+        
         self.RightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RIGHT",0))
         self.LeftButton.pressed.connect(lambda: self.MapView.manual_map_movement("LEFT",0))
         self.FrontButton.pressed.connect(lambda: self.MapView.manual_map_movement("FRONT",0))
@@ -497,17 +535,17 @@ class Robot(QGraphicsPixmapItem):
         self.angle += angle
         self.setRotation(self.angle)
 
-    def keyPressEvent(self, event:QKeyEvent):
-        # print('lol')
+    # def keyPressEvent(self, event:QKeyEvent):
+    #     # print('lol')
 
-        if event.key() == Qt.Key_Left:
-            if self.pos().x()>0:
-                self.setPos(self.x()-MANUAL_SIDE_MOVEMENT, self.y())
-        elif event.key() == Qt.Key_Right:
-            if self.pos().x() < 780:
-                self.setPos(self.x()+MANUAL_SIDE_MOVEMENT, self.y())
+    #     if event.key() == Qt.Key_Left:
+    #         if self.pos().x()>0:
+    #             self.setPos(self.x()-MANUAL_SIDE_MOVEMENT, self.y())
+    #     elif event.key() == Qt.Key_Right:
+    #         if self.pos().x() < 780:
+    #             self.setPos(self.x()+MANUAL_SIDE_MOVEMENT, self.y())
 
-        return super().keyPressEvent(event)
+    #     return super().keyPressEvent(event)
 
 class Map(QGraphicsView):
     def __init__(self,parent):
@@ -529,7 +567,7 @@ class Map(QGraphicsView):
 
         self.show
 
-        #CREATE OBJECT WHEN DETECTED
+        #CREATE TARGET OBJECT WHEN DETECTED
 
     def auto_map_movement(self,jsondata):
         if jsondata is not None:
@@ -554,6 +592,147 @@ class Map(QGraphicsView):
 
 class Target(QGraphicsPixmapItem):
     pass
+
+class VideoTracking(QLabel):
+    def __init__(self,parent):
+        super().__init__(parent)
+
+        self.capwebcam = cv2.VideoCapture(0)
+        self.camTimer = QTimer()
+        self.maskButton = QCheckBox(parent)
+        self.Lower_H_Slider = QSlider(parent)
+        self.Lower_H_Value = QLineEdit(parent)
+        self.Lower_S_Slider = QSlider(parent)
+        self.Lower_S_Value = QLineEdit(parent)
+        self.Lower_V_Slider = QSlider(parent)
+        self.Lower_V_Value = QLineEdit(parent)
+        self.Upper_H_Slider = QSlider(parent)
+        self.Upper_H_Value = QLineEdit(parent)
+        self.Upper_S_Slider = QSlider(parent)
+        self.Upper_S_Value = QLineEdit(parent)
+        self.Upper_V_Slider = QSlider(parent)
+        self.Upper_V_Value = QLineEdit(parent)
+
+        self.Lower_H_Slider.setGeometry(QRect(80, 50, 160, 16))
+        self.Lower_H_Slider.setOrientation(Qt.Horizontal)
+        self.Lower_H_Slider.setRange(0,180)
+        self.Lower_H_Slider.setValue(5)
+        self.Lower_H_Slider.hasTracking()
+        self.Lower_H_Value.setGeometry(QRect(250, 50, 41, 16))
+        self.Lower_H_Value.setReadOnly(True)
+
+        self.Lower_S_Slider.setGeometry(QRect(80, 70, 160, 16))
+        self.Lower_S_Slider.setOrientation(Qt.Horizontal)
+        self.Lower_S_Slider.setRange(0, 255)
+        self.Lower_S_Slider.setValue(102)
+        self.Lower_S_Slider.hasTracking()
+        self.Lower_S_Value.setGeometry(QRect(250, 70, 41, 16))
+        self.Lower_S_Value.setReadOnly(True)
+
+        self.Lower_V_Slider.setGeometry(QRect(80, 90, 160, 16))
+        self.Lower_V_Slider.setOrientation(Qt.Horizontal)
+        self.Lower_V_Slider.setRange(0, 255)
+        self.Lower_V_Slider.setValue(102)
+        self.Lower_V_Slider.hasTracking()
+        self.Lower_V_Value.setGeometry(QRect(250, 90, 41, 16))
+        self.Lower_V_Value.setReadOnly(True)
+
+        self.Upper_H_Slider.setGeometry(QRect(80, 110, 160, 16))
+        self.Upper_H_Slider.setOrientation(Qt.Horizontal)
+        self.Upper_H_Slider.setRange(0, 180)
+        self.Upper_H_Slider.hasTracking()
+        self.Upper_H_Slider.setValue(141)
+        self.Upper_H_Value.setGeometry(QRect(250, 110, 41, 16))
+        self.Upper_H_Value.setReadOnly(True)
+
+        self.Upper_S_Slider.setGeometry(QRect(80, 130, 160, 16))
+        self.Upper_S_Slider.setOrientation(Qt.Horizontal)
+        self.Upper_S_Slider.setRange(0, 255)
+        self.Upper_S_Slider.hasTracking()
+        self.Upper_S_Slider.setValue(255)
+        self.Upper_S_Value.setGeometry(QRect(250, 130, 41, 16))
+        self.Upper_S_Value.setReadOnly(True)
+
+        self.Upper_V_Slider.setGeometry(QRect(80, 150, 160, 16))
+        self.Upper_V_Slider.setOrientation(Qt.Horizontal)
+        self.Upper_V_Slider.setRange(0, 255)
+        self.Upper_V_Slider.hasTracking()
+        self.Upper_V_Slider.setValue(255)
+        self.Upper_V_Value.setGeometry(QRect(250, 150, 41, 16))
+        self.Upper_V_Value.setReadOnly(True)
+
+        self.maskButton.setGeometry(QRect(250, 170, 120, 41))
+        self.new_width = 261
+        self.font = cv2.FONT_HERSHEY_COMPLEX
+
+
+        if self.capwebcam.isOpened() == False:
+            print("error:camera not accessed successfully")
+
+        self.camTimer.timeout.connect(self.OnPeriodicEvent)
+        self.camTimer.start(CAM_UPDATE_RATE)
+
+    def OnPeriodicEvent(self):
+        success,frame = self.capwebcam.read()
+
+        if success: 
+            self.changeSliderValues()
+            self.detectColor(frame)
+
+    def changeSliderValues(self):
+        self.Lower_H_Value.setText(str(self.Lower_H_Slider.value()))
+        self.Lower_S_Value.setText(str(self.Lower_S_Slider.value()))
+        self.Lower_V_Value.setText(str(self.Lower_V_Slider.value()))
+        self.Upper_H_Value.setText(str(self.Upper_H_Slider.value()))
+        self.Upper_S_Value.setText(str(self.Upper_S_Slider.value()))
+        self.Upper_V_Value.setText(str(self.Upper_V_Slider.value()))
+        
+
+    def detectColor(self,frame):
+        self.Lower = (self.Lower_H_Slider.value(), self.Lower_S_Slider.value(), self.Lower_V_Slider.value())
+        self.Upper = (self.Upper_H_Slider.value(), self.Upper_S_Slider.value(), self.Upper_V_Slider.value())
+        
+        frame = imutils.resize(frame, width=self.new_width)
+        blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+        hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+
+        mask = cv2.inRange(hsv, self.Lower, self.Upper)
+        kernel = np.ones((5, 5), np.uint8)
+        mask = cv2.erode(mask, kernel, iterations=2)
+        # mask = cv2.dilate(mask, None, iterations=2)
+
+        contours,_ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
+            x = approx.ravel()[0]
+            y = approx.ravel()[1]
+
+            if area > 400:
+                cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
+
+                if len(approx) == 3:
+                    cv2.putText(frame, "Triangle", (x, y), self.font, 1, (0, 0, 0))
+                elif len(approx) == 4:
+                    cv2.putText(frame, "Rectangle", (x, y), self.font, 1, (0, 0, 0))
+                elif 10 < len(approx) < 20:
+                    cv2.putText(frame, "Circle", (x, y), self.font, 1, (0, 0, 0))
+
+
+
+            imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
+
+            imagemask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
+            imagemask = QImage(imagemask,imagemask.shape[1],imagemask.shape[0],imagemask.strides[0],QImage.Format_RGB888)
+
+            if self.maskButton.checkState() == 2:
+                self.setPixmap(QPixmap.fromImage(imagemask))
+            else:
+                self.setPixmap(QPixmap.fromImage(imageframe))
+
 
 
 if __name__ == "__main__":
