@@ -100,3 +100,5 @@ Under this section, you will find external links and descriptions of the project
 - Model : Tyenazad03xwg94zo
 - ASIN :
 - Information / Resources : [Amazon Webpage](https://www.amazon.ca/gp/product/B097QT54C7/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&amp&psc=1)
+#### <h2>Info complémentaire</h2>
+-![image](https://user-images.githubusercontent.com/48064854/157460746-2bec9fb2-8022-4ce6-bfc0-32e5ccd08d65.png)
