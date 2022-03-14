@@ -1,6 +1,7 @@
 from cmath import cos, pi, sin
 import encodings
 import cv2
+import re
 import numpy as np
 import imutils
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
@@ -13,10 +14,6 @@ from PyQt5.QtGui import QPixmap, QFont, QBrush, QImage, QKeyEvent, QIcon
 from PyQt5.QtChart import QChart,QChartView,QLineSeries
 import sys, os, json, math
 
-
-SCRIPT_DIR = os.path.dirname(__file__)+os.path.sep
-SCRIPT_IMAGES = SCRIPT_DIR + "Qt_Images"+os.path.sep
-SCRIPT_BUTTONS = SCRIPT_IMAGES+ "Buttons"+os.path.sep
 BAUD_RATE = 115200
 UI_UPDATE_RATE = 1000# Ms
 CAM_UPDATE_RATE = 20
@@ -24,14 +21,27 @@ NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
 
-print(SCRIPT_IMAGES)
+CUSTOM_MODEL_NAME = 'Ant' 
+PRETRAINED_MODEL_NAME = 'ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8'
+PRETRAINED_MODEL_URL = 'http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8.tar.gz'
+TF_RECORD_SCRIPT_NAME = 'generate_tfrecord.py'
+LABEL_MAP_NAME = 'label_map.pbtxt'
 
-GREEN = (0, 255, 0)
-RED = (0, 0, 255)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-YELLOW = (0, 255, 255)
-
+paths = {
+    'DISPLAY_IMAGE_PATH': os.path.join('Qt_Images','Display'),
+    'BUTTON_IMAGE_PATH': os.path.join('Qt_Images', 'Buttons'),
+    'WORKSPACE_PATH': os.path.join('Tensorflow', 'workspace'),
+    'SCRIPTS_PATH': os.path.join('Tensorflow','scripts'),
+    'APIMODEL_PATH': os.path.join('Tensorflow','models'),
+    'ANNOTATION_PATH': os.path.join('Tensorflow', 'workspace','annotations'),
+    'IMAGE_PATH': os.path.join('Tensorflow', 'workspace','images'),
+    'MODEL_PATH': os.path.join('Tensorflow', 'workspace','models'),
+    'PRETRAINED_MODEL_PATH': os.path.join('Tensorflow', 'workspace','pre-trained-models'),
+    'CHECKPOINT_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME), 
+    'OUTPUT_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME, 'export'), 
+    'TFLITE_PATH':os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME, 'tfliteexport'), 
+    'PROTOC_PATH':os.path.join('Tensorflow','protoc')
+ }
 
 class Ui_MainWindow(QMainWindow):
 
@@ -56,37 +66,37 @@ class Ui_MainWindow(QMainWindow):
             self.Servo[idx] = QLineEdit(self.widget)
 
         self.RightButton = QPushButton(self.widget)
-        self.RightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Right.png"))
+        self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right.png")))
         self.RightButton.setIconSize(QSize(61,61))
         self.RightButton.setAutoRepeat(True)
         self.RightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RightButton.setAutoRepeatInterval(1000)#mseconds
         self.RotateRightButton = QPushButton(self.widget)
-        self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateR.png"))
+        self.RotateRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
         self.RotateRightButton.setIconSize(QSize(61,61))
         self.RotateRightButton.setAutoRepeat(True)
         self.RotateRightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RotateRightButton.setAutoRepeatInterval(1000)#mseconds
         self.LeftButton = QPushButton(self.widget)
-        self.LeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Left.png"))
+        self.LeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Left.png")))
         self.LeftButton.setIconSize(QSize(61,61))
         self.LeftButton.setAutoRepeat(True)
         self.LeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds        
         self.LeftButton.setAutoRepeatInterval(1000)#mseconds
         self.RotateLeftButton = QPushButton(self.widget)
-        self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateL.png"))
+        self.RotateLeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateL.png")))
         self.RotateLeftButton.setIconSize(QSize(61,61))
         self.RotateLeftButton.setAutoRepeat(True)
         self.RotateLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RotateLeftButton.setAutoRepeatInterval(1000)#mseconds
         self.FrontButton = QPushButton(self.widget)
-        self.FrontButton.setIcon(QIcon(SCRIPT_BUTTONS+"Front.png"))
+        self.FrontButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Front.png")))
         self.FrontButton.setIconSize(QSize(61,61))
         self.FrontButton.setAutoRepeat(True)
         self.FrontButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
         self.FrontButton.setAutoRepeatInterval(1000)#mseconds
         self.BackButton = QPushButton(self.widget)
-        self.BackButton.setIcon(QIcon(SCRIPT_BUTTONS+"Back.png"))
+        self.BackButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Back.png")))
         self.BackButton.setIconSize(QSize(61,61))
         self.BackButton.setAutoRepeat(True)
         self.BackButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
@@ -144,7 +154,7 @@ class Ui_MainWindow(QMainWindow):
         self.line.setFrameShadow(QFrame.Sunken)
 
         self.Hexapod_Pic.setGeometry(QRect(285, 400, 321, 361))
-        self.Hexapod_Pic.setPixmap(QPixmap(SCRIPT_IMAGES+"hexapod.png"))
+        self.Hexapod_Pic.setPixmap(QPixmap(os.path.join(paths['DISPLAY_IMAGE_PATH'],"hexapod.png")))
         self.Hexapod_Pic.setScaledContents(True)
 
         self.Servo[1].setGeometry(QRect(400, 560, 41, 25))
@@ -324,40 +334,40 @@ class Ui_MainWindow(QMainWindow):
 
     def changeButtonIcon(self,button,state):
         if button == "RIGHT" and state == 1:
-            self.RightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Right_pressed.png"))
+            self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right_pressed.png")))
             self.RightButton.setIconSize(QSize(61,61))
         elif button == "RIGHT" and state == 0:
-            self.RightButton.setIcon(QIcon(SCRIPT_BUTTONS+"Right.png"))
+            self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right.png")))
             self.RightButton.setIconSize(QSize(61,61))
         elif button == "LEFT" and state == 1:
-            self.LeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Left_pressed.png"))
+            self.LeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Left_pressed.png")))
             self.LeftButton.setIconSize(QSize(61,61))
         elif button == "LEFT" and state == 0:
-            self.LeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"Left.png"))
+            self.LeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Left.png")))
             self.LeftButton.setIconSize(QSize(61,61))
         elif button == "FRONT" and state == 1:
-            self.FrontButton.setIcon(QIcon(SCRIPT_BUTTONS+"Front_pressed.png"))
+            self.FrontButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Front_pressed.png")))
             self.FrontButton.setIconSize(QSize(61,61))
         elif button == "FRONT" and state == 0:
-            self.FrontButton.setIcon(QIcon(SCRIPT_BUTTONS+"Front.png"))
+            self.FrontButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Front.png")))
             self.FrontButton.setIconSize(QSize(61,61))
         elif button == "BACK" and state == 1:
-            self.BackButton.setIcon(QIcon(SCRIPT_BUTTONS+"Back_pressed.png"))
+            self.BackButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Back_pressed.png")))
             self.BackButton.setIconSize(QSize(61,61))
         elif button == "BACK" and state == 0:
-            self.BackButton.setIcon(QIcon(SCRIPT_BUTTONS+"Back.png"))
+            self.BackButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Back.png")))
             self.BackButton.setIconSize(QSize(61,61))
         elif button == "RLEFT" and state == 1:
-            self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateL_pressed.png"))
+            self.RotateLeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateL_pressed.png")))
             self.RotateLeftButton.setIconSize(QSize(61,61))
         elif button == "RLEFT" and state == 0:
-            self.RotateLeftButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateL.png"))
+            self.RotateLeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateL.png")))
             self.RotateLeftButton.setIconSize(QSize(61,61))
         elif button == "RRIGHT" and state == 1:
-            self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateR_pressed.png"))
+            self.RotateRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR_pressed.png")))
             self.RotateRightButton.setIconSize(QSize(61,61))
         elif button == "RRIGHT" and state == 0:
-            self.RotateRightButton.setIcon(QIcon(SCRIPT_BUTTONS+"RotateR.png"))
+            self.RotateRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
             self.RotateRightButton.setIconSize(QSize(61,61))
         
 
@@ -510,7 +520,7 @@ class SerialProtocol(QComboBox):
 class Robot(QGraphicsPixmapItem):
     def __init__(self):
         super().__init__()
-        pixmap = QPixmap(SCRIPT_IMAGES+"hexapod.png")
+        pixmap = QPixmap(os.path.join(paths['DISPLAY_IMAGE_PATH'],"hexapod.png"))
         pixmap_resized = pixmap.scaled(66,73,Qt.KeepAspectRatio)
         self.setPixmap(pixmap_resized)
         self.setPos(120, 120)
@@ -555,7 +565,7 @@ class Map(QGraphicsView):
         # Create scene
         self.scene = QGraphicsScene()
         self.scene.setSceneRect(0, 0, 320,320)
-        self.scene.setBackgroundBrush(QBrush(QImage(SCRIPT_IMAGES+"Arena.png")))
+        self.scene.setBackgroundBrush(QBrush(QImage(os.path.join(paths['DISPLAY_IMAGE_PATH'],"Arena.png"))))
         self.setScene(self.scene)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

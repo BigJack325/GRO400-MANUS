@@ -1,0 +1,26 @@
+<annotation>
+	<folder>Happy</folder>
+	<filename>Happy.27c96c60-a2f7-11ec-9ab1-48bf6be6d4d2.jpg</filename>
+	<path>/Users/jackson/Desktop/Programmation/Projet/GRO400-MANUS/Hexapod-master/Hexapod_Qt/Tensorflow/workspace/images/collectedimages/Happy/Happy.27c96c60-a2f7-11ec-9ab1-48bf6be6d4d2.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1280</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Happy</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>550</xmin>
+			<ymin>318</ymin>
+			<xmax>671</xmax>
+			<ymax>545</ymax>
+		</bndbox>
+	</object>
+</annotation>
