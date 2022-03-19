@@ -1,0 +1,7 @@
+opencv-python-headless
+PyQt5 == 5.15.2
+PyQtChart
+wget
+imutils
+#ipykernel
+lxml

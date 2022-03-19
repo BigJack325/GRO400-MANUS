@@ -1,0 +1,2 @@
+sudo apt-get install qtbase5-dev
+sudo apt install libqt5charts5 libqt5charts5-dev
