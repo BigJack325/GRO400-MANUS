@@ -2,8 +2,10 @@ from cmath import cos, pi, sin
 import encodings
 import cv2
 import re
+import time
 import numpy as np
 import imutils
+from imutils.video import VideoStream
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
                              QLineEdit, QPushButton, QWidget,
@@ -16,7 +18,7 @@ import sys, os, json, math
 
 BAUD_RATE = 115200
 UI_UPDATE_RATE = 1000# Ms
-CAM_UPDATE_RATE = 20
+CAM_UPDATE_RATE = 10
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
@@ -26,6 +28,7 @@ PRETRAINED_MODEL_NAME = 'ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8'
 PRETRAINED_MODEL_URL = 'http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8.tar.gz'
 TF_RECORD_SCRIPT_NAME = 'generate_tfrecord.py'
 LABEL_MAP_NAME = 'label_map.pbtxt'
+
 
 paths = {
     'DISPLAY_IMAGE_PATH': os.path.join('Qt_Images','Display'),
@@ -42,7 +45,6 @@ paths = {
     'TFLITE_PATH':os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME, 'tfliteexport'), 
     'PROTOC_PATH':os.path.join('Tensorflow','protoc')
  }
-
 class Ui_MainWindow(QMainWindow):
 
     def __init__(self):
@@ -207,10 +209,10 @@ class Ui_MainWindow(QMainWindow):
         font.setBold(True)
         self.StopButton.setFont(font)
 
-        self.Cam_label.setGeometry(QRect(0, 175, 50, 22))
-        self.Cam.setGeometry(QRect(0, 190, 261, 261))
-        self.CamDistance_label.setGeometry(QRect(310, 230, 218, 22))
-        self.CamDistanceText.setGeometry(QRect(310, 250, 281, 151))
+        self.Cam_label.setGeometry(QRect(0, 200, 50, 22))
+        self.Cam.setGeometry(QRect(0, 160, 320, 320))
+        self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
+        self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
         self.HSVMask_label.setGeometry(QRect(0, 10, 71, 22))
         self.Lower_H_label.setGeometry(QRect(0, 50, 71, 16))
@@ -220,8 +222,6 @@ class Ui_MainWindow(QMainWindow):
         self.Upper_S_label.setGeometry(QRect(0, 130, 71, 16))
         self.Upper_V_label.setGeometry(QRect(0, 150, 71, 16))
 
-
-
         self.Angle_label.setGeometry(QRect(615, 680, 94, 22))
         self.AngleBox.setGeometry(QRect(710, 680, 124, 22))
         self.AngleBox.setMinimum(0)
@@ -230,8 +230,8 @@ class Ui_MainWindow(QMainWindow):
         self.AngleBox.setValue(10)
         self.AngleBox.setSingleStep(1)
 
-        self.Json_label.setGeometry(QRect(310, 10, 218, 22))
-        self.Json_Browser.setGeometry(QRect(310, 30, 281, 201))
+        self.Json_label.setGeometry(QRect(388, 10, 218, 22))
+        self.Json_Browser.setGeometry(QRect(388, 30, 200, 201))
         font = QFont()
         font.setPointSize(9)
         self.Json_Browser.setFont(font)
@@ -517,46 +517,6 @@ class SerialProtocol(QComboBox):
         if self.serial_ != None:
             del self.serial_
 
-class Robot(QGraphicsPixmapItem):
-    def __init__(self):
-        super().__init__()
-        pixmap = QPixmap(os.path.join(paths['DISPLAY_IMAGE_PATH'],"hexapod.png"))
-        pixmap_resized = pixmap.scaled(66,73,Qt.KeepAspectRatio)
-        self.setPixmap(pixmap_resized)
-        self.setPos(120, 120)
-        self.setTransformOriginPoint(33,51.5)#image is 66 by 103 pixel
-        self.angle = 0
-
-    def move(self,xpos,ypos):
-
-        if self.angle == 0:
-            self.setPos(xpos+self.x(),ypos+self.y())
-        elif self.angle > 0:
-            x = xpos*cos(math.radians(self.angle))-ypos*sin(math.radians(self.angle))
-            y = xpos*sin(math.radians(self.angle))+ypos*cos(math.radians(self.angle))
-            self.setPos(self.x()+ x.real,self.y()+y.real)
-        elif self.angle < 0:
-            x = xpos*cos(-math.radians(self.angle))+ypos*sin(-math.radians(self.angle))
-            y = -xpos*sin(-math.radians(self.angle))+ypos*cos(-math.radians(self.angle))
-            self.setPos(self.x()+ x.real,self.y()+y.real)
-
-
-    def rotate(self,angle):
-        self.angle += angle
-        self.setRotation(self.angle)
-
-    # def keyPressEvent(self, event:QKeyEvent):
-    #     # print('lol')
-
-    #     if event.key() == Qt.Key_Left:
-    #         if self.pos().x()>0:
-    #             self.setPos(self.x()-MANUAL_SIDE_MOVEMENT, self.y())
-    #     elif event.key() == Qt.Key_Right:
-    #         if self.pos().x() < 780:
-    #             self.setPos(self.x()+MANUAL_SIDE_MOVEMENT, self.y())
-
-    #     return super().keyPressEvent(event)
-
 class Map(QGraphicsView):
     def __init__(self,parent):
         super().__init__(parent)
@@ -600,6 +560,46 @@ class Map(QGraphicsView):
         if key == "RRIGHT":
             self.hexapod.rotate(angle)
 
+class Robot(QGraphicsPixmapItem):
+    def __init__(self):
+        super().__init__()
+        pixmap = QPixmap(os.path.join(paths['DISPLAY_IMAGE_PATH'],"hexapod.png"))
+        pixmap_resized = pixmap.scaled(66,73,Qt.KeepAspectRatio)
+        self.setPixmap(pixmap_resized)
+        self.setPos(130, 120)
+        self.setTransformOriginPoint(33,51.5)#image is 66 by 103 pixel
+        self.angle = 0
+
+    def move(self,xpos,ypos):
+
+        if self.angle == 0:
+            self.setPos(xpos+self.x(),ypos+self.y())
+        elif self.angle > 0:
+            x = xpos*cos(math.radians(self.angle))-ypos*sin(math.radians(self.angle))
+            y = xpos*sin(math.radians(self.angle))+ypos*cos(math.radians(self.angle))
+            self.setPos(self.x()+ x.real,self.y()+y.real)
+        elif self.angle < 0:
+            x = xpos*cos(-math.radians(self.angle))+ypos*sin(-math.radians(self.angle))
+            y = -xpos*sin(-math.radians(self.angle))+ypos*cos(-math.radians(self.angle))
+            self.setPos(self.x()+ x.real,self.y()+y.real)
+
+    def rotate(self,angle):
+        self.angle += angle
+        self.setRotation(self.angle)
+
+    # def keyPressEvent(self, event:QKeyEvent):
+    #     # print('lol')
+
+    #     if event.key() == Qt.Key_Left:
+    #         if self.pos().x()>0:
+    #             self.setPos(self.x()-MANUAL_SIDE_MOVEMENT, self.y())
+    #     elif event.key() == Qt.Key_Right:
+    #         if self.pos().x() < 780:
+    #             self.setPos(self.x()+MANUAL_SIDE_MOVEMENT, self.y())
+
+    #     return super().keyPressEvent(event)
+
+
 class Target(QGraphicsPixmapItem):
     pass
 
@@ -607,7 +607,7 @@ class VideoTracking(QLabel):
     def __init__(self,parent):
         super().__init__(parent)
 
-        self.capwebcam = cv2.VideoCapture(0)
+        self.capwebcam = VideoStream(0).start()
         self.camTimer = QTimer()
         self.maskButton = QCheckBox(parent)
         self.Lower_H_Slider = QSlider(parent)
@@ -671,23 +671,23 @@ class VideoTracking(QLabel):
         self.Upper_V_Value.setGeometry(QRect(250, 150, 41, 16))
         self.Upper_V_Value.setReadOnly(True)
 
-        self.maskButton.setGeometry(QRect(250, 170, 120, 41))
-        self.new_width = 261
+        self.maskButton.setGeometry(QRect(250, 190, 120, 41))
+        self.new_width = 320
         self.font = cv2.FONT_HERSHEY_COMPLEX
 
 
-        if self.capwebcam.isOpened() == False:
-            print("error:camera not accessed successfully")
-
+        # if self.capwebcam.isOpened() == False:
+        #     print("error:camera not accessed successfully")
+        time.sleep(0.1)
         self.camTimer.timeout.connect(self.OnPeriodicEvent)
         self.camTimer.start(CAM_UPDATE_RATE)
 
     def OnPeriodicEvent(self):
-        success,frame = self.capwebcam.read()
+        frame = self.capwebcam.read()
 
-        if success: 
-            self.changeSliderValues()
-            self.detectColor(frame)
+    
+        self.changeSliderValues()
+        self.detectColor(frame)
 
     def changeSliderValues(self):
         self.Lower_H_Value.setText(str(self.Lower_H_Slider.value()))

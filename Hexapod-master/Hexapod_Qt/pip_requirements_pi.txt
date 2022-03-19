@@ -1,7 +1,5 @@
 opencv-python-headless
 PyQt5
 PyQtChart
-wget
 imutils
-ipykernel
 lxml
