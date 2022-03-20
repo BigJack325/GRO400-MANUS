@@ -2,4 +2,9 @@ sudo apt-get install qtbase5-dev
 sudo apt install libqt5charts5 libqt5charts5-dev
 sudo apt install libqt5serialport5  libqt5serialport5-dev
 sudo apt-get install python3-pyqt5.qtserialport
-
+sudo apt-get install libcblas-dev
+sudo apt-get install libhdf5-dev
+sudo apt-get install libhdf5-serial-dev
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libjasper-dev 
+sudo apt-get install python3-tflite-runtime
