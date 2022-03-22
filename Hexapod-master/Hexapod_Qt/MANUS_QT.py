@@ -5,6 +5,7 @@ import re
 import time
 import numpy as np
 import imutils
+from tflite_runtime.interpreter import Interpreter
 from imutils.video import VideoStream
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
@@ -22,29 +23,20 @@ CAM_UPDATE_RATE = 10
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
+CAMERA_WIDTH = 320
+CAMERA_HEIGHT= 320
 
 CUSTOM_MODEL_NAME = 'Ant' 
-PRETRAINED_MODEL_NAME = 'ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8'
-PRETRAINED_MODEL_URL = 'http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8.tar.gz'
-TF_RECORD_SCRIPT_NAME = 'generate_tfrecord.py'
-LABEL_MAP_NAME = 'label_map.pbtxt'
+LABEL_MAP_NAME = 'labelmap.txt'
 
 
 paths = {
     'DISPLAY_IMAGE_PATH': os.path.join('Qt_Images','Display'),
     'BUTTON_IMAGE_PATH': os.path.join('Qt_Images', 'Buttons'),
-    'WORKSPACE_PATH': os.path.join('Tensorflow', 'workspace'),
-    'SCRIPTS_PATH': os.path.join('Tensorflow','scripts'),
-    'APIMODEL_PATH': os.path.join('Tensorflow','models'),
-    'ANNOTATION_PATH': os.path.join('Tensorflow', 'workspace','annotations'),
-    'IMAGE_PATH': os.path.join('Tensorflow', 'workspace','images'),
-    'MODEL_PATH': os.path.join('Tensorflow', 'workspace','models'),
-    'PRETRAINED_MODEL_PATH': os.path.join('Tensorflow', 'workspace','pre-trained-models'),
-    'CHECKPOINT_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME), 
-    'OUTPUT_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME, 'export'), 
-    'TFLITE_PATH':os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME, 'tfliteexport'), 
-    'PROTOC_PATH':os.path.join('Tensorflow','protoc')
+    'TFLITE_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME,'tfliteexport'),
  }
+
+
 class Ui_MainWindow(QMainWindow):
 
     def __init__(self):
@@ -127,13 +119,13 @@ class Ui_MainWindow(QMainWindow):
         self.CamDistance_label = QLabel(self.widget)
         self.CamDistanceText = QPlainTextEdit(self.widget)
 
-        self.HSVMask_label = QLabel(self.widget)
-        self.Lower_H_label = QLabel(self.widget)
-        self.Lower_S_label = QLabel(self.widget)
-        self.Lower_V_label = QLabel(self.widget)
-        self.Upper_H_label = QLabel(self.widget)
-        self.Upper_S_label = QLabel(self.widget)
-        self.Upper_V_label = QLabel(self.widget)
+        # self.HSVMask_label = QLabel(self.widget)
+        # self.Lower_H_label = QLabel(self.widget)
+        # self.Lower_S_label = QLabel(self.widget)
+        # self.Lower_V_label = QLabel(self.widget)
+        # self.Upper_H_label = QLabel(self.widget)
+        # self.Upper_S_label = QLabel(self.widget)
+        # self.Upper_V_label = QLabel(self.widget)
 
         self.Angle_label = QLabel(self.widget)
         self.AngleBox = QDoubleSpinBox(self.widget)
@@ -209,18 +201,18 @@ class Ui_MainWindow(QMainWindow):
         font.setBold(True)
         self.StopButton.setFont(font)
 
-        self.Cam_label.setGeometry(QRect(0, 200, 50, 22))
+        self.Cam_label.setGeometry(QRect(0, 170, 50, 22))
         self.Cam.setGeometry(QRect(0, 160, 320, 320))
         self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
         self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
-        self.HSVMask_label.setGeometry(QRect(0, 10, 71, 22))
-        self.Lower_H_label.setGeometry(QRect(0, 50, 71, 16))
-        self.Lower_S_label.setGeometry(QRect(0, 70, 71, 16))
-        self.Lower_V_label.setGeometry(QRect(0, 90, 71, 16))
-        self.Upper_H_label.setGeometry(QRect(0, 110, 71, 16))
-        self.Upper_S_label.setGeometry(QRect(0, 130, 71, 16))
-        self.Upper_V_label.setGeometry(QRect(0, 150, 71, 16))
+        # self.HSVMask_label.setGeometry(QRect(0, 10, 71, 22))
+        # self.Lower_H_label.setGeometry(QRect(0, 50, 71, 16))
+        # self.Lower_S_label.setGeometry(QRect(0, 70, 71, 16))
+        # self.Lower_V_label.setGeometry(QRect(0, 90, 71, 16))
+        # self.Upper_H_label.setGeometry(QRect(0, 110, 71, 16))
+        # self.Upper_S_label.setGeometry(QRect(0, 130, 71, 16))
+        # self.Upper_V_label.setGeometry(QRect(0, 150, 71, 16))
 
         self.Angle_label.setGeometry(QRect(615, 680, 94, 22))
         self.AngleBox.setGeometry(QRect(710, 680, 124, 22))
@@ -264,13 +256,13 @@ class Ui_MainWindow(QMainWindow):
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
         self.Manual_mode.setText(_translate("MainWindow", "Manual Mode"))
-        self.HSVMask_label.setText(_translate("MainWindow", "HSV Mask:"))
-        self.Lower_H_label.setText(_translate("MainWindow", "L-H:"))
-        self.Lower_S_label.setText(_translate("MainWindow", "L-S:"))
-        self.Lower_V_label.setText(_translate("MainWindow", "L-V:"))
-        self.Upper_H_label.setText(_translate("MainWindow", "U-H:"))
-        self.Upper_S_label.setText(_translate("MainWindow", "U-S:"))
-        self.Upper_V_label.setText(_translate("MainWindow", "U-V:"))
+        # self.HSVMask_label.setText(_translate("MainWindow", "HSV Mask:"))
+        # self.Lower_H_label.setText(_translate("MainWindow", "L-H:"))
+        # self.Lower_S_label.setText(_translate("MainWindow", "L-S:"))
+        # self.Lower_V_label.setText(_translate("MainWindow", "L-V:"))
+        # self.Upper_H_label.setText(_translate("MainWindow", "U-H:"))
+        # self.Upper_S_label.setText(_translate("MainWindow", "U-S:"))
+        # self.Upper_V_label.setText(_translate("MainWindow", "U-V:"))
 
     def portCensus(self):
         self.comboBoxPort.clear()
@@ -607,141 +599,168 @@ class VideoTracking(QLabel):
     def __init__(self,parent):
         super().__init__(parent)
 
-        self.capwebcam = VideoStream(0).start()
+        self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
         self.camTimer = QTimer()
-        self.maskButton = QCheckBox(parent)
-        self.Lower_H_Slider = QSlider(parent)
-        self.Lower_H_Value = QLineEdit(parent)
-        self.Lower_S_Slider = QSlider(parent)
-        self.Lower_S_Value = QLineEdit(parent)
-        self.Lower_V_Slider = QSlider(parent)
-        self.Lower_V_Value = QLineEdit(parent)
-        self.Upper_H_Slider = QSlider(parent)
-        self.Upper_H_Value = QLineEdit(parent)
-        self.Upper_S_Slider = QSlider(parent)
-        self.Upper_S_Value = QLineEdit(parent)
-        self.Upper_V_Slider = QSlider(parent)
-        self.Upper_V_Value = QLineEdit(parent)
+        # self.maskButton = QCheckBox(parent)
+        # self.Lower_H_Slider = QSlider(parent)
+        # self.Lower_H_Value = QLineEdit(parent)
+        # self.Lower_S_Slider = QSlider(parent)
+        # self.Lower_S_Value = QLineEdit(parent)
+        # self.Lower_V_Slider = QSlider(parent)
+        # self.Lower_V_Value = QLineEdit(parent)
+        # self.Upper_H_Slider = QSlider(parent)
+        # self.Upper_H_Value = QLineEdit(parent)
+        # self.Upper_S_Slider = QSlider(parent)
+        # self.Upper_S_Value = QLineEdit(parent)
+        # self.Upper_V_Slider = QSlider(parent)
+        # self.Upper_V_Value = QLineEdit(parent)
 
-        self.Lower_H_Slider.setGeometry(QRect(80, 50, 160, 16))
-        self.Lower_H_Slider.setOrientation(Qt.Horizontal)
-        self.Lower_H_Slider.setRange(0,180)
-        self.Lower_H_Slider.setValue(5)
-        self.Lower_H_Slider.hasTracking()
-        self.Lower_H_Value.setGeometry(QRect(250, 50, 41, 16))
-        self.Lower_H_Value.setReadOnly(True)
+        # self.Lower_H_Slider.setGeometry(QRect(80, 50, 160, 16))
+        # self.Lower_H_Slider.setOrientation(Qt.Horizontal)
+        # self.Lower_H_Slider.setRange(0,180)
+        # self.Lower_H_Slider.setValue(5)
+        # self.Lower_H_Slider.hasTracking()
+        # self.Lower_H_Value.setGeometry(QRect(250, 50, 41, 16))
+        # self.Lower_H_Value.setReadOnly(True)
 
-        self.Lower_S_Slider.setGeometry(QRect(80, 70, 160, 16))
-        self.Lower_S_Slider.setOrientation(Qt.Horizontal)
-        self.Lower_S_Slider.setRange(0, 255)
-        self.Lower_S_Slider.setValue(102)
-        self.Lower_S_Slider.hasTracking()
-        self.Lower_S_Value.setGeometry(QRect(250, 70, 41, 16))
-        self.Lower_S_Value.setReadOnly(True)
+        # self.Lower_S_Slider.setGeometry(QRect(80, 70, 160, 16))
+        # self.Lower_S_Slider.setOrientation(Qt.Horizontal)
+        # self.Lower_S_Slider.setRange(0, 255)
+        # self.Lower_S_Slider.setValue(102)
+        # self.Lower_S_Slider.hasTracking()
+        # self.Lower_S_Value.setGeometry(QRect(250, 70, 41, 16))
+        # self.Lower_S_Value.setReadOnly(True)
 
-        self.Lower_V_Slider.setGeometry(QRect(80, 90, 160, 16))
-        self.Lower_V_Slider.setOrientation(Qt.Horizontal)
-        self.Lower_V_Slider.setRange(0, 255)
-        self.Lower_V_Slider.setValue(102)
-        self.Lower_V_Slider.hasTracking()
-        self.Lower_V_Value.setGeometry(QRect(250, 90, 41, 16))
-        self.Lower_V_Value.setReadOnly(True)
+        # self.Lower_V_Slider.setGeometry(QRect(80, 90, 160, 16))
+        # self.Lower_V_Slider.setOrientation(Qt.Horizontal)
+        # self.Lower_V_Slider.setRange(0, 255)
+        # self.Lower_V_Slider.setValue(102)
+        # self.Lower_V_Slider.hasTracking()
+        # self.Lower_V_Value.setGeometry(QRect(250, 90, 41, 16))
+        # self.Lower_V_Value.setReadOnly(True)
 
-        self.Upper_H_Slider.setGeometry(QRect(80, 110, 160, 16))
-        self.Upper_H_Slider.setOrientation(Qt.Horizontal)
-        self.Upper_H_Slider.setRange(0, 180)
-        self.Upper_H_Slider.hasTracking()
-        self.Upper_H_Slider.setValue(141)
-        self.Upper_H_Value.setGeometry(QRect(250, 110, 41, 16))
-        self.Upper_H_Value.setReadOnly(True)
+        # self.Upper_H_Slider.setGeometry(QRect(80, 110, 160, 16))
+        # self.Upper_H_Slider.setOrientation(Qt.Horizontal)
+        # self.Upper_H_Slider.setRange(0, 180)
+        # self.Upper_H_Slider.hasTracking()
+        # self.Upper_H_Slider.setValue(141)
+        # self.Upper_H_Value.setGeometry(QRect(250, 110, 41, 16))
+        # self.Upper_H_Value.setReadOnly(True)
 
-        self.Upper_S_Slider.setGeometry(QRect(80, 130, 160, 16))
-        self.Upper_S_Slider.setOrientation(Qt.Horizontal)
-        self.Upper_S_Slider.setRange(0, 255)
-        self.Upper_S_Slider.hasTracking()
-        self.Upper_S_Slider.setValue(255)
-        self.Upper_S_Value.setGeometry(QRect(250, 130, 41, 16))
-        self.Upper_S_Value.setReadOnly(True)
+        # self.Upper_S_Slider.setGeometry(QRect(80, 130, 160, 16))
+        # self.Upper_S_Slider.setOrientation(Qt.Horizontal)
+        # self.Upper_S_Slider.setRange(0, 255)
+        # self.Upper_S_Slider.hasTracking()
+        # self.Upper_S_Slider.setValue(255)
+        # self.Upper_S_Value.setGeometry(QRect(250, 130, 41, 16))
+        # self.Upper_S_Value.setReadOnly(True)
 
-        self.Upper_V_Slider.setGeometry(QRect(80, 150, 160, 16))
-        self.Upper_V_Slider.setOrientation(Qt.Horizontal)
-        self.Upper_V_Slider.setRange(0, 255)
-        self.Upper_V_Slider.hasTracking()
-        self.Upper_V_Slider.setValue(255)
-        self.Upper_V_Value.setGeometry(QRect(250, 150, 41, 16))
-        self.Upper_V_Value.setReadOnly(True)
+        # self.Upper_V_Slider.setGeometry(QRect(80, 150, 160, 16))
+        # self.Upper_V_Slider.setOrientation(Qt.Horizontal)
+        # self.Upper_V_Slider.setRange(0, 255)
+        # self.Upper_V_Slider.hasTracking()
+        # self.Upper_V_Slider.setValue(255)
+        # self.Upper_V_Value.setGeometry(QRect(250, 150, 41, 16))
+        # self.Upper_V_Value.setReadOnly(True)
 
-        self.maskButton.setGeometry(QRect(250, 190, 120, 41))
+        # self.maskButton.setGeometry(QRect(250, 175, 120, 41))
         self.new_width = 320
         self.font = cv2.FONT_HERSHEY_COMPLEX
 
+        self.labels = self.load_labels()
+        self.interpreter = Interpreter(model_path=os.path.join(paths['TFLITE_PATH'],"detect.tflite"))
+        self.interpreter.allocate_tensors()
+        self.input_height= self.interpreter.get_input_details()[0]['shape'][1]
+        self.input_width= self.interpreter.get_input_details()[0]['shape'][2]
 
-        # if self.capwebcam.isOpened() == False:
-        #     print("error:camera not accessed successfully")
-        time.sleep(0.1)
+        time.sleep(1)
         self.camTimer.timeout.connect(self.OnPeriodicEvent)
         self.camTimer.start(CAM_UPDATE_RATE)
 
     def OnPeriodicEvent(self):
         frame = self.capwebcam.read()
+        # self.changeSliderValues()
+        self.vision(frame)
+
+    # def changeSliderValues(self):
+    #     self.Lower_H_Value.setText(str(self.Lower_H_Slider.value()))
+    #     self.Lower_S_Value.setText(str(self.Lower_S_Slider.value()))
+    #     self.Lower_V_Value.setText(str(self.Lower_V_Slider.value()))
+    #     self.Upper_H_Value.setText(str(self.Upper_H_Slider.value()))
+    #     self.Upper_S_Value.setText(str(self.Upper_S_Slider.value()))
+    #     self.Upper_V_Value.setText(str(self.Upper_V_Slider.value()))
+
+    def load_labels(self,path=os.path.join(paths['TFLITE_PATH'],"labelmap.txt")):
+
+        with open(path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            labels = {}
+            for row_number, content in enumerate(lines):
+                pair = re.split(r'[:\s]+', content.strip(), maxsplit=1)
+                if len(pair) == 2 and pair[0].strip().isdigit():
+                   labels[int(pair[0])] = pair[1].strip()
+                else:
+                    labels[row_number] = pair[0].strip()
+        
+        return labels
+    
+    def set_input_tensor(self,interpreter, image):
+
+        tensor_index = interpreter.get_input_details()[0]['index']
+        input_tensor = interpreter.tensor(tensor_index)()[0]
+        input_tensor[:, :] = np.expand_dims((image-255)/255, axis=0)
 
     
-        self.changeSliderValues()
-        self.detectColor(frame)
+    def get_output_tensor(self,interpreter, index):
 
-    def changeSliderValues(self):
-        self.Lower_H_Value.setText(str(self.Lower_H_Slider.value()))
-        self.Lower_S_Value.setText(str(self.Lower_S_Slider.value()))
-        self.Lower_V_Value.setText(str(self.Lower_V_Slider.value()))
-        self.Upper_H_Value.setText(str(self.Upper_H_Slider.value()))
-        self.Upper_S_Value.setText(str(self.Upper_S_Slider.value()))
-        self.Upper_V_Value.setText(str(self.Upper_V_Slider.value()))
+        output_details = interpreter.get_output_details()[index]
+        tensor = np.squeeze(interpreter.get_tensor(output_details['index']))
+        return tensor
+    
+    def detect_objects(self,interpreter, image, threshold):
+        self.set_input_tensor(interpreter, image)
+        interpreter.invoke()
+        # Get all output details
+        boxes = self.get_output_tensor(interpreter, 1)
+        classes = self.get_output_tensor(interpreter, 3)
+        scores = self.get_output_tensor(interpreter, 0)
+
+        results = []
+        for i in range(len(scores)):
+            if scores[i] >= threshold:
+                result = {
+                    'bounding_box': boxes[i],
+                    'class_id': classes[i],
+                    'score': scores[i]
+                }
+                results.append(result)
+        return results
         
 
-    def detectColor(self,frame):
-        self.Lower = (self.Lower_H_Slider.value(), self.Lower_S_Slider.value(), self.Lower_V_Slider.value())
-        self.Upper = (self.Upper_H_Slider.value(), self.Upper_S_Slider.value(), self.Upper_V_Slider.value())
-        
-        frame = imutils.resize(frame, width=self.new_width)
-        blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-        hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    def vision(self,frame):
 
-        mask = cv2.inRange(hsv, self.Lower, self.Upper)
-        kernel = np.ones((5, 5), np.uint8)
-        mask = cv2.erode(mask, kernel, iterations=2)
-        # mask = cv2.dilate(mask, None, iterations=2)
+        img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
-        contours,_ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        res = self.detect_objects(self.interpreter, img, 0.8)
+        print(res)
 
+        for result in res:
+            ymin, xmin, ymax, xmax = result['bounding_box']
+            xmin = int(max(1,xmin * 320))
+            xmax = int(min(320, xmax * 320))
+            ymin = int(max(1, ymin * 200))
+            ymax = int(min(200, ymax * 250))
 
-        for cnt in contours:
-            area = cv2.contourArea(cnt)
-            approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
-            x = approx.ravel()[0]
-            y = approx.ravel()[1]
-
-            if area > 400:
-                cv2.drawContours(frame, [approx], 0, (0, 0, 0), 5)
-
-                if len(approx) == 3:
-                    cv2.putText(frame, "Triangle", (x, y), self.font, 1, (0, 0, 0))
-                elif len(approx) == 4:
-                    cv2.putText(frame, "Rectangle", (x, y), self.font, 1, (0, 0, 0))
-                elif 10 < len(approx) < 20:
-                    cv2.putText(frame, "Circle", (x, y), self.font, 1, (0, 0, 0))
+            label = '%s: %d%%' % (self.labels[int(result['class_id'])], int(result['score']*100))
+            
+            cv2.rectangle(frame,(xmin, ymin),(xmax, ymax),(0,255,0),3)
+            cv2.putText(frame,label,(xmin, ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,255,255),2,cv2.LINE_AA) 
 
 
+        imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
 
-            imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
-
-            imagemask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
-            imagemask = QImage(imagemask,imagemask.shape[1],imagemask.shape[0],imagemask.strides[0],QImage.Format_RGB888)
-
-            if self.maskButton.checkState() == 2:
-                self.setPixmap(QPixmap.fromImage(imagemask))
-            else:
-                self.setPixmap(QPixmap.fromImage(imageframe))
+        self.setPixmap(QPixmap.fromImage(imageframe))
 
 
 
