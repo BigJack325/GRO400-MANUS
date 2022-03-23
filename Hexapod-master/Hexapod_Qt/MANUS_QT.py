@@ -741,7 +741,7 @@ class VideoTracking(QLabel):
 
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
-        res = self.detect_objects(self.interpreter, img, 0.8)
+        res = self.detect_objects(self.interpreter, img, 0.5)
         print(res)
 
         for result in res:
