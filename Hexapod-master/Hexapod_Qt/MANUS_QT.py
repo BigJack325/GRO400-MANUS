@@ -460,7 +460,6 @@ class Ui_MainWindow(QMainWindow):
             self.msgBuffer_ = ""
 
         if self.msgBuffer_.endswith('\n') and self.msgBuffer_.startswith("{"):
-            print('yo')
             self.jsondata = json.loads(self.msgBuffer_)
             jsondataString = json.dumps(self.jsondata,indent=2)
             self.Json_Browser.setText(jsondataString)
