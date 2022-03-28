@@ -446,10 +446,21 @@ class Ui_MainWindow(QMainWindow):
         self.serialCom_.newMessage.connect(self.receiveFromSerial)
 
     def receiveFromSerial(self,msg):
-        self.msgBuffer_ += msg
-        # print(msg)
 
-        if self.msgBuffer_.endswith("\n") and self.msgBuffer_.startswith("{"):
+        for word in msg:
+            if word != '}':
+                self.msgBuffer_ += word
+            if word == '}':
+                self.msgBuffer_ += '}\n'
+                break
+        # print(msg)
+        # print(self.msgBuffer_)
+
+        if not self.msgBuffer_.startswith("{"):
+            self.msgBuffer_ = ""
+
+        if self.msgBuffer_.endswith('\n') and self.msgBuffer_.startswith("{"):
+            print('yo')
             self.jsondata = json.loads(self.msgBuffer_)
             jsondataString = json.dumps(self.jsondata,indent=2)
             self.Json_Browser.setText(jsondataString)
@@ -469,11 +480,13 @@ class Ui_MainWindow(QMainWindow):
             
             self.msgBuffer_ = ""
 
+
     def cleanUp(self):
 
         print("Exiting program...")
         self.serialCom_.serialQuit()
         self.updateTimer.stop()
+        self.Cam.capwebcam.stop()
         print("END")
 
 class SerialProtocol(QComboBox):
@@ -483,6 +496,7 @@ class SerialProtocol(QComboBox):
         super().__init__()
         self.serial_ = QSerialPort(self)
         self.serial_.setPortName(portName)
+
 
         if self.serial_.open(QIODevice.ReadWrite):
             self.serial_.setBaudRate(BAUD_RATE)
@@ -742,7 +756,7 @@ class VideoTracking(QLabel):
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
         res = self.detect_objects(self.interpreter, img, 0.5)
-        print(res)
+        # print(res)
 
         for result in res:
             ymin, xmin, ymax, xmax = result['bounding_box']

@@ -91,7 +91,6 @@ int SmoothMovement(MegaServo servo, int Speed, int Angle);
 
 void setup() {
   Serial.begin(BAUD);              // initialisation de la communication serielle
-
   // Chronometre envoie message
   timerSendMsg_.setDelay(UPDATE_PERIODE);
   timerSendMsg_.setCallback(timerCallback);
@@ -111,12 +110,12 @@ ActualAngle = servo_z.read();
 void loop() {
   
   
-  // if(shouldRead_){
-  //   readMsg();
-  // }
-  // if(shouldSend_){
-  //   sendMsg();
-  // }
+  if(shouldRead_){
+    readMsg();
+  }
+  if(shouldSend_){
+    sendMsg();
+  }
   
 //----------------------FAIRE SWITCH CASE ICI-------------------------------
   SmoothMovement(servo_z, 5, 135);
@@ -137,12 +136,13 @@ void serialEvent(){shouldRead_ = true;}
 void timerCallback(){shouldSend_ = true;}
 
 void sendMsg(){
+
   /* Envoit du message Json sur le port seriel */
   StaticJsonDocument<500> doc;
   // Elements du message
 
   doc["time"]      = (millis()/1000.0);
-  doc["pulsePWM"]  = pulsePWM_;
+  // doc["pulsePWM"]  = pulsePWM_;
   doc["cur_x"] = cur_x;
   doc["cur_y"] = cur_y;
   doc["cur_angle"] = cur_angle;
@@ -206,7 +206,6 @@ int SmoothMovement(MegaServo servo, int Speed, int Angle) //Speed : incrmeent de
   int GapToAngle = Angle;
   int PreviousTime = 0;
   int Direction = Angle - servo.read();
-  Serial.println("Yoooo0");
   for (AngleIncrement = 1; GapToAngle >= 0; AngleIncrement++)
   {
     ActualAngle = servo.read();
