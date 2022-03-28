@@ -119,14 +119,6 @@ class Ui_MainWindow(QMainWindow):
         self.CamDistance_label = QLabel(self.widget)
         self.CamDistanceText = QPlainTextEdit(self.widget)
 
-        # self.HSVMask_label = QLabel(self.widget)
-        # self.Lower_H_label = QLabel(self.widget)
-        # self.Lower_S_label = QLabel(self.widget)
-        # self.Lower_V_label = QLabel(self.widget)
-        # self.Upper_H_label = QLabel(self.widget)
-        # self.Upper_S_label = QLabel(self.widget)
-        # self.Upper_V_label = QLabel(self.widget)
-
         self.Angle_label = QLabel(self.widget)
         self.AngleBox = QDoubleSpinBox(self.widget)
 
@@ -206,14 +198,6 @@ class Ui_MainWindow(QMainWindow):
         self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
         self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
-        # self.HSVMask_label.setGeometry(QRect(0, 10, 71, 22))
-        # self.Lower_H_label.setGeometry(QRect(0, 50, 71, 16))
-        # self.Lower_S_label.setGeometry(QRect(0, 70, 71, 16))
-        # self.Lower_V_label.setGeometry(QRect(0, 90, 71, 16))
-        # self.Upper_H_label.setGeometry(QRect(0, 110, 71, 16))
-        # self.Upper_S_label.setGeometry(QRect(0, 130, 71, 16))
-        # self.Upper_V_label.setGeometry(QRect(0, 150, 71, 16))
-
         self.Angle_label.setGeometry(QRect(615, 680, 94, 22))
         self.AngleBox.setGeometry(QRect(710, 680, 124, 22))
         self.AngleBox.setMinimum(0)
@@ -256,13 +240,7 @@ class Ui_MainWindow(QMainWindow):
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
         self.Manual_mode.setText(_translate("MainWindow", "Manual Mode"))
-        # self.HSVMask_label.setText(_translate("MainWindow", "HSV Mask:"))
-        # self.Lower_H_label.setText(_translate("MainWindow", "L-H:"))
-        # self.Lower_S_label.setText(_translate("MainWindow", "L-S:"))
-        # self.Lower_V_label.setText(_translate("MainWindow", "L-V:"))
-        # self.Upper_H_label.setText(_translate("MainWindow", "U-H:"))
-        # self.Upper_S_label.setText(_translate("MainWindow", "U-S:"))
-        # self.Upper_V_label.setText(_translate("MainWindow", "U-V:"))
+
 
     def portCensus(self):
         self.comboBoxPort.clear()
@@ -461,7 +439,14 @@ class Ui_MainWindow(QMainWindow):
 
         if self.msgBuffer_.endswith('\n') and self.msgBuffer_.startswith("{"):
             self.jsondata = json.loads(self.msgBuffer_)
-            jsondataString = json.dumps(self.jsondata,indent=2)
+            jsonBrowserText = json.loads(self.msgBuffer_)
+
+            for key in list(self.jsondata):
+                if key == "Servo_1" or key=="Servo_2" or key=="Servo_3" or key=="Servo_4" or key=="Servo_5" or key=="Servo_6" or key=="Servo_7" or key=="Servo_8" or key=="Servo_9"or key=="Servo_10" or key=="Servo_11" or key=="Servo_12" or key=="Servo_13" or key=="Servo_14" or key=="Servo_15" or key=="Servo_16" or key=="Servo_17" or key=="Servo_18" or key=="Servo_19" :
+                    del jsonBrowserText[key]
+            
+            jsondataString = json.dumps(jsonBrowserText,indent=2)
+
             self.Json_Browser.setText(jsondataString)
      
             for key in self.jsondata.keys():
@@ -614,69 +599,7 @@ class VideoTracking(QLabel):
 
         self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
         self.camTimer = QTimer()
-        # self.maskButton = QCheckBox(parent)
-        # self.Lower_H_Slider = QSlider(parent)
-        # self.Lower_H_Value = QLineEdit(parent)
-        # self.Lower_S_Slider = QSlider(parent)
-        # self.Lower_S_Value = QLineEdit(parent)
-        # self.Lower_V_Slider = QSlider(parent)
-        # self.Lower_V_Value = QLineEdit(parent)
-        # self.Upper_H_Slider = QSlider(parent)
-        # self.Upper_H_Value = QLineEdit(parent)
-        # self.Upper_S_Slider = QSlider(parent)
-        # self.Upper_S_Value = QLineEdit(parent)
-        # self.Upper_V_Slider = QSlider(parent)
-        # self.Upper_V_Value = QLineEdit(parent)
-
-        # self.Lower_H_Slider.setGeometry(QRect(80, 50, 160, 16))
-        # self.Lower_H_Slider.setOrientation(Qt.Horizontal)
-        # self.Lower_H_Slider.setRange(0,180)
-        # self.Lower_H_Slider.setValue(5)
-        # self.Lower_H_Slider.hasTracking()
-        # self.Lower_H_Value.setGeometry(QRect(250, 50, 41, 16))
-        # self.Lower_H_Value.setReadOnly(True)
-
-        # self.Lower_S_Slider.setGeometry(QRect(80, 70, 160, 16))
-        # self.Lower_S_Slider.setOrientation(Qt.Horizontal)
-        # self.Lower_S_Slider.setRange(0, 255)
-        # self.Lower_S_Slider.setValue(102)
-        # self.Lower_S_Slider.hasTracking()
-        # self.Lower_S_Value.setGeometry(QRect(250, 70, 41, 16))
-        # self.Lower_S_Value.setReadOnly(True)
-
-        # self.Lower_V_Slider.setGeometry(QRect(80, 90, 160, 16))
-        # self.Lower_V_Slider.setOrientation(Qt.Horizontal)
-        # self.Lower_V_Slider.setRange(0, 255)
-        # self.Lower_V_Slider.setValue(102)
-        # self.Lower_V_Slider.hasTracking()
-        # self.Lower_V_Value.setGeometry(QRect(250, 90, 41, 16))
-        # self.Lower_V_Value.setReadOnly(True)
-
-        # self.Upper_H_Slider.setGeometry(QRect(80, 110, 160, 16))
-        # self.Upper_H_Slider.setOrientation(Qt.Horizontal)
-        # self.Upper_H_Slider.setRange(0, 180)
-        # self.Upper_H_Slider.hasTracking()
-        # self.Upper_H_Slider.setValue(141)
-        # self.Upper_H_Value.setGeometry(QRect(250, 110, 41, 16))
-        # self.Upper_H_Value.setReadOnly(True)
-
-        # self.Upper_S_Slider.setGeometry(QRect(80, 130, 160, 16))
-        # self.Upper_S_Slider.setOrientation(Qt.Horizontal)
-        # self.Upper_S_Slider.setRange(0, 255)
-        # self.Upper_S_Slider.hasTracking()
-        # self.Upper_S_Slider.setValue(255)
-        # self.Upper_S_Value.setGeometry(QRect(250, 130, 41, 16))
-        # self.Upper_S_Value.setReadOnly(True)
-
-        # self.Upper_V_Slider.setGeometry(QRect(80, 150, 160, 16))
-        # self.Upper_V_Slider.setOrientation(Qt.Horizontal)
-        # self.Upper_V_Slider.setRange(0, 255)
-        # self.Upper_V_Slider.hasTracking()
-        # self.Upper_V_Slider.setValue(255)
-        # self.Upper_V_Value.setGeometry(QRect(250, 150, 41, 16))
-        # self.Upper_V_Value.setReadOnly(True)
-
-        # self.maskButton.setGeometry(QRect(250, 175, 120, 41))
+        
         self.new_width = 320
         self.font = cv2.FONT_HERSHEY_COMPLEX
 
@@ -692,16 +615,7 @@ class VideoTracking(QLabel):
 
     def OnPeriodicEvent(self):
         frame = self.capwebcam.read()
-        # self.changeSliderValues()
         self.vision(frame)
-
-    # def changeSliderValues(self):
-    #     self.Lower_H_Value.setText(str(self.Lower_H_Slider.value()))
-    #     self.Lower_S_Value.setText(str(self.Lower_S_Slider.value()))
-    #     self.Lower_V_Value.setText(str(self.Lower_V_Slider.value()))
-    #     self.Upper_H_Value.setText(str(self.Upper_H_Slider.value()))
-    #     self.Upper_S_Value.setText(str(self.Upper_S_Slider.value()))
-    #     self.Upper_V_Value.setText(str(self.Upper_V_Slider.value()))
 
     def load_labels(self,path=os.path.join(paths['TFLITE_PATH'],"labelmap.txt")):
 
