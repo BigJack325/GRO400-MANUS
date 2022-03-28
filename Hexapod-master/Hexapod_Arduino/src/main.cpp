@@ -653,7 +653,7 @@ void sendMsg(){
   doc["cur_pos_y"]  = current_position_y;
   doc["cur_orientation"]  = current_orientation;
   
-  // doc["cur_angle_A1"]  = A1_.Read();
+  //doc["cur_angle_A1"]  = A1_.Read();
   // doc["cur_angle_B1"]  = B1_.Read();
   // doc["cur_angle_C1"]  = C1_.Read();
   // doc["cur_angle_A2"]  = A2_.Read();

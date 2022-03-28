@@ -67,7 +67,7 @@
 
 static servo_t servos[MAX_SERVOS];                         // static array of servo structures
 static volatile int8_t Channel[NBR_TIMERS];                // counter for the servo being pulsed for each timer (or -1 if refresh interval)
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || (__AVR_ATmega2560__)
 typedef enum {  _timer5, _timer1, _timer3, _timer4 } servoTimer_t; // this is the sequence for timer utilization 
 #else
 typedef enum { _timer1 } servoTimer_t;                     // this is the sequence for timer utilization 
@@ -117,7 +117,7 @@ SIGNAL (TIMER1_COMPA_vect)
   handle_interrupts(_timer1, &TCNT1, &OCR1A); 
 }
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || (__AVR_ATmega2560__)
 SIGNAL (TIMER3_COMPA_vect) 
 { 
   handle_interrupts(_timer3, &TCNT3, &OCR3A); 
@@ -141,7 +141,7 @@ static void initISR(servoTimer_t timer)
     TIFR1 = _BV(OCF1A);     // clear any pending interrupts; 
     TIMSK1 =  _BV(OCIE1A) ; // enable the output compare interrupt	  
   }
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || (__AVR_ATmega2560__)
   else if(timer == _timer3) {
     TCCR3A = 0;             // normal counting mode 
     TCCR3B = _BV(CS31);     // set prescaler of 8  
