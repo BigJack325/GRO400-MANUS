@@ -60,7 +60,7 @@
 #define DEFAULT_PULSE_WIDTH  1500        // default pulse width when servo is attached
 #define REFRESH_INTERVAL    20000        // minumim time to refresh servos in microseconds 
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define MAX_SERVOS             48        // the maximum number of servos  (valid range is from 1 to 48)
 #else
 #define MAX_SERVOS             12        // this library supports up to 12 on a standard Arduino
