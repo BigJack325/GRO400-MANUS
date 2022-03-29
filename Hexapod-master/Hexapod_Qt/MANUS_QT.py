@@ -344,9 +344,9 @@ class Ui_MainWindow(QMainWindow):
 
     def ManualMessage(self,msg):
         if msg == "START":
-            msg_array = {"START":1,"STOP":0}
+            msg_array = {"CASE":10}
         elif msg == "STOP":
-            msg_array = {"START":0,"STOP":1}
+            msg_array = {"CASE":2}
         elif msg == "RIGHT":
             msg_array = {"RIGHT":1}
         elif msg == "LEFT":

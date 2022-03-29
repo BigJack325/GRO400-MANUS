@@ -259,18 +259,18 @@ using namespace std;
 #define step_delay                     500               // delay between each steps
 
 //--- CASE NUMBERS ----
-#define INITIALIZATION                 1         // Initial case of the robot when turned on
-#define WAIT                           2         // Case when robot is waiting for a command
-#define MOVE_FORWARD                   3         // Case for robot to move forward
-#define MOVE_BACKWARD                  4         // Case for robot to move backward
-#define SIDESTEP_LEFT                  5         // Case for robot to move sideways left
-#define SIDESTEP_RIGHT                 6         // Case for robot to move sideways right
-#define TURN_LEFT                      7         // Case for robot to spin on itself left
-#define TURN_RIGHT                     8         // Case for robot to spin on itself right
-#define PICKUP                         9         // Case for robot to pick up object
-#define DROP                           10        // Case for robot to drop object
-#define STAND                          20        // Case for robot to get up off the ground
-#define LAYDOWN                        21        // Case for robot to gently drop to ground
+#define INITIALIZATION                 0         // Initial case of the robot when turned on
+#define WAIT                           1         // Case when robot is waiting for a command
+#define MOVE_FORWARD                   2         // Case for robot to move forward
+#define MOVE_BACKWARD                  3         // Case for robot to move backward
+#define SIDESTEP_LEFT                  4         // Case for robot to move sideways left
+#define SIDESTEP_RIGHT                 5         // Case for robot to move sideways right
+#define TURN_LEFT                      6         // Case for robot to spin on itself left
+#define TURN_RIGHT                     7         // Case for robot to spin on itself right
+#define PICKUP                         8         // Case for robot to pick up object
+#define DROP                           9        // Case for robot to drop object
+#define STAND                          10        // Case for robot to get up off the ground
+#define LAYDOWN                        11        // Case for robot to gently drop to ground
 
 // --- Class constants
 #define A                              1         // Variable to identify which motors is associated with object synchservo
@@ -349,7 +349,6 @@ double time2 =                         0.0;               //Variable used if a d
 int step =                             1;                 //To organize motion in each case
 float t;                                                  //Variable to use as timer for steps
 
-int input_command =                    WAIT;       // command recu du HMI
 
 /*---------------------------- Objects ---------------------------*/
 
@@ -460,7 +459,6 @@ void setup() {
   D1_.attach(D1_Pin); 
 
   command = INITIALIZATION;
-  input_command = WAIT;
   t = millis();
 }
 
@@ -497,10 +495,9 @@ void loop() {
         
         case WAIT :                // Waiting for a command
           //Do nothing
-          if (input_command != WAIT)
+          if (command != WAIT)
           {
             t = millis();
-            command = input_command;
           }
         break;
 
@@ -698,6 +695,8 @@ void readMsg(){
     Serial.println(error.c_str());
     return;
   }
+
+  command = doc["CASE"];
   // Analyse des éléments du message
   // parse_msg = doc["pulsePWM"];
   // if(!parse_msg.isNull()){
