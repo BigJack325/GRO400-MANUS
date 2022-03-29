@@ -641,6 +641,8 @@ void loop() {
             }
         break;
     }
+  
+  timerSendMsg_.update();
 
 }
 
@@ -657,29 +659,29 @@ void sendMsg(){
   // Elements du message
 
   doc["time"]      = (millis()/1000.0);
-  doc["cur_pos_x"]  = current_position_x; 
-  doc["cur_pos_y"]  = current_position_y;
-  doc["cur_orientation"]  = current_orientation;
+  doc["cur_x"]  = current_position_x; 
+  doc["cur_y"]  = current_position_y;
+  doc["cur_angle"]  = current_orientation;
   
-  //doc["cur_angle_A1"]  = A1_.Read();
-  // doc["cur_angle_B1"]  = B1_.Read();
-  // doc["cur_angle_C1"]  = C1_.Read();
-  // doc["cur_angle_A2"]  = A2_.Read();
-  // doc["cur_angle_B2"]  = B2_.Read();
-  // doc["cur_angle_C2"]  = C2_.Read();
-  // doc["cur_angle_A3"]  = A3_.Read();
-  // doc["cur_angle_B3"]  = B3_.Read();
-  // doc["cur_angle_C3"]  = C3_.Read();
-  // doc["cur_angle_A4"]  = A4_.Read();
-  // doc["cur_angle_B4"]  = B4_.Read();
-  // doc["cur_angle_C4"]  = C4_.Read();
-  // doc["cur_angle_A5"]  = A5_.Read();
-  // doc["cur_angle_B5"]  = B5_.Read();
-  // doc["cur_angle_C5"]  = C5_.Read();
-  // doc["cur_angle_A6"]  = A6_.Read();
-  // doc["cur_angle_B6"]  = B6_.Read();
-  // doc["cur_angle_C6"]  = C6_.Read();
-  // doc["cur_angle_D1"]  = D1_.Read();
+  doc["Servo_A1"]  = A1_.read();
+  doc["Servo_B1"]  = B1_.read();
+  doc["Servo_C1"]  = C1_.read();
+  doc["Servo_A2"]  = A2_.read();
+  doc["Servo_B2"]  = B2_.read();
+  doc["Servo_C2"]  = C2_.read();
+  doc["Servo_A3"]  = A3_.read();
+  doc["Servo_B3"]  = B3_.read();
+  doc["Servo_C3"]  = C3_.read();
+  doc["Servo_A4"]  = A4_.read();
+  doc["Servo_B4"]  = B4_.read();
+  doc["Servo_C4"]  = C4_.read();
+  doc["Servo_A5"]  = A5_.read();
+  doc["Servo_B5"]  = B5_.read();
+  doc["Servo_C5"]  = C5_.read();
+  doc["Servo_A6"]  = A6_.read();
+  doc["Servo_B6"]  = B6_.read();
+  doc["Servo_C6"]  = C6_.read();
+  doc["Servo_D1"]  = D1_.read();
   
  
   // Serialisation

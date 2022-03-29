@@ -378,25 +378,25 @@ class Ui_MainWindow(QMainWindow):
 
     def connectMotorLabels(self):
         if self.jsondata is not None:
-            self.Servo[1].setText(str(self.jsondata["Servo_1"]))
-            self.Servo[2].setText(str(self.jsondata["Servo_2"]))
-            self.Servo[3].setText(str(self.jsondata["Servo_3"]))
-            self.Servo[4].setText(str(self.jsondata["Servo_4"]))
-            self.Servo[5].setText(str(self.jsondata["Servo_5"]))
-            self.Servo[6].setText(str(self.jsondata["Servo_6"]))
-            self.Servo[7].setText(str(self.jsondata["Servo_7"]))
-            self.Servo[8].setText(str(self.jsondata["Servo_8"]))
-            self.Servo[9].setText(str(self.jsondata["Servo_9"]))
-            self.Servo[10].setText(str(self.jsondata["Servo_10"]))
-            self.Servo[11].setText(str(self.jsondata["Servo_11"]))
-            self.Servo[12].setText(str(self.jsondata["Servo_12"]))
-            self.Servo[13].setText(str(self.jsondata["Servo_13"]))
-            self.Servo[14].setText(str(self.jsondata["Servo_14"]))
-            self.Servo[15].setText(str(self.jsondata["Servo_15"]))
-            self.Servo[16].setText(str(self.jsondata["Servo_16"]))
-            self.Servo[17].setText(str(self.jsondata["Servo_17"]))
-            self.Servo[18].setText(str(self.jsondata["Servo_18"]))
-            self.Servo[19].setText(str(self.jsondata["Servo_19"]))
+            self.Servo[1].setText(str(self.jsondata["Servo_A1"]))
+            self.Servo[2].setText(str(self.jsondata["Servo_A2"]))
+            self.Servo[3].setText(str(self.jsondata["Servo_A3"]))
+            self.Servo[4].setText(str(self.jsondata["Servo_A4"]))
+            self.Servo[5].setText(str(self.jsondata["Servo_A5"]))
+            self.Servo[6].setText(str(self.jsondata["Servo_A6"]))
+            self.Servo[7].setText(str(self.jsondata["Servo_B1"]))
+            self.Servo[8].setText(str(self.jsondata["Servo_B2"]))
+            self.Servo[9].setText(str(self.jsondata["Servo_B3"]))
+            self.Servo[10].setText(str(self.jsondata["Servo_B4"]))
+            self.Servo[11].setText(str(self.jsondata["Servo_B5"]))
+            self.Servo[12].setText(str(self.jsondata["Servo_B6"]))
+            self.Servo[13].setText(str(self.jsondata["Servo_C1"]))
+            self.Servo[14].setText(str(self.jsondata["Servo_C2"]))
+            self.Servo[15].setText(str(self.jsondata["Servo_C3"]))
+            self.Servo[16].setText(str(self.jsondata["Servo_C4"]))
+            self.Servo[17].setText(str(self.jsondata["Servo_C5"]))
+            self.Servo[18].setText(str(self.jsondata["Servo_C6"]))
+            self.Servo[19].setText(str(self.jsondata["Servo_D1"]))
 
     def checkManual(self):
         if self.Manual_mode.checkState() == 0:
@@ -453,7 +453,7 @@ class Ui_MainWindow(QMainWindow):
             jsonBrowserText = json.loads(self.msgBuffer_)
 
             for key in list(self.jsondata):
-                if key == "Servo_1" or key=="Servo_2" or key=="Servo_3" or key=="Servo_4" or key=="Servo_5" or key=="Servo_6" or key=="Servo_7" or key=="Servo_8" or key=="Servo_9"or key=="Servo_10" or key=="Servo_11" or key=="Servo_12" or key=="Servo_13" or key=="Servo_14" or key=="Servo_15" or key=="Servo_16" or key=="Servo_17" or key=="Servo_18" or key=="Servo_19" :
+                if key == "Servo_A1" or key=="Servo_A2" or key=="Servo_A3" or key=="Servo_A4" or key=="Servo_A5" or key=="Servo_A6" or key=="Servo_B1" or key=="Servo_B2" or key=="Servo_B3"or key=="Servo_B4" or key=="Servo_B5" or key=="Servo_B6" or key=="Servo_C1" or key=="Servo_C2" or key=="Servo_C3" or key=="Servo_C4" or key=="Servo_C5" or key=="Servo_C6" or key=="Servo_D1" :
                     del jsonBrowserText[key]
             
             jsondataString = json.dumps(jsonBrowserText,indent=2)
@@ -680,7 +680,7 @@ class VideoTracking(QLabel):
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
         res = self.detect_objects(self.interpreter, img, 0.5)
-        # print(res)
+        print(res)
 
         for result in res:
             ymin, xmin, ymax, xmax = result['bounding_box']
