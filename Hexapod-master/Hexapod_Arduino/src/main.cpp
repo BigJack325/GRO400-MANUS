@@ -251,12 +251,14 @@ using namespace std;
 #define angle_backward                 10         // Angle of servo A used in backward movements
 #define angle_rotation                 10         // Angle of servo A used in spinning movements
 
+#define angle_laydown_B               160          // Angle used to lay robot on ground
+
 #define arena_sizex                    200                //Width of the arena (cm)
 #define arena_sizey                    200                //length of the arena (cm)
 #define initial_position_x             arena_sizex/2      //Initial position of the robot on the x axis (cm)
 #define initial_position_y             arena_sizey/2      //Initial position of the robot on the y-axis (cm)
 
-#define step_delay                     500               // delay between each steps
+#define step_delay                     300               // delay between each steps
 
 //--- CASE NUMBERS ----
 #define INITIALIZATION                 0         // Initial case of the robot when turned on
@@ -495,10 +497,7 @@ void loop() {
         
         case WAIT :                // Waiting for a command
           //Do nothing
-          if (command != WAIT)
-          {
             t = millis();
-          }
         break;
 
         case MOVE_FORWARD :                // Move one step forward sequence
@@ -575,23 +574,35 @@ void loop() {
         break;
 
         case TURN_LEFT :                // Pivot counter-clockwise sequence
-
           stepsequence(1, step_delay, &B236_, walking_angle_B);
-          turnstepsequence(2, step_delay, &A236_, turn_angle);
+          turnstepsequence(2, step_delay, &A236_, -turn_angle);
           stepsequence(3, step_delay, &B236_, standing_angle_B);
           stepsequence(4, step_delay, &B145_, walking_angle_B);
-          sidestepsequence(5, step_delay, &A236_, 0);
+          turnstepsequence(5, step_delay, &A236_, 0);
           stepsequence(6, step_delay, &B145_, standing_angle_B);
 
            if (step == 7)
           {
             step = 1;
-            command = WAIT;;
+            command = WAIT;
           }
+          
 
         break;
 
         case TURN_RIGHT :                // Pivot clockwise sequence
+          stepsequence(1, step_delay, &B236_, walking_angle_B);
+          turnstepsequence(2, step_delay, &A236_, turn_angle);
+          stepsequence(3, step_delay, &B236_, standing_angle_B);
+          stepsequence(4, step_delay, &B145_, walking_angle_B);
+          turnstepsequence(5, step_delay, &A236_, 0);
+          stepsequence(6, step_delay, &B145_, standing_angle_B);
+
+           if (step == 7)
+          {
+            step = 1;
+            command = WAIT;
+          }
         break;
 
         case PICKUP :                // Pickup object sequence
@@ -618,8 +629,8 @@ void loop() {
         break;
 
         case LAYDOWN :                // Gently lands body on the ground and sets legs into transport position
-          stepsequence(1, 0, &B145_, initial_angle_B );
-          stepsequence(2, step_delay, &B236_, initial_angle_B );
+          stepsequence(1, 0, &B145_, angle_laydown_B );
+          stepsequence(2, step_delay, &B236_, angle_laydown_B );
           stepsequence(3, 0, &C145_, standing_angle_C );
           stepsequence(4, step_delay, &C236_, standing_angle_C );
           
@@ -800,14 +811,14 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
           if(servos->group == 1)
           {
             servos->servo1->write(initial_angle_A + angle);
-            servos->servo2->write(180 - initial_angle_A - angle);
+            servos->servo2->write(180 - initial_angle_A + angle);
             servos->servo3->write(initial_angle_A + angle);
           }
 
           if(servos->group == 2)
           {
             servos->servo1->write(180 - initial_angle_A + angle);
-            servos->servo2->write(initial_angle_A - angle);
+            servos->servo2->write(initial_angle_A + angle);
             servos->servo3->write(180 - initial_angle_A + angle);
           }
           

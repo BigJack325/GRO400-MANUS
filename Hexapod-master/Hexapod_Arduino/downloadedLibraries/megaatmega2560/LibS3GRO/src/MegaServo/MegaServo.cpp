@@ -202,7 +202,7 @@ MegaServo::MegaServo()
 {
   if( ServoCount < MAX_SERVOS) {
     this->servoIndex = ServoCount++;                    // assign a servo index to this instance
-	servos[this->servoIndex].ticks = DEFAULT_PULSE_WIDTH * TICKS_PER_uS;   // store default values	
+//	servos[this->servoIndex].ticks = DEFAULT_PULSE_WIDTH * TICKS_PER_uS;   // store default values	
   }
   else
     this->servoIndex = INVALID_SERVO ;  // too many servos 
