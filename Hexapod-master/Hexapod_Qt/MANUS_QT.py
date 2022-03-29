@@ -278,6 +278,7 @@ class Ui_MainWindow(QMainWindow):
         self.RotateLeftButton.pressed.connect(lambda: self.ManualMessage("RLEFT"))
         self.RotateRightButton.pressed.connect(lambda: self.ManualMessage("RRIGHT"))
 
+
         # Change button image when pressed
         self.RightButton.pressed.connect(lambda: self.changeButtonIcon("RIGHT",1))
         self.LeftButton.pressed.connect(lambda: self.changeButtonIcon("LEFT",1))
@@ -303,6 +304,9 @@ class Ui_MainWindow(QMainWindow):
         self.RotateRightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RRIGHT",int(self.AngleBox.text())))
 
     def changeButtonIcon(self,button,state):
+
+        
+
         if button == "RIGHT" and state == 1:
             self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right_pressed.png")))
             self.RightButton.setIconSize(QSize(61,61))
@@ -346,23 +350,30 @@ class Ui_MainWindow(QMainWindow):
         if msg == "START":
             msg_array = {"CASE":10}
         elif msg == "STOP":
-            msg_array = {"CASE":2}
+            msg_array = {"CASE":1}
         elif msg == "RIGHT":
-            msg_array = {"RIGHT":1}
+            msg_array = {"CASE":5}
         elif msg == "LEFT":
-            msg_array = {"LEFT":1}
+            msg_array = {"CASE":4}
         elif msg == "FRONT":
-            msg_array = {"FRONT":1}
+            msg_array = {"CASE":2}
         elif msg == "BACK":
-            msg_array = {"BACK":1}
+            msg_array = {"CASE":3}
         elif msg == "RLEFT":
-            msg_array = {"RLEFT":1}
+            msg_array = {"CASE":6}
         elif msg == "RRIGHT":
-            msg_array = {"RRIGHT":1}
+            msg_array = {"CASE":7}
         
         
         data_out = json.dumps(msg_array)
         self.serialCom_.sendMessage(data_out)
+
+        self.RightButton.released.connect(lambda: self.ManualMessage("WAIT"))
+        self.LeftButton.released.connect(lambda: self.ManualMessage("WAIT"))
+        self.FrontButton.released.connect(lambda: self.ManualMessage("WAIT"))
+        self.BackButton.released.connect(lambda: self.ManualMessage("WAIT"))
+        self.RotateLeftButton.released.connect(lambda: self.ManualMessage("WAIT"))
+        self.RotateRightButton.released.connect(lambda: self.ManualMessage("WAIT"))
 
 
     def connectMotorLabels(self):
