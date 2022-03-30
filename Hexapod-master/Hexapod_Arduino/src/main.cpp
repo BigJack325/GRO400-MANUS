@@ -662,6 +662,7 @@ void sendMsg(){
   doc["cur_x"]  = current_position_x; 
   doc["cur_y"]  = current_position_y;
   doc["cur_angle"]  = current_orientation;
+  doc["Case"] = command;
   
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
@@ -682,6 +683,7 @@ void sendMsg(){
   doc["Servo_B6"]  = B6_.read();
   doc["Servo_C6"]  = C6_.read();
   doc["Servo_D1"]  = D1_.read();
+
   
  
   // Serialisation

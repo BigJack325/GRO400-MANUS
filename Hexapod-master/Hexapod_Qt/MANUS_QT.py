@@ -364,16 +364,9 @@ class Ui_MainWindow(QMainWindow):
         elif msg == "RRIGHT":
             msg_array = {"CASE":7}
         
-        
         data_out = json.dumps(msg_array)
         self.serialCom_.sendMessage(data_out)
 
-        self.RightButton.released.connect(lambda: self.ManualMessage("WAIT"))
-        self.LeftButton.released.connect(lambda: self.ManualMessage("WAIT"))
-        self.FrontButton.released.connect(lambda: self.ManualMessage("WAIT"))
-        self.BackButton.released.connect(lambda: self.ManualMessage("WAIT"))
-        self.RotateLeftButton.released.connect(lambda: self.ManualMessage("WAIT"))
-        self.RotateRightButton.released.connect(lambda: self.ManualMessage("WAIT"))
 
 
     def connectMotorLabels(self):
