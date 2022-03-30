@@ -231,7 +231,7 @@ using namespace std;
 
 #define VIN                            A0
 #define BAUD                           115200    // Frequence de transmission serielle
-#define UPDATE_PERIODE                 100     // Periode (ms) d'envoie d'etat general
+#define UPDATE_PERIODE                 20     // Periode (ms) d'envoie d'etat general
 
 #define MANUEL                         1         // Used to set robot in manuel mode
 #define AUTOMATIC                      2         // Used to set robot in automatic mode
@@ -351,6 +351,8 @@ double time2 =                         0.0;               //Variable used if a d
 
 int step =                             1;                 //To organize motion in each case
 float t;                                                  //Variable to use as timer for steps
+
+float real_current;
 
 
 /*---------------------------- Objects ---------------------------*/
@@ -475,6 +477,8 @@ void loop() {
   if(shouldSend_){
     sendMsg();
   }
+
+  real_current = current();
   
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
@@ -664,7 +668,8 @@ void sendMsg(){
   doc["cur_y"]  = current_position_y;
   doc["cur_angle"]  = current_orientation;
   doc["Case"] = command;
-  
+  doc["current"] = real_current;
+
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
   doc["Servo_C1"]  = C1_.read();
@@ -847,4 +852,24 @@ float current(){
   float current;
   current = voltage/sensitivity;
   return current;
+}
+
+// LED pin 10 et 11
+
+float battery_voltage()
+{
+    const int pin_LED = 10;
+    const int pin_voltage = A3;
+    int sensor_value = analogRead(pin_voltage);
+    float voltage = sensor_value * (5.0 / 1023.0);
+
+    if (voltage < 3.2)
+    {
+        digitalWrite(pin_LED, HIGH);
+    }
+    else
+    {
+        digitalWrite(pin_LED, LOW);
+    }
+
 }

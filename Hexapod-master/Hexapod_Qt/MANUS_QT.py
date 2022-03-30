@@ -28,12 +28,14 @@ CAMERA_HEIGHT= 320
 
 CUSTOM_MODEL_NAME = 'Ant' 
 LABEL_MAP_NAME = 'labelmap.txt'
+DISTANCE_IMAGE = 'Happy.e3232dfe-aabb-11ec-abb9-dca632b24006.jpg'
 
 
 paths = {
     'DISPLAY_IMAGE_PATH': os.path.join('Qt_Images','Display'),
     'BUTTON_IMAGE_PATH': os.path.join('Qt_Images', 'Buttons'),
     'TFLITE_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME,'tfliteexport'),
+    'TF_TEST_IMG_PATH': os.path.join('Tensorflow', 'workspace','images','test',DISTANCE_IMAGE),
  }
 
 
@@ -117,7 +119,6 @@ class Ui_MainWindow(QMainWindow):
         self.Cam_label = QLabel(self.widget)
         self.Cam = VideoTracking(self.widget)
         self.CamDistance_label = QLabel(self.widget)
-        self.CamDistanceText = QPlainTextEdit(self.widget)
 
         self.Angle_label = QLabel(self.widget)
         self.AngleBox = QDoubleSpinBox(self.widget)
@@ -173,6 +174,7 @@ class Ui_MainWindow(QMainWindow):
         self.FrontButton.setGeometry(QRect(760, 430, 61, 61))
         self.BackButton.setGeometry(QRect(760, 590, 61, 61))
         self.ProneButton.setGeometry(QRect(760, 510, 61, 61))
+
         
         self.Port_label.setGeometry(QRect(660, 300, 94, 22))
         self.comboBoxPort.setGeometry(QRect(800, 300, 124, 22))
@@ -196,10 +198,9 @@ class Ui_MainWindow(QMainWindow):
         self.Cam_label.setGeometry(QRect(0, 170, 50, 22))
         self.Cam.setGeometry(QRect(0, 160, 320, 320))
         self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
-        self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
-        self.Angle_label.setGeometry(QRect(615, 680, 94, 22))
-        self.AngleBox.setGeometry(QRect(710, 680, 124, 22))
+        self.Angle_label.setGeometry(QRect(615, 735, 94, 22))
+        self.AngleBox.setGeometry(QRect(710, 735, 124, 22))
         self.AngleBox.setMinimum(0)
         self.AngleBox.setMaximum(180)
         self.AngleBox.setDecimals(0)
@@ -212,7 +213,7 @@ class Ui_MainWindow(QMainWindow):
         font.setPointSize(9)
         self.Json_Browser.setFont(font)
 
-        self.Manual_mode.setGeometry(QRect(850, 670, 120, 41))
+        self.Manual_mode.setGeometry(QRect(840, 720, 120, 50))
 
         self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
         self.setCentralWidget(self.centralWidget)
@@ -227,7 +228,7 @@ class Ui_MainWindow(QMainWindow):
     def retranslateUi(self):
         _translate = QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "MANUS"))
-        self.JsonKey.setText(_translate("MainWindow", "time"))
+        self.JsonKey.setText(_translate("MainWindow", "current"))
         self.Map_label.setText(_translate("MainWindow", "Map:"))
         self.ProneButton.setText(_translate("MainWindow", "PRONE"))
         self.Cam_label.setText(_translate("MainWindow", "Cam:"))
@@ -372,22 +373,22 @@ class Ui_MainWindow(QMainWindow):
     def connectMotorLabels(self):
         if self.jsondata is not None:
             self.Servo[1].setText(str(self.jsondata["Servo_A1"]))
-            self.Servo[2].setText(str(self.jsondata["Servo_A2"]))
-            self.Servo[3].setText(str(self.jsondata["Servo_A3"]))
-            self.Servo[4].setText(str(self.jsondata["Servo_A4"]))
-            self.Servo[5].setText(str(self.jsondata["Servo_A5"]))
-            self.Servo[6].setText(str(self.jsondata["Servo_A6"]))
-            self.Servo[7].setText(str(self.jsondata["Servo_B1"]))
-            self.Servo[8].setText(str(self.jsondata["Servo_B2"]))
-            self.Servo[9].setText(str(self.jsondata["Servo_B3"]))
-            self.Servo[10].setText(str(self.jsondata["Servo_B4"]))
-            self.Servo[11].setText(str(self.jsondata["Servo_B5"]))
-            self.Servo[12].setText(str(self.jsondata["Servo_B6"]))
-            self.Servo[13].setText(str(self.jsondata["Servo_C1"]))
-            self.Servo[14].setText(str(self.jsondata["Servo_C2"]))
-            self.Servo[15].setText(str(self.jsondata["Servo_C3"]))
-            self.Servo[16].setText(str(self.jsondata["Servo_C4"]))
-            self.Servo[17].setText(str(self.jsondata["Servo_C5"]))
+            self.Servo[2].setText(str(self.jsondata["Servo_B1"]))
+            self.Servo[3].setText(str(self.jsondata["Servo_C1"]))
+            self.Servo[4].setText(str(self.jsondata["Servo_A2"]))
+            self.Servo[5].setText(str(self.jsondata["Servo_B2"]))
+            self.Servo[6].setText(str(self.jsondata["Servo_C2"]))
+            self.Servo[7].setText(str(self.jsondata["Servo_A3"]))
+            self.Servo[8].setText(str(self.jsondata["Servo_B3"]))
+            self.Servo[9].setText(str(self.jsondata["Servo_C3"]))
+            self.Servo[10].setText(str(self.jsondata["Servo_A4"]))
+            self.Servo[11].setText(str(self.jsondata["Servo_B4"]))
+            self.Servo[12].setText(str(self.jsondata["Servo_C4"]))
+            self.Servo[13].setText(str(self.jsondata["Servo_A5"]))
+            self.Servo[14].setText(str(self.jsondata["Servo_B5"]))
+            self.Servo[15].setText(str(self.jsondata["Servo_C5"]))
+            self.Servo[16].setText(str(self.jsondata["Servo_A6"]))
+            self.Servo[17].setText(str(self.jsondata["Servo_B6"]))
             self.Servo[18].setText(str(self.jsondata["Servo_C6"]))
             self.Servo[19].setText(str(self.jsondata["Servo_D1"]))
 
@@ -448,7 +449,31 @@ class Ui_MainWindow(QMainWindow):
             for key in list(self.jsondata):
                 if key == "Servo_A1" or key=="Servo_A2" or key=="Servo_A3" or key=="Servo_A4" or key=="Servo_A5" or key=="Servo_A6" or key=="Servo_B1" or key=="Servo_B2" or key=="Servo_B3"or key=="Servo_B4" or key=="Servo_B5" or key=="Servo_B6" or key=="Servo_C1" or key=="Servo_C2" or key=="Servo_C3" or key=="Servo_C4" or key=="Servo_C5" or key=="Servo_C6" or key=="Servo_D1" :
                     del jsonBrowserText[key]
-            
+                if key == "Case":
+                    if jsonBrowserText[key] == 1:
+                        jsonBrowserText[key] = "WAIT"
+                    if jsonBrowserText[key] == 2:
+                        jsonBrowserText[key] = "FRONT"
+                    if jsonBrowserText[key] == 3:
+                        jsonBrowserText[key] = "BACK"
+                    if jsonBrowserText[key] == 4:
+                        jsonBrowserText[key] = "LEFT"
+                    if jsonBrowserText[key] == 5:
+                        jsonBrowserText[key] = "RIGHT"
+                    if jsonBrowserText[key] == 6:
+                        jsonBrowserText[key] = "RLEFT"
+                    if jsonBrowserText[key] == 7:
+                        jsonBrowserText[key] = "RRIGHT"
+                    if jsonBrowserText[key] == 8:
+                        jsonBrowserText[key] = "PICK"
+                    if jsonBrowserText[key] == 9:
+                        jsonBrowserText[key] = "DROP"
+                    if jsonBrowserText[key] == 10:
+                        jsonBrowserText[key] = "STAND"
+                    if jsonBrowserText[key] == 11:
+                        jsonBrowserText[key] = "PRONE"
+                    
+
             jsondataString = json.dumps(jsonBrowserText,indent=2)
 
             self.Json_Browser.setText(jsondataString)
@@ -605,13 +630,21 @@ class VideoTracking(QLabel):
         self.camTimer = QTimer()
         
         self.new_width = 320
+        self.real_img_width = 5.7
+        self.real_distance = 50.0
         self.font = cv2.FONT_HERSHEY_COMPLEX
+
+        self.CamDistanceText = QPlainTextEdit(parent)
+        self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
         self.labels = self.load_labels()
         self.interpreter = Interpreter(model_path=os.path.join(paths['TFLITE_PATH'],"detect.tflite"))
         self.interpreter.allocate_tensors()
         self.input_height= self.interpreter.get_input_details()[0]['shape'][1]
         self.input_width= self.interpreter.get_input_details()[0]['shape'][2]
+
+        self.pixel_width = self.pixel_width_finder(cv2.imread(paths['TF_TEST_IMG_PATH']))
+        self.focal_length = self.Focal_Length_Finder(self.real_distance,self.real_img_width,self.pixel_width)
 
         time.sleep(1)
         self.camTimer.timeout.connect(self.OnPeriodicEvent)
@@ -667,13 +700,39 @@ class VideoTracking(QLabel):
                 results.append(result)
         return results
         
+    def Distance_finder(self,Focal_Length, real_object_width, object_width_in_frame):
+ 
+        distance = (real_object_width * Focal_Length)/object_width_in_frame
+        return distance
+
+    def Focal_Length_Finder(self,measured_distance1, real_width1, width_in_rf_image1):
+ 
+        # finding the focal length
+        focal_length = (width_in_rf_image1 * measured_distance1) / real_width1
+        return focal_length
+
+    def pixel_width_finder(self,frame):
+        img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
+
+        res = self.detect_objects(self.interpreter, img, 0.8)
+
+        for result in res:
+            _, xmin, _, xmax = result['bounding_box']
+            xmin = int(max(1,xmin * 320))
+            xmax = int(min(320, xmax * 320))
+
+        return xmax-xmin
+    
 
     def vision(self,frame):
 
+        frame = cv2.flip(frame,0)
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
-        res = self.detect_objects(self.interpreter, img, 0.5)
+        res = self.detect_objects(self.interpreter, img, 0.8)
         print(res)
+
+
 
         for result in res:
             ymin, xmin, ymax, xmax = result['bounding_box']
@@ -686,7 +745,10 @@ class VideoTracking(QLabel):
             
             cv2.rectangle(frame,(xmin, ymin),(xmax, ymax),(0,255,0),3)
             cv2.putText(frame,label,(xmin, ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,255,255),2,cv2.LINE_AA) 
+            
+            distance = self.Distance_finder(self.focal_length,self.real_img_width,(xmax-xmin))
 
+            self.CamDistanceText.setPlainText("Image Distance: "+str(round(distance,2)))
 
         imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
