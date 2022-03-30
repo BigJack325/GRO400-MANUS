@@ -229,8 +229,9 @@ bool SynchServo::readall(int angle_check)
 /*------------------------------ Constantes ---------------------------------*/
 using namespace std;
 
-#define BAUD                            115200    // Frequence de transmission serielle
-#define UPDATE_PERIODE                  100     // Periode (ms) d'envoie d'etat general
+#define VIN                            A0
+#define BAUD                           115200    // Frequence de transmission serielle
+#define UPDATE_PERIODE                 100     // Periode (ms) d'envoie d'etat general
 
 #define MANUEL                         1         // Used to set robot in manuel mode
 #define AUTOMATIC                      2         // Used to set robot in automatic mode
@@ -251,7 +252,7 @@ using namespace std;
 #define angle_backward                 10         // Angle of servo A used in backward movements
 #define angle_rotation                 10         // Angle of servo A used in spinning movements
 
-#define angle_laydown_B               160          // Angle used to lay robot on ground
+#define angle_laydown_B                160          // Angle used to lay robot on ground
 
 #define arena_sizex                    200                //Width of the arena (cm)
 #define arena_sizey                    200                //length of the arena (cm)
@@ -286,46 +287,46 @@ using namespace std;
 //----------------------------- PINS USED -----------------------------------
 
                           //Must Change pin numbers
-#define A1_Pin                          42  //Digital Port for Servo A1
-#define B1_Pin                          41  //Digital Port for Servo B1
-#define C1_Pin                          40  //Digital Port for Servo C1
+#define A1_Pin                         42  //Digital Port for Servo A1
+#define B1_Pin                         41  //Digital Port for Servo B1
+#define C1_Pin                         40  //Digital Port for Servo C1
 
-#define A2_Pin                          25  //Digital Port for Servo A2
-#define B2_Pin                          26  //Digital Port for Servo B2
-#define C2_Pin                          27  //Digital Port for Servo C2
+#define A2_Pin                         25  //Digital Port for Servo A2
+#define B2_Pin                         26  //Digital Port for Servo B2
+#define C2_Pin                         27  //Digital Port for Servo C2
 
-#define A3_Pin                          39  //Digital Port for Servo A3
-#define B3_Pin                          38  //Digital Port for Servo B3
-#define C3_Pin                          37  //Digital Port for Servo C3
+#define A3_Pin                         39  //Digital Port for Servo A3
+#define B3_Pin                         38  //Digital Port for Servo B3
+#define C3_Pin                         37  //Digital Port for Servo C3
 
-#define A4_Pin                          28  //Digital Port for Servo A4
-#define B4_Pin                          29  //Digital Port for Servo B4
-#define C4_Pin                          30  //Digital Port for Servo C4
+#define A4_Pin                         28  //Digital Port for Servo A4
+#define B4_Pin                         29  //Digital Port for Servo B4
+#define C4_Pin                         30  //Digital Port for Servo C4
 
-#define A5_Pin                          36  //Digital Port for Servo A5
-#define B5_Pin                          35  //Digital Port for Servo B5
-#define C5_Pin                          34  //Digital Port for Servo C5
+#define A5_Pin                         36  //Digital Port for Servo A5
+#define B5_Pin                         35  //Digital Port for Servo B5
+#define C5_Pin                         34  //Digital Port for Servo C5
 
-#define A6_Pin                          31  //Digital Port for Servo A6
-#define B6_Pin                          32  //Digital Port for Servo B6
-#define C6_Pin                          33  //Digital Port for Servo C6
+#define A6_Pin                         31  //Digital Port for Servo A6
+#define B6_Pin                         32  //Digital Port for Servo B6
+#define C6_Pin                         33  //Digital Port for Servo C6
 
-#define D1_Pin                          23  //Digital Port for Servo D1 (head)
-#define D2_Pin                          44  //Digital Port for Servo D2 (mandibules)
+#define D1_Pin                         23  //Digital Port for Servo D1 (head)
+#define D2_Pin                         44  //Digital Port for Servo D2 (mandibules)
 
 /*---------------------------- GLOBAL VARIABLES ---------------------------*/
 
-volatile bool shouldSend_ =             false;    // Ready to send message flag
-volatile bool shouldRead_ =             false;    // Ready to read message flag
-volatile bool shouldPulse_ =            false;    // Generate a pulse flag
-volatile bool isInPulse_ =              false;    // Currently in a pulse flag
+volatile bool shouldSend_ =            false;    // Ready to send message flag
+volatile bool shouldRead_ =            false;    // Ready to read message flag
+volatile bool shouldPulse_ =           false;    // Generate a pulse flag
+volatile bool isInPulse_ =             false;    // Currently in a pulse flag
 
 SoftTimer timerSendMsg_;                          // Send message timer
 SoftTimer timerPulse_;                            // Duration of a pulse timer
 
-uint16_t pulseTime_ =                   0;        // Pulse time in ms
+uint16_t pulseTime_ =                  0;        // Pulse time in ms
 
-int time =                              0;        // Loop timer
+int time =                             0;        // Loop timer
 
 
 int operation_mode =                   MANUEL;            //Determines whether robot is in automatic or manuel mode
@@ -424,7 +425,7 @@ void stepsequence(int step_number, int delay_microseconds, SynchServo* servos , 
 void sidestepsequence(int step_number, int delay_microseconds, SynchServo* servos , int angle);   //Move synchservo for sidestepping with timer
 void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servos , int angle);    //Move synchservo for turning with timer
 
-
+ void current();
 /*---------------------------- fonctions "Main" -----------------------------*/
 
 void setup() {
@@ -834,3 +835,10 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
         }
   return;
 }
+
+  void current()
+  {
+  float voltage_raw = (5.0/1023.0) * analogRead(VIN);
+  voltage = voltage_raw - QVt + 0.012;
+  float current = voltage/sensitivity;
+  }
