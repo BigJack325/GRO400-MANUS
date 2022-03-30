@@ -836,9 +836,14 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
   return;
 }
 
-  void current()
-  {
-  float voltage_raw = (5.0/1023.0) * analogRead(VIN);
+void current(){
+  const float VCC = 5.0;  
+  const float QVt = 0.5*VCC;
+  float sensitivity = 0.100;
+  float voltage_raw;
+  voltage_raw = (5.0/1023.0) * analogRead(VIN);
+  float voltage; 
   voltage = voltage_raw - QVt + 0.012;
-  float current = voltage/sensitivity;
-  }
+  float current;
+  current = voltage/sensitivity;
+}
