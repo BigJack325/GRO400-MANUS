@@ -425,7 +425,7 @@ void stepsequence(int step_number, int delay_microseconds, SynchServo* servos , 
 void sidestepsequence(int step_number, int delay_microseconds, SynchServo* servos , int angle);   //Move synchservo for sidestepping with timer
 void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servos , int angle);    //Move synchservo for turning with timer
 
- void current();
+float current();
 /*---------------------------- fonctions "Main" -----------------------------*/
 
 void setup() {
@@ -836,7 +836,7 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
   return;
 }
 
-void current(){
+float current(){
   const float VCC = 5.0;  
   const float QVt = 0.5*VCC;
   float sensitivity = 0.100;
@@ -846,4 +846,5 @@ void current(){
   voltage = voltage_raw - QVt + 0.012;
   float current;
   current = voltage/sensitivity;
+  return current;
 }
