@@ -18,7 +18,7 @@ class SynchServo
   public:
      //constructor
     SynchServo();
-    SynchServo(MegaServo* servo_1, MegaServo* servo_2,  MegaServo* servo_3, int A_B_or_C, int either_145_or_236);
+    SynchServo(MegaServo* servo_1, MegaServo* servo_2,  MegaServo* servo_3, int A_B_or_C, int either_145_or_236, int offset_1, int offset_2, int offset_3);
 
     int cinematic_inverse(int left_or_right, float X, float Y, float Z);
     void move_angle(int angle_selon__patte_gauche);
@@ -47,6 +47,10 @@ class SynchServo
     float L3x;
     float L3y;
     float L3z;
+
+    int offset1;
+    int offset2;
+    int offset3;
 };
 
 //constructor
@@ -67,7 +71,7 @@ SynchServo::SynchServo()
    L3z = 0;
 }
 
-SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_3, int  A_B_or_C, int either_145_or_236)
+SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_3, int  A_B_or_C, int either_145_or_236, int offset_1, intoffset_2, int offset_3)
 {
   servo1 = servo_1;
   servo2 = servo_2;
@@ -75,6 +79,10 @@ SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_
   
   letter = A_B_or_C;
   group  = either_145_or_236;
+
+  offset1 = offset_1;
+  offset2 = offset_2;
+  offset3 = offset_3;
 
   //dimensions of the 3 pieces of the leg for inverse kinematics
    L1x = 0;
@@ -170,9 +178,9 @@ void SynchServo::move_angle(int angle_selon_patte_gauche)
     // float angle_servo2 = (micro_selon_patte_gauche * new_percent) + ((2400 - servo2->readMicroseconds()) *old_percent);
     // float angle_servo3 = (micro_selon_patte_gauche * new_percent) + (servo3->readMicroseconds() *old_percent);
 
-    servo1->write(angle_selon_patte_gauche);
-    servo2->write(180 - angle_selon_patte_gauche); //2400
-    servo3->write(angle_selon_patte_gauche);
+    servo1->write(angle_selon_patte_gauche + offset1);
+    servo2->write(180 - (angle_selon_patte_gauche + offset2)); //2400
+    servo3->write(angle_selon_patte_gauche + offset3);
   }
   
   if (group == 2)
@@ -258,6 +266,31 @@ using namespace std;
 #define arena_sizey                    200                //length of the arena (cm)
 #define initial_position_x             arena_sizex/2      //Initial position of the robot on the x axis (cm)
 #define initial_position_y             arena_sizey/2      //Initial position of the robot on the y-axis (cm)
+
+#define offset_A1                      0
+#define offset_A2                      0
+#define offset_A3                      0
+#define offset_A4                      0
+#define offset_A5                      0
+#define offset_A6                      0
+#define offset_B1                      0
+#define offset_B2                      0
+#define offset_B3                      0
+#define offset_B4                      0
+#define offset_B5                      0
+#define offset_B6                      0
+#define offset_C1                      0
+#define offset_C2                      0
+#define offset_C3                      0
+#define offset_C4                      0
+#define offset_C5                      0
+#define offset_C6                      0
+#define offset_D1                      0
+#define offset_D2                      0
+
+
+
+
 
 #define step_delay                     300               // delay between each steps
 
@@ -405,13 +438,13 @@ MegaServo* C6_p =  &C6_;
 
 
 
-SynchServo A145_(A1_p, A4_p, A5_p, A, group145);
-SynchServo B145_(B1_p, B4_p, B5_p, B, group145);
-SynchServo C145_(C1_p, C4_p, C5_p, C, group145);
+SynchServo A145_(A1_p, A4_p, A5_p, A, group145, offset_A1, offset_A4, offset_A5);
+SynchServo B145_(B1_p, B4_p, B5_p, B, group145, offset_B1, offset_B4, offset_B5);
+SynchServo C145_(C1_p, C4_p, C5_p, C, group145, offset_C1, offset_C4, offset_C5);
 
-SynchServo A236_(A2_p, A3_p, A6_p, A, group236);
-SynchServo B236_(B2_p, B3_p, B6_p, B, group236);
-SynchServo C236_(C2_p, C3_p, C6_p, C, group236);
+SynchServo A236_(A2_p, A3_p, A6_p, A, group236, offset_A2, offset_A3, offset_A6);
+SynchServo B236_(B2_p, B3_p, B6_p, B, group236, offset_B2, offset_B3, offset_B6);
+SynchServo C236_(C2_p, C3_p, C6_p, C, group236, offset_C2, offset_C3, offset_C6);
 
 
 
