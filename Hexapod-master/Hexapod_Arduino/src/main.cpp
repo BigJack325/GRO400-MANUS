@@ -349,6 +349,7 @@ using namespace std;
 
 #define voltage_pin                    A3
 #define current_pin                    A0
+#define voltage_pin_LED                10
 
 /*---------------------------- GLOBAL VARIABLES ---------------------------*/
 
@@ -363,7 +364,7 @@ SoftTimer timerPulse_;                            // Duration of a pulse timer
 uint16_t pulseTime_ =                  0;        // Pulse time in ms
 
 int time =                             0;        // Loop timer
-
+uint32_t Time;                                   // Timer for SmoothMovementWhileV2
 
 int operation_mode =                   MANUEL;            //Determines whether robot is in automatic or manuel mode
 int command =                          0;                 //Variable to give command (inicate which case to do)
@@ -389,6 +390,7 @@ int step =                             1;                 //To organize motion i
 float t;                                                  //Variable to use as timer for steps
 
 float real_current;
+float real_voltage;
 
 
 /*---------------------------- Objects ---------------------------*/
@@ -462,6 +464,7 @@ bool isinarena();                                                //Checks if rob
 void stepsequence(int step_number, int delay_microseconds, SynchServo* servos , int angle);       //Move a synchservo object with timer
 void sidestepsequence(int step_number, int delay_microseconds, SynchServo* servos , int angle);   //Move synchservo for sidestepping with timer
 void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servos , int angle);    //Move synchservo for turning with timer
+void SmoothMovementWhileV2(MegaServo servo, int Speed, int Angle, int DelayTime);
 
 float current();
 /*---------------------------- fonctions "Main" -----------------------------*/
@@ -480,6 +483,7 @@ void setup() {
 
   pinMode(current_pin, INPUT);
   pinMode(voltage_pin, INPUT);
+  pinMode(voltage_pin_LED, OUTPUT);
 
   //Assign each servo to their object 
   A1_.attach(A1_Pin);         
@@ -504,6 +508,7 @@ void setup() {
 
   command = INITIALIZATION;
   t = millis();
+  Time = millis();
 }
 
 
@@ -518,6 +523,7 @@ void loop() {
   }
 
   real_current = current();
+  real_voltage = battery_voltage();
   
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
@@ -708,6 +714,7 @@ void sendMsg(){
   doc["cur_angle"]  = current_orientation;
   doc["Case"] = command;
   doc["current"] = real_current;
+  doc["voltage"] = real_voltage;
 
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
@@ -757,11 +764,6 @@ void readMsg(){
   }
 
   command = doc["CASE"];
-  // Analyse des éléments du message
-  // parse_msg = doc["pulsePWM"];
-  // if(!parse_msg.isNull()){
-  //    pulsePWM_ = doc["pulsePWM"].as<float>();
-  // }
 
 }
 
@@ -880,6 +882,62 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
   return;
 }
 
+void SmoothMovementWhileV2(MegaServo servo, int Speed, int Angle, int DelayTime)
+{
+  int GapToAngle = abs(Angle-servo.read());
+  int GoToAngle = 0;
+  int Direction = Angle-servo.read();
+  int ElseCount = 0;
+  while(GapToAngle!=0)
+  {
+    if(millis()>=Time+DelayTime)
+    {
+      if(GapToAngle <= Speed)
+      {
+        GoToAngle = Angle;
+        servo.write(GoToAngle);
+      }
+      else if(Direction>0 && GapToAngle!=0)
+      {
+        GoToAngle = servo.read()+Speed;
+        servo.write(GoToAngle);
+      }
+      else if(Direction<0 && GapToAngle!=0)
+      {
+        GoToAngle = servo.read()-Speed;
+        servo.write(GoToAngle);
+      }
+      else
+      {
+        servo.write(Angle);
+        break;
+      }
+      Time = millis();
+      GapToAngle = abs(Angle-GoToAngle);
+    }
+    else if (ElseCount>=1 && millis()>=Time+DelayTime)
+    {
+      if(Direction>0)
+      {
+        servo.write(GoToAngle+Speed);
+        GapToAngle = abs(Angle-servo.read());
+        Direction = Angle-servo.read();
+      }
+      else if(Direction<0)
+      {
+        servo.write(GoToAngle-Speed);
+        GapToAngle = abs(Angle-servo.read());
+        Direction = Angle-servo.read();
+      }
+      ElseCount = 0;
+    }
+    else
+    {
+      ElseCount += 1;
+    }
+  }
+}
+
 float current(){
   const float VCC = 5.0;  
   const float QVt = 0.5*VCC;
@@ -897,18 +955,20 @@ float current(){
 
 float battery_voltage()
 {
-    const int pin_LED = 10;
-    const int pin_voltage = A3;
-    int sensor_value = analogRead(pin_voltage);
+
+    int sensor_value = analogRead(voltage_pin);
     float voltage = sensor_value * (5.0 / 1023.0);
+    
 
     if (voltage < 3.2)
     {
-        digitalWrite(pin_LED, HIGH);
+        digitalWrite(voltage_pin_LED, HIGH);
     }
     else
     {
-        digitalWrite(pin_LED, LOW);
+        digitalWrite(voltage_pin_LED, LOW);
     }
+
+    return (voltage*12.0)/5.0;
 
 }
