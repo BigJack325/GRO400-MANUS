@@ -314,6 +314,9 @@ using namespace std;
 #define D1_Pin                         23  //Digital Port for Servo D1 (head)
 #define D2_Pin                         44  //Digital Port for Servo D2 (mandibules)
 
+#define voltage_pin                    A3
+#define current_pin                    A0
+
 /*---------------------------- GLOBAL VARIABLES ---------------------------*/
 
 volatile bool shouldSend_ =            false;    // Ready to send message flag
@@ -441,6 +444,9 @@ void setup() {
 
   // Pulse duration timer
   //timerPulse_.setCallback(endPulse);
+
+  pinMode(current_pin, INPUT);
+  pinMode(voltage_pin, INPUT);
 
   //Assign each servo to their object 
   A1_.attach(A1_Pin);         
@@ -846,7 +852,7 @@ float current(){
   const float QVt = 0.5*VCC;
   float sensitivity = 0.100;
   float voltage_raw;
-  voltage_raw = (5.0/1023.0) * analogRead(VIN);
+  voltage_raw = abs((5.0/1023.0) * analogRead(VIN));
   float voltage; 
   voltage = voltage_raw - QVt + 0.012;
   float current;
