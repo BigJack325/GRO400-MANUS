@@ -316,6 +316,7 @@ using namespace std;
 
 #define voltage_pin                    A3
 #define current_pin                    A0
+#define voltage_pin_LED                10
 
 /*---------------------------- GLOBAL VARIABLES ---------------------------*/
 
@@ -356,6 +357,7 @@ int step =                             1;                 //To organize motion i
 float t;                                                  //Variable to use as timer for steps
 
 float real_current;
+float real_voltage;
 
 
 /*---------------------------- Objects ---------------------------*/
@@ -447,6 +449,7 @@ void setup() {
 
   pinMode(current_pin, INPUT);
   pinMode(voltage_pin, INPUT);
+  pinMode(voltage_pin_LED, OUTPUT);
 
   //Assign each servo to their object 
   A1_.attach(A1_Pin);         
@@ -485,6 +488,7 @@ void loop() {
   }
 
   real_current = current();
+  real_voltage = battery_voltage();
   
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
@@ -675,6 +679,7 @@ void sendMsg(){
   doc["cur_angle"]  = current_orientation;
   doc["Case"] = command;
   doc["current"] = real_current;
+  doc["voltage"] = real_voltage;
 
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
@@ -724,11 +729,6 @@ void readMsg(){
   }
 
   command = doc["CASE"];
-  // Analyse des éléments du message
-  // parse_msg = doc["pulsePWM"];
-  // if(!parse_msg.isNull()){
-  //    pulsePWM_ = doc["pulsePWM"].as<float>();
-  // }
 
 }
 
@@ -864,18 +864,20 @@ float current(){
 
 float battery_voltage()
 {
-    const int pin_LED = 10;
-    const int pin_voltage = A3;
-    int sensor_value = analogRead(pin_voltage);
+
+    int sensor_value = analogRead(voltage_pin);
     float voltage = sensor_value * (5.0 / 1023.0);
+    
 
     if (voltage < 3.2)
     {
-        digitalWrite(pin_LED, HIGH);
+        digitalWrite(voltage_pin_LED, HIGH);
     }
     else
     {
-        digitalWrite(pin_LED, LOW);
+        digitalWrite(voltage_pin_LED, LOW);
     }
+
+    return (voltage*12.0)/5.0;
 
 }
