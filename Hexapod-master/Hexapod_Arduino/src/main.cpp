@@ -71,7 +71,7 @@ SynchServo::SynchServo()
    L3z = 0;
 }
 
-SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_3, int  A_B_or_C, int either_145_or_236, int offset_1, intoffset_2, int offset_3)
+SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_3, int  A_B_or_C, int either_145_or_236, int offset_1, int offset_2, int offset_3)
 {
   servo1 = servo_1;
   servo2 = servo_2;
@@ -467,6 +467,7 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
 void SmoothMovementWhileV2(MegaServo servo, int Speed, int Angle, int DelayTime);
 
 float current();
+float battery_voltage();
 /*---------------------------- fonctions "Main" -----------------------------*/
 
 void setup() {
