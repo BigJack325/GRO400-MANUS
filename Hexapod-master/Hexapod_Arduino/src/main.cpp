@@ -71,7 +71,7 @@ SynchServo::SynchServo()
    L3z = 0;
 }
 
-SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_3, int  A_B_or_C, int either_145_or_236, int offset_1, intoffset_2, int offset_3)
+SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_3, int  A_B_or_C, int either_145_or_236, int offset_1, int offset_2, int offset_3)
 {
   servo1 = servo_1;
   servo2 = servo_2;
@@ -238,8 +238,8 @@ bool SynchServo::readall(int angle_check)
 using namespace std;
 
 #define VIN                            A0
-#define BAUD                           115200    // Frequence de transmission serielle
-#define UPDATE_PERIODE                 20     // Periode (ms) d'envoie d'etat general
+#define BAUD                           115200  // Frequence de transmission serielle
+#define UPDATE_PERIODE                 100     // Periode (ms) d'envoie d'etat general
 
 #define MANUEL                         1         // Used to set robot in manuel mode
 #define AUTOMATIC                      2         // Used to set robot in automatic mode
@@ -467,6 +467,7 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
 void SmoothMovementWhileV2(MegaServo servo, int Speed, int Angle, int DelayTime);
 
 float current();
+float battery_voltage();
 /*---------------------------- fonctions "Main" -----------------------------*/
 
 void setup() {
