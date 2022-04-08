@@ -189,9 +189,9 @@ void SynchServo::move_angle(int angle_selon_patte_gauche)
     // float angle_servo2 = (micro_selon_patte_gauche* new_percent) + ( servo2->readMicroseconds() *old_percent);
     // float angle_servo3 = (micro_selon_patte_gauche* new_percent) + ((2400 - servo3->readMicroseconds()) *old_percent);
 
-    servo1->write(180 - angle_selon_patte_gauche);
-    servo2->write(angle_selon_patte_gauche);
-    servo3->write(180 - angle_selon_patte_gauche);
+    servo1->write(180 - (angle_selon_patte_gauche + offset1));
+    servo2->write(angle_selon_patte_gauche + offset2);
+    servo3->write(180 - (angle_selon_patte_gauche + offset3));
   }
 }
 
@@ -247,6 +247,7 @@ using namespace std;
 #define initial_angle_A                90         //Angle of servo A in initialized state
 #define initial_angle_B                180         //Angle of servo B in initialized state
 #define initial_angle_C                145       //Angle of servo C in initialized state
+#define initial_angle_D                83         //Angle of the neck
 
 #define standing_angle_B               140        // Angle for B servos in standing position
 #define standing_angle_C               140        // Angle for C servos in standing position
@@ -267,24 +268,24 @@ using namespace std;
 #define initial_position_x             arena_sizex/2      //Initial position of the robot on the x axis (cm)
 #define initial_position_y             arena_sizey/2      //Initial position of the robot on the y-axis (cm)
 
-#define offset_A1                      0
-#define offset_A2                      0
-#define offset_A3                      0
-#define offset_A4                      0
-#define offset_A5                      0
-#define offset_A6                      0
-#define offset_B1                      0
-#define offset_B2                      0
-#define offset_B3                      0
-#define offset_B4                      0
-#define offset_B5                      0
-#define offset_B6                      0
-#define offset_C1                      0
-#define offset_C2                      0
-#define offset_C3                      0
-#define offset_C4                      0
-#define offset_C5                      0
-#define offset_C6                      0
+#define offset_A1                      6    //ok
+#define offset_A2                      -3   //ok
+#define offset_A3                      2    //ok
+#define offset_A4                      -5   //ok
+#define offset_A5                      0    //ok
+#define offset_A6                      -6   //ok  
+#define offset_B1                      0    //ok
+#define offset_B2                      -2   //ok
+#define offset_B3                      8    //ok
+#define offset_B4                      -2   //ok
+#define offset_B5                      4    //ok
+#define offset_B6                      2    //ok
+#define offset_C1                      4    //ok
+#define offset_C2                      7    //
+#define offset_C3                      4    //ok
+#define offset_C4                      7    //
+#define offset_C5                      -1   //ok 
+#define offset_C6                      13    //ok
 #define offset_D1                      0
 #define offset_D2                      0
 
@@ -505,7 +506,8 @@ void setup() {
   A6_.attach(A6_Pin);           
   B6_.attach(B6_Pin);         
   C6_.attach(C6_Pin);
-  D1_.attach(D1_Pin); 
+  D1_.attach(D1_Pin);
+  D2_.attach(D2_Pin);
 
   command = INITIALIZATION;
   t = millis();
@@ -537,7 +539,7 @@ void loop() {
         stepsequence(4, step_delay, &B236_, initial_angle_B);
         stepsequence(5, step_delay, &C145_, initial_angle_C);
         stepsequence(6, step_delay, &C236_, initial_angle_C);
-
+        D1_.write(initial_angle_D);
           if (step == 7)
           {
             step = 1;
