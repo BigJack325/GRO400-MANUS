@@ -343,8 +343,9 @@ uint16_t pulseTime_ =                  0;        // Pulse time in ms
 int time =                             0;        // Loop timer
 uint32_t Time;                                   // Timer for SmoothMovementWhileV2
 
-int operation_mode =                   MODE_MANUEL;            //Determines whether robot is in automatic or manuel mode
+int operation_mode =                   MODE_MANUEL;       //Determines whether robot is in automatic or manuel mode
 int command =                          0;                 //Variable to give command (inicate which case to do)
+bool robot_is_standing =               false;             //Varibale indicates if robot is standing or lying down
 
 bool current_overload =                false;
 bool insufficient_voltage =            false;
@@ -543,6 +544,11 @@ void loop() {
     electrical_shutdown = true;
     command = WAIT;
   }
+
+  if(robot_is_standing == false && (command != STAND || command != INITIALIZATION))
+  {
+    command = WAIT;
+  }
   
 
 //---------------------- SWITCH CASE -------------------------------
@@ -708,6 +714,7 @@ void loop() {
             if (step == 5)
             {
               step = 1;
+              robot_is_standing = true;
               command = WAIT;
             }
         break;
@@ -721,6 +728,7 @@ void loop() {
             if (step == 5)
             {
               step = 1;
+              robot_is_standing = false;
               command = WAIT;
             }
         break;
