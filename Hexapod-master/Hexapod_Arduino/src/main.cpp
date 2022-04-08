@@ -318,7 +318,9 @@ using namespace std;
 #define DROP                           9        // Case for robot to drop object
 #define STAND                          10        // Case for robot to get up off the ground
 #define LAYDOWN                        11        // Case for robot to gently drop to ground
-#define AUTOMATIC                      12        // Case for when the robot is in automatic mode
+#define HEAD_LEFT                      12        // Case to turn the head to the left
+#define HEAD_RIGHT                     13        // Case to turn the head to the right
+#define AUTOMATIC                      14        // Case for when the robot is in automatic mode
 
 // --- Class constants
 #define A                              1         // Variable to identify which motors is associated with object synchservo
@@ -557,7 +559,7 @@ void loop() {
   real_voltage = battery_voltage();
 
 
-  if(operation_mode = MODE_MANUEL) // if in manuel mode reset mode automatic
+  if(operation_mode == MODE_MANUEL) // if in manuel mode reset mode automatic
   {
     automatic_done = false;
   }
