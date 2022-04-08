@@ -98,7 +98,6 @@ class Ui_MainWindow(QMainWindow):
         self.BackButton.setAutoRepeat(True)
         self.BackButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
         self.BackButton.setAutoRepeatInterval(1000)#mseconds
-        self.ProneButton = QPushButton(self.widget)
         self.RotateHeadRightButton = QPushButton(self.widget)
         self.RotateHeadRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
         self.RotateHeadRightButton.setIconSize(QSize(61,61))
@@ -113,9 +112,8 @@ class Ui_MainWindow(QMainWindow):
         self.RotateHeadLeftButton.setAutoRepeatInterval(1000)#mseconds
 
         self.PickDropButton = QPushButton(self.widget)
-        self.PickDropButton.setCheckable(True)
 
-
+        self.StandLayButton = QPushButton(self.widget)
 
         self.Port_label = QLabel(self.widget)
         self.comboBoxPort = QComboBox(self.widget)
@@ -130,9 +128,6 @@ class Ui_MainWindow(QMainWindow):
 
         self.Donnees_label = QLabel(self.widget)
         self.JsonKey = QLineEdit(self.widget)
-
-        self.StandButton = QPushButton(self.widget)
-        self.LayButton = QPushButton(self.widget)
 
         self.Cam_label = QLabel(self.widget)
         self.Cam = VideoTracking(self.widget)
@@ -191,10 +186,24 @@ class Ui_MainWindow(QMainWindow):
         self.RotateLeftButton.setGeometry(QRect(680, 420, 61, 61))
         self.FrontButton.setGeometry(QRect(760, 420, 61, 61))
         self.BackButton.setGeometry(QRect(760, 580, 61, 61))
-        self.ProneButton.setGeometry(QRect(760, 500, 61, 61))
         self.RotateHeadRightButton.setGeometry(QRect(840, 650, 61, 61))
         self.RotateHeadLeftButton.setGeometry(QRect(680, 650, 61, 61))
         self.PickDropButton.setGeometry(QRect(760, 650, 61, 61))
+        self.StandLayButton.setGeometry(QRect(760, 500, 61, 61))
+
+        self.PickDropButton.setCheckable(True)
+        self.StandLayButton.setCheckable(True)
+
+        self.RightButton.setEnabled(False)
+        self.LeftButton.setEnabled(False)
+        self.FrontButton.setEnabled(False)
+        self.BackButton.setEnabled(False)
+        self.RotateLeftButton.setEnabled(False)
+        self.RotateRightButton.setEnabled(False)
+        self.RotateHeadLeftButton.setEnabled(False)
+        self.RotateHeadRightButton.setEnabled(False)
+        self.StandLayButton.setEnabled(False)
+        self.PickDropButton.setEnabled(False)
 
         
         self.Port_label.setGeometry(QRect(660, 300, 94, 22))
@@ -209,9 +218,6 @@ class Ui_MainWindow(QMainWindow):
 
         self.Graph_label.setGeometry(QRect(620, 10, 218, 22))
         self.graphView.setGeometry(QRect(620, 30, 341, 211))
-
-        self.StandButton.setGeometry(QRect(820, 360, 131, 31))
-        self.LayButton.setGeometry(QRect(640, 360, 131, 31))
 
         self.Cam_label.setGeometry(QRect(0, 170, 50, 22))
         self.Cam.setGeometry(QRect(0, 160, 320, 320))
@@ -232,6 +238,7 @@ class Ui_MainWindow(QMainWindow):
         self.Json_Browser.setFont(font)
 
         self.Manual_mode.setGeometry(QRect(840, 720, 120, 50))
+        self.Manual_mode.setChecked(True)
 
         self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
         self.setCentralWidget(self.centralWidget)
@@ -248,12 +255,10 @@ class Ui_MainWindow(QMainWindow):
         self.setWindowTitle(_translate("MainWindow", "MANUS"))
         self.JsonKey.setText(_translate("MainWindow", "current"))
         self.Map_label.setText(_translate("MainWindow", "Map:"))
-        self.ProneButton.setText(_translate("MainWindow", "PRONE"))
         self.Cam_label.setText(_translate("MainWindow", "Cam:"))
-        self.StandButton.setText(_translate("MainWindow", "Stand"))
+        self.StandLayButton.setText(_translate("MainWindow", "STAND"))
         self.Port_label.setText(_translate("MainWindow", "Port:"))
         self.Donnees_label.setText(_translate("MainWindow", "Donnees brutes:"))
-        self.LayButton.setText(_translate("MainWindow", "Down"))
         self.Angle_label.setText(_translate("MainWindow", "Angle[0,360]"))
         self.Json_label.setText(_translate("MainWindow", "Messages Json de l\'Arduino:"))
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
@@ -291,8 +296,6 @@ class Ui_MainWindow(QMainWindow):
     def connectButtons(self):
 
         #Send message to Arduino for manual movement
-        self.StandButton.pressed.connect(lambda: self.ManualMessage("STAND"))
-        self.LayButton.pressed.connect(lambda: self.ManualMessage("DOWN"))
         self.RightButton.pressed.connect(lambda: self.ManualMessage("RIGHT"))
         self.LeftButton.pressed.connect(lambda: self.ManualMessage("LEFT"))
         self.FrontButton.pressed.connect(lambda: self.ManualMessage("FRONT"))
@@ -307,11 +310,20 @@ class Ui_MainWindow(QMainWindow):
             self.PickDropButton.clicked.connect(lambda: self.ManualMessage("PICK"))
             self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("PICK",1))
 
-        if self.PickDropButton.text() == "DROP":
+        elif self.PickDropButton.text() == "DROP":
 
             self.PickDropButton.clicked.connect(lambda: self.ManualMessage("DROP"))
             self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("DROP",1))
- 
+
+        if self.StandLayButton.text() == "STAND":
+
+            self.StandLayButton.clicked.connect(lambda: self.ManualMessage("STAND"))
+            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("STAND",1))
+
+        elif self.StandLayButton.text() == "LAY":
+
+            self.StandLayButton.clicked.connect(lambda: self.ManualMessage("LAY"))
+            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("LAY",1))
 
 
         # Change button image when pressed
@@ -343,8 +355,6 @@ class Ui_MainWindow(QMainWindow):
         self.RotateRightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RRIGHT",int(self.AngleBox.text())))
 
     def changeButtonIcon(self,button,state):
-
-        
 
         if button == "RIGHT" and state == 1:
             self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right_pressed.png")))
@@ -398,13 +408,17 @@ class Ui_MainWindow(QMainWindow):
             self.PickDropButton.setText("DROP")
         elif button == "DROP":
             self.PickDropButton.setText("PICK")
+        elif button == "STAND":
+            self.StandLayButton.setText("LAY")
+        elif button == "LAY":
+            self.StandLayButton.setText("STAND")
         
 
 
     def ManualMessage(self,msg):
         if msg == "STAND":
             msg_array = {"CASE":10}
-        elif msg == "DOWN":
+        elif msg == "LAY":
             msg_array = {"CASE":11}
         elif msg == "RIGHT":
             msg_array = {"CASE":5}
@@ -423,7 +437,11 @@ class Ui_MainWindow(QMainWindow):
         elif msg == "HEADRLEFT":
             msg_array = {"CASE":6}
         elif msg == "PICK":
-            msg_array = {"CASE":6}
+            msg_array = {"CASE":8}
+        elif msg == "LAY":
+            msg_array = {"CASE":9}
+
+        print(msg)
         
         data_out = json.dumps(msg_array)
         self.serialCom_.sendMessage(data_out)
@@ -462,8 +480,9 @@ class Ui_MainWindow(QMainWindow):
             self.RotateRightButton.setEnabled(False)
             self.RotateHeadLeftButton.setEnabled(False)
             self.RotateHeadRightButton.setEnabled(False)
-            self.ProneButton.setEnabled(False)
-        elif self.Manual_mode.checkState() == 2 and  self.serialCom_ is not None:
+            self.StandLayButton.setEnabled(False)
+            self.PickDropButton.setEnabled(False)
+        elif self.Manual_mode.checkState() == 2 and  self.serialCom_  is not None:
             self.RightButton.setEnabled(True)
             self.LeftButton.setEnabled(True)
             self.FrontButton.setEnabled(True)
@@ -472,14 +491,8 @@ class Ui_MainWindow(QMainWindow):
             self.RotateRightButton.setEnabled(True)
             self.RotateHeadLeftButton.setEnabled(True)
             self.RotateHeadRightButton.setEnabled(True)
-            self.ProneButton.setEnabled(True)
-
-        if self.serialCom_ is None:
-            self.StandButton.setEnabled(False)
-            self.LayButton.setEnabled(False)
-        else:
-            self.StandButton.setEnabled(True)
-            self.LayButton.setEnabled(True)
+            self.StandLayButton.setEnabled(True)
+            self.PickDropButton.setEnabled(True)
 
     def connectSerialComboBox(self):
         self.comboBoxPort.activated.connect(lambda: self.startSerialCom(self.comboBoxPort.currentText()))
@@ -537,7 +550,7 @@ class Ui_MainWindow(QMainWindow):
                     if jsonBrowserText[key] == 10:
                         jsonBrowserText[key] = "STAND"
                     if jsonBrowserText[key] == 11:
-                        jsonBrowserText[key] = "PRONE"
+                        jsonBrowserText[key] = "LAY"
                     
 
             jsondataString = json.dumps(jsonBrowserText,indent=2)
@@ -669,7 +682,7 @@ class Robot(QGraphicsPixmapItem):
             self.setPos(self.x()+ x.real,self.y()+y.real)
 
     def rotate(self,angle):
-        self.angle += angle
+        self.angle = angle
         self.setRotation(self.angle)
 
     # def keyPressEvent(self, event:QKeyEvent):

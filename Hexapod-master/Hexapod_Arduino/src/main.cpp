@@ -972,6 +972,6 @@ float battery_voltage()
         digitalWrite(voltage_pin_LED, LOW);
     }
 
-    return (voltage*12.0)/5.0;
+    return (voltage*12.0)/4.0;
 
 }
