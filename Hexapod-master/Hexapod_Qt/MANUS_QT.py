@@ -28,14 +28,15 @@ CAMERA_HEIGHT= 320
 
 CUSTOM_MODEL_NAME = 'Ant' 
 LABEL_MAP_NAME = 'labelmap.txt'
-DISTANCE_IMAGE = 'Happy.e3232dfe-aabb-11ec-abb9-dca632b24006.jpg'
+DISTANCE_IMAGE = 'Distance.jpg'
 
 
 paths = {
     'DISPLAY_IMAGE_PATH': os.path.join('Qt_Images','Display'),
     'BUTTON_IMAGE_PATH': os.path.join('Qt_Images', 'Buttons'),
     'TFLITE_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME,'tfliteexport'),
-    'TF_TEST_IMG_PATH': os.path.join('Tensorflow', 'workspace','images','test',DISTANCE_IMAGE),
+    'TF_DISTANCE_IMG_PATH': os.path.join('Tensorflow', 'workspace','images','distance',DISTANCE_IMAGE),
+
  }
 
 
@@ -110,7 +111,9 @@ class Ui_MainWindow(QMainWindow):
         self.RotateHeadLeftButton.setAutoRepeat(True)
         self.RotateHeadLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RotateHeadLeftButton.setAutoRepeatInterval(1000)#mseconds
+
         self.PickDropButton = QPushButton(self.widget)
+        self.PickDropButton.setCheckable(True)
 
 
 
@@ -191,6 +194,7 @@ class Ui_MainWindow(QMainWindow):
         self.ProneButton.setGeometry(QRect(760, 500, 61, 61))
         self.RotateHeadRightButton.setGeometry(QRect(840, 650, 61, 61))
         self.RotateHeadLeftButton.setGeometry(QRect(680, 650, 61, 61))
+        self.PickDropButton.setGeometry(QRect(760, 650, 61, 61))
 
         
         self.Port_label.setGeometry(QRect(660, 300, 94, 22))
@@ -255,6 +259,17 @@ class Ui_MainWindow(QMainWindow):
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
         self.Manual_mode.setText(_translate("MainWindow", "Manual Mode"))
+        self.PickDropButton.setText(_translate("MainWindow", "PICK"))
+
+    def OnPeriodicEvent(self):
+        self.portCensus()
+        self.connectMotorLabels()
+        self.checkManual()
+        self.connectButtons()
+        if self.Manual_mode.checkState() == 0:
+            self.MapView.auto_map_movement(self.jsondata)
+
+        print('*')
 
 
     def portCensus(self):
@@ -271,15 +286,7 @@ class Ui_MainWindow(QMainWindow):
         self.updateTimer.timeout.connect(self.OnPeriodicEvent)
         self.updateTimer.start(updateTime)
     
-    
-    def OnPeriodicEvent(self):
-        self.portCensus()
-        self.connectMotorLabels()
-        self.checkManual()
-        if self.Manual_mode.checkState() == 0:
-            self.MapView.auto_map_movement(self.jsondata)
 
-        print('*')
 
     def connectButtons(self):
 
@@ -294,6 +301,17 @@ class Ui_MainWindow(QMainWindow):
         self.RotateRightButton.pressed.connect(lambda: self.ManualMessage("RRIGHT"))
         self.RotateHeadLeftButton.pressed.connect(lambda: self.ManualMessage("HEADRLEFT"))
         self.RotateHeadRightButton.pressed.connect(lambda: self.ManualMessage("HEADRRIGHT"))
+
+        if self.PickDropButton.text() == "PICK":
+
+            self.PickDropButton.clicked.connect(lambda: self.ManualMessage("PICK"))
+            self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("PICK",1))
+
+        if self.PickDropButton.text() == "DROP":
+
+            self.PickDropButton.clicked.connect(lambda: self.ManualMessage("DROP"))
+            self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("DROP",1))
+ 
 
 
         # Change button image when pressed
@@ -376,6 +394,10 @@ class Ui_MainWindow(QMainWindow):
         elif button == "HEADRRIGHT" and state == 0:
             self.RotateHeadRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
             self.RotateHeadRightButton.setIconSize(QSize(61,61))
+        elif button == "PICK":
+            self.PickDropButton.setText("DROP")
+        elif button == "DROP":
+            self.PickDropButton.setText("PICK")
         
 
 
@@ -399,6 +421,8 @@ class Ui_MainWindow(QMainWindow):
         elif msg == "HEADRRIGHT":
             msg_array = {"CASE":7}
         elif msg == "HEADRLEFT":
+            msg_array = {"CASE":6}
+        elif msg == "PICK":
             msg_array = {"CASE":6}
         
         data_out = json.dumps(msg_array)
@@ -470,6 +494,7 @@ class Ui_MainWindow(QMainWindow):
 
     def receiveFromSerial(self,msg):
 
+
         for word in msg:
             if word != '}':
                 self.msgBuffer_ += word
@@ -479,10 +504,11 @@ class Ui_MainWindow(QMainWindow):
         # print(msg)
         # print(self.msgBuffer_)
 
-        # if not self.msgBuffer_.startswith("{"):
-        #     self.msgBuffer_ = ""
+        if not self.msgBuffer_.startswith("{"):
+            self.msgBuffer_ = ""
 
         if self.msgBuffer_.endswith('\n') and self.msgBuffer_.startswith("{"):
+
             self.jsondata = json.loads(self.msgBuffer_)
             jsonBrowserText = json.loads(self.msgBuffer_)
 
@@ -531,7 +557,7 @@ class Ui_MainWindow(QMainWindow):
             if self.JsonKey.text() not in self.jsondata.keys():
                 self.series_.clear()
             
-            self.msgBuffer_ = ""
+            self.msgBuffer_ =""
 
 
     def cleanUp(self):
@@ -666,7 +692,7 @@ class VideoTracking(QLabel):
     def __init__(self,parent):
         super().__init__(parent)
 
-        #self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
+        # self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
         self.camTimer = QTimer()
         
         self.new_width = 320
@@ -683,7 +709,7 @@ class VideoTracking(QLabel):
         self.input_height= self.interpreter.get_input_details()[0]['shape'][1]
         self.input_width= self.interpreter.get_input_details()[0]['shape'][2]
 
-        self.pixel_width = self.pixel_width_finder(cv2.imread(paths['TF_TEST_IMG_PATH']))
+        self.pixel_width = self.pixel_width_finder(cv2.imread(paths['TF_DISTANCE_IMG_PATH']))
         self.focal_length = self.Focal_Length_Finder(self.real_distance,self.real_img_width,self.pixel_width)
 
         time.sleep(1)
@@ -766,11 +792,11 @@ class VideoTracking(QLabel):
 
     def vision(self,frame):
 
-        frame = cv2.flip(frame,0)
+        # frame = cv2.flip(frame,0)
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
-        res = self.detect_objects(self.interpreter, img, 0.8)
-        print(res)
+        res = self.detect_objects(self.interpreter, img, 0.5)
+        # print(res)
 
 
 
