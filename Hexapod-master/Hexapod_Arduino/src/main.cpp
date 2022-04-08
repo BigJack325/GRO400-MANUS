@@ -241,8 +241,8 @@ using namespace std;
 #define BAUD                           115200  // Frequence de transmission serielle
 #define UPDATE_PERIODE                 100     // Periode (ms) d'envoie d'etat general
 
-#define MANUEL                         1         // Used to set robot in manuel mode
-#define AUTOMATIC                      2         // Used to set robot in automatic mode
+#define MODE_MANUEL                         1         // Used to set robot in manuel mode
+#define MODE_AUTOMATIC                      2         // Used to set robot in automatic mode
 
 #define initial_angle_A                90         //Angle of servo A in initialized state
 #define initial_angle_B                180         //Angle of servo B in initialized state
@@ -262,6 +262,9 @@ using namespace std;
 #define angle_rotation                 10         // Angle of servo A used in spinning movements
 
 #define angle_laydown_B                160          // Angle used to lay robot on ground
+
+#define mandible_open_angle            97         //Servo angle for mandibles to be open
+#define mandible_close_angle           130        //Servo angle for mandibles to be closed for grabbing
 
 #define arena_sizex                    200                //Width of the arena (cm)
 #define arena_sizey                    200                //length of the arena (cm)
@@ -295,6 +298,13 @@ using namespace std;
 
 #define step_delay                     300               // delay between each steps
 
+#define max_current_b4_forced_stop     9.8
+#define min_battery_voltage            9.5
+
+#define dropoff_angle_tolerance        10
+#define dropoff_x_tolerance            5
+#define dropoff_y_tolerance            5
+
 //--- CASE NUMBERS ----
 #define INITIALIZATION                 0         // Initial case of the robot when turned on
 #define WAIT                           1         // Case when robot is waiting for a command
@@ -308,6 +318,7 @@ using namespace std;
 #define DROP                           9        // Case for robot to drop object
 #define STAND                          10        // Case for robot to get up off the ground
 #define LAYDOWN                        11        // Case for robot to gently drop to ground
+#define AUTOMATIC                      12        // Case for when the robot is in automatic mode
 
 // --- Class constants
 #define A                              1         // Variable to identify which motors is associated with object synchservo
@@ -349,8 +360,7 @@ using namespace std;
 #define D2_Pin                         44  //Digital Port for Servo D2 (mandibules)
 
 #define voltage_pin                    A3
-#define current_pin                    A0
-#define voltage_pin_LED                10
+#define pin_voltage_LED                10
 
 /*---------------------------- GLOBAL VARIABLES ---------------------------*/
 
@@ -367,8 +377,13 @@ uint16_t pulseTime_ =                  0;        // Pulse time in ms
 int time =                             0;        // Loop timer
 uint32_t Time;                                   // Timer for SmoothMovementWhileV2
 
-int operation_mode =                   MANUEL;            //Determines whether robot is in automatic or manuel mode
+int operation_mode =                   MODE_MANUEL;       //Determines whether robot is in automatic or manuel mode
 int command =                          0;                 //Variable to give command (inicate which case to do)
+bool robot_is_standing =               false;             //Varibale indicates if robot is standing or lying down
+
+bool current_overload =                false;
+bool insufficient_voltage =            false;
+bool electrical_shutdown =             false;
 
 int current_position_x =               0;                 //Current position of the robot on the x axis (cm)
 int current_position_y =               0;                 //Current position of the robot on the y-axis (cm)
@@ -379,8 +394,11 @@ int future_position_y =                0;                 //Calculated future of
 int future_orientation =               0;                //Calculated future angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
 
 float distance_from_target =           300;               //Distance robot must cover to reach target object (cm)
-float drop_offx =                      0;                 //Coordinate on x-axis of object-drop location
-float drop_offy =                      0;                 //Coordinate on y-axis of object-drop location
+float drop_off1x =                      0;                //Coordinate on x-axis of object 1 drop location
+float drop_off1y =                      0;                //Coordinate on y-axis of object 1 drop location
+float drop_off2x =                      0;                //Coordinate on x-axis of object 2 drop location
+float drop_off2y =                      0;                //Coordinate on y-axis of object 2 drop location
+
 
 int leg_identification =               0;                 //Leg number to be used in movement
 
@@ -390,9 +408,17 @@ double time2 =                         0.0;               //Variable used if a d
 int step =                             1;                 //To organize motion in each case
 float t;                                                  //Variable to use as timer for steps
 
-float real_current;
-float real_voltage;
+float real_current;                                       //Current consumption in amps
+float real_voltage;                                       //Present battery voltage
 
+bool in_possession =                   false;             // Variable to indicate if target object is being grabbed by robot (Automatic mode)
+bool object_detected =                 false;             // Variable to indicate if camera is identifying the target object (automatic mode)
+int  object_aim =                      0;                 // Indicates if robot is to the left (1), dead center (2), to the right (3), undetected (0) (mode automatic)
+bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
+float grab_range =                     5;                 // How close robot has to be to be able to grab object   
+float target_distance =                1000.0;            // The distance the camera detects the object to be from the robot 
+int which_image =                      0;                 // Inidcates which of the images is being seen (1= happy 2=angry)
+bool automatic_done =                  false;             // Indicates if the automatic mode has drop the target at the dropoff point
 
 /*---------------------------- Objects ---------------------------*/
 
@@ -483,9 +509,10 @@ void setup() {
   // Pulse duration timer
   //timerPulse_.setCallback(endPulse);
 
-  pinMode(current_pin, INPUT);
+  //pinMode(current_pin, INPUT);
   pinMode(voltage_pin, INPUT);
-  pinMode(voltage_pin_LED, OUTPUT);
+  pinMode(VIN, INPUT);
+  pinMode(pin_voltage_LED, OUTPUT);
 
   //Assign each servo to their object 
   A1_.attach(A1_Pin);         
@@ -506,8 +533,8 @@ void setup() {
   A6_.attach(A6_Pin);           
   B6_.attach(B6_Pin);         
   C6_.attach(C6_Pin);
-  D1_.attach(D1_Pin);
-  D2_.attach(D2_Pin);
+  D1_.attach(D1_Pin); 
+  D1_.attach(D2_Pin);
 
   command = INITIALIZATION;
   t = millis();
@@ -525,9 +552,39 @@ void loop() {
     sendMsg();
   }
 
+
   real_current = current();
   real_voltage = battery_voltage();
+
+
+  if(operation_mode = MODE_MANUEL) // if in manuel mode reset mode automatic
+  {
+    automatic_done = false;
+  }
   
+
+  if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
+  { 
+    current_overload = true;
+  }
+
+  if(real_voltage <= min_battery_voltage)             // If voltage reaches lower limit
+  { 
+    insufficient_voltage = true;
+  }
+
+  if(current_overload == true || insufficient_voltage == true)  // if voltage or current error trigger shutdown
+  {
+    electrical_shutdown = true;
+    command = WAIT;
+  }
+
+  if(robot_is_standing == false && (command != STAND || command != INITIALIZATION))
+  {
+    command = WAIT;
+  }
+  
+
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
     {
@@ -539,18 +596,34 @@ void loop() {
         stepsequence(4, step_delay, &B236_, initial_angle_B);
         stepsequence(5, step_delay, &C145_, initial_angle_C);
         stepsequence(6, step_delay, &C236_, initial_angle_C);
-        D1_.write(initial_angle_D);
+        D1_.write(90);  
+        D2_.write(mandible_open_angle);  
+
           if (step == 7)
           {
             step = 1;
             command = WAIT;
           }
+
         break;
 
-        
         case WAIT :                // Waiting for a command
-          //Do nothing
+
             t = millis();
+
+            if(operation_mode == MODE_AUTOMATIC && automatic_done == false)
+            {
+              command = AUTOMATIC;
+            }
+            
+            if (electrical_shutdown == true)  //If electrical problem stop moving
+            {
+              while (1)
+              {
+                //Stop things from happening to prevent current flow
+              }
+            }
+            
         break;
 
         case MOVE_FORWARD :                // Move one step forward sequence
@@ -617,7 +690,6 @@ void loop() {
           stepsequence(4, step_delay, &B236_, walking_angle_B);
           sidestepsequence(5, step_delay, &C236_, 0);
           stepsequence(6, step_delay, &B236_, standing_angle_B);
-
       
           if (step == 7)
           {
@@ -639,8 +711,7 @@ void loop() {
             step = 1;
             command = WAIT;
           }
-          
-
+    
         break;
 
         case TURN_RIGHT :                // Pivot clockwise sequence
@@ -659,12 +730,12 @@ void loop() {
         break;
 
         case PICKUP :                // Pickup object sequence
-          D2_.write(0); 
+          D2_.write(mandible_close_angle); 
           command = WAIT;       
         break;
 
         case DROP :                // Drop object sequence
-          D2_.write(100);  
+          D2_.write(mandible_open_angle);  
           command = WAIT;
         break;
 
@@ -677,6 +748,7 @@ void loop() {
             if (step == 5)
             {
               step = 1;
+              robot_is_standing = true;
               command = WAIT;
             }
         break;
@@ -690,13 +762,145 @@ void loop() {
             if (step == 5)
             {
               step = 1;
+              robot_is_standing = false;
               command = WAIT;
             }
         break;
-    }
-  
-  timerSendMsg_.update();
 
+
+        case AUTOMATIC :
+
+          //if object is not in robots possession
+          if(in_possession == false)
+          {
+              // if object not detected 
+              if(object_detected == false)
+              {
+
+
+              }
+               
+              // if object detected
+              if(object_detected == true)
+              {
+                    //check if object is left, right or center of camera
+                    //if left turn left until center
+                    if(object_aim == 1)
+                    {
+                      command = TURN_RIGHT;
+                    }
+
+                    //if right turn right until center
+                    if(object_aim == 3)
+                    {
+                      command = TURN_LEFT;
+                    }
+
+                    //if center move forward
+                    if(object_aim == 2 && in_grab_range == false)
+                    {
+                      command = MOVE_FORWARD;
+                    }
+
+                    //check if object is in pickup distance                
+                    if (target_distance < grab_range)
+                    {
+                      in_grab_range = true;
+                    }
+                    else        // ------------might be a problem when comes time to grab and too close to see image
+                    {
+                      in_grab_range = false;
+                    }
+                    
+
+                    //if in grab distance grab target
+                    if(in_grab_range == true)
+                    {
+                      command = PICKUP;
+                      in_possession = true;
+                    }
+
+              }
+          }
+
+          //if object is in robots possession 
+          if(in_possession == true)
+          {
+            //if happy
+              if(which_image == 1)
+              {
+               
+              float distancex_from_dropoff = drop_off1x - current_position_x; 
+              float distancey_from_dropoff = drop_off1y - current_position_y; 
+              float angle_to_dropoff = tan(distancey_from_dropoff/distancex_from_dropoff) *360/(2*PI);
+
+                //if not at drop off position
+                if( abs(current_position_x - drop_off1x) > dropoff_x_tolerance && abs(current_position_y - drop_off1y) > dropoff_y_tolerance)
+                {
+                    //if not in correct orrientation to reach target: turn
+                    if (abs(angle_to_dropoff - current_orientation) > dropoff_angle_tolerance)
+                    {
+                      if ( (angle_to_dropoff - current_orientation) < 180 && (angle_to_dropoff - current_orientation) > 0)
+                      {
+                        command = TURN_LEFT;
+                      }
+                      else
+                      {
+                        command = TURN_RIGHT;
+                      }
+                    }
+                    else // If in right orientation: walk forward
+                    {
+                      command = MOVE_FORWARD;
+                    }
+                }
+                else // If at drop off position
+                {
+                  command = DROP;
+                  automatic_done = true;
+                }
+              }
+
+              //if angry
+              if(which_image == 2)
+              {
+               
+              float distancex_from_dropoff = drop_off2x - current_position_x; 
+              float distancey_from_dropoff = drop_off2y - current_position_y; 
+              float angle_to_dropoff = tan(distancey_from_dropoff/distancex_from_dropoff) *360/(2*PI);
+
+                //if not at drop off position
+                if( abs(current_position_x - drop_off2x) > dropoff_x_tolerance && abs(current_position_y - drop_off2y) > dropoff_y_tolerance)
+                {
+                    //if not in correct orrientation to reach target: turn
+                    if (abs(angle_to_dropoff - current_orientation) > dropoff_angle_tolerance)
+                    {
+                      if ( (angle_to_dropoff - current_orientation) > 0 && (angle_to_dropoff - current_orientation) < 180 )
+                      {
+                        command = TURN_LEFT;
+                      }
+                      else
+                      {
+                        command = TURN_RIGHT;
+                      }
+                    }
+                    else // If in right orientation: walk forward
+                    {
+                      command = MOVE_FORWARD;
+                    }
+                }
+                else // If at drop off position
+                {
+                  command = DROP;
+                  automatic_done = true;
+                }
+              }
+          }
+
+        break;
+    }
+
+  timerSendMsg_.update();
 }
 
 /*---------------------------Function definition communication ------------------------*/
@@ -958,20 +1162,19 @@ float current(){
 
 float battery_voltage()
 {
-
-    int sensor_value = analogRead(voltage_pin);
-    float voltage = sensor_value * (5.0 / 1023.0);
     
+    int sensor_value = analogRead(voltage_pin);
+    float voltage_analog = sensor_value * (5.0 / 1023.0);
+    float voltage = voltage_analog * 3;
 
-    if (voltage < 3.2)
+    if (voltage < min_battery_voltage) // If battery voltage is getting too close to 9V
     {
-        digitalWrite(voltage_pin_LED, HIGH);
+        digitalWrite(pin_voltage_LED, HIGH);
     }
     else
     {
-        digitalWrite(voltage_pin_LED, LOW);
+        digitalWrite(pin_voltage_LED, LOW);
     }
 
-    return (voltage*12.0)/5.0;
-
+    return  voltage;
 }
