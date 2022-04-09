@@ -575,18 +575,22 @@ void loop() {
     insufficient_voltage = true;
   }
 
-  if(current_overload == true || insufficient_voltage == true)  // if voltage or current error trigger shutdown
+  if(current_overload == true || insufficient_voltage == true)  // if "voltage or current error" trigger shutdown
   {
     electrical_shutdown = true;
     command = WAIT;
   }
+  
 
-  if(robot_is_standing == false && (command != STAND || command != INITIALIZATION))
+  if(robot_is_standing == false && (command != STAND && command != INITIALIZATION))
   {
     command = WAIT;
   }
   
-
+  Serial.println(command);
+  Serial.println(real_voltage);
+  Serial.println(electrical_shutdown);
+  delay(500);
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
     {
@@ -598,7 +602,7 @@ void loop() {
         stepsequence(4, step_delay, &B236_, initial_angle_B);
         stepsequence(5, step_delay, &C145_, initial_angle_C);
         stepsequence(6, step_delay, &C236_, initial_angle_C);
-        D1_.write(90);  
+        D1_.write(initial_angle_D);  
         D2_.write(mandible_open_angle);  
 
           if (step == 7)
@@ -917,33 +921,33 @@ void sendMsg(){
   StaticJsonDocument<500> doc;
   // Elements du message
 
-  doc["time"]      = (millis()/1000.0);
-  doc["cur_x"]  = current_position_x; 
-  doc["cur_y"]  = current_position_y;
-  doc["cur_angle"]  = current_orientation;
-  doc["Case"] = command;
-  doc["current"] = real_current;
-  doc["voltage"] = real_voltage;
+  // doc["time"]      = (millis()/1000.0);
+  // doc["cur_x"]  = current_position_x; 
+  // doc["cur_y"]  = current_position_y;
+  // doc["cur_angle"]  = current_orientation;
+  // doc["Case"] = command;
+  // doc["current"] = real_current;
+  // doc["voltage"] = real_voltage;
 
-  doc["Servo_A1"]  = A1_.read();
-  doc["Servo_B1"]  = B1_.read();
-  doc["Servo_C1"]  = C1_.read();
-  doc["Servo_A2"]  = A2_.read();
-  doc["Servo_B2"]  = B2_.read();
-  doc["Servo_C2"]  = C2_.read();
-  doc["Servo_A3"]  = A3_.read();
-  doc["Servo_B3"]  = B3_.read();
-  doc["Servo_C3"]  = C3_.read();
-  doc["Servo_A4"]  = A4_.read();
-  doc["Servo_B4"]  = B4_.read();
-  doc["Servo_C4"]  = C4_.read();
-  doc["Servo_A5"]  = A5_.read();
-  doc["Servo_B5"]  = B5_.read();
-  doc["Servo_C5"]  = C5_.read();
-  doc["Servo_A6"]  = A6_.read();
-  doc["Servo_B6"]  = B6_.read();
-  doc["Servo_C6"]  = C6_.read();
-  doc["Servo_D1"]  = D1_.read();
+  // doc["Servo_A1"]  = A1_.read();
+  // doc["Servo_B1"]  = B1_.read();
+  // doc["Servo_C1"]  = C1_.read();
+  // doc["Servo_A2"]  = A2_.read();
+  // doc["Servo_B2"]  = B2_.read();
+  // doc["Servo_C2"]  = C2_.read();
+  // doc["Servo_A3"]  = A3_.read();
+  // doc["Servo_B3"]  = B3_.read();
+  // doc["Servo_C3"]  = C3_.read();
+  // doc["Servo_A4"]  = A4_.read();
+  // doc["Servo_B4"]  = B4_.read();
+  // doc["Servo_C4"]  = C4_.read();
+  // doc["Servo_A5"]  = A5_.read();
+  // doc["Servo_B5"]  = B5_.read();
+  // doc["Servo_C5"]  = C5_.read();
+  // doc["Servo_A6"]  = A6_.read();
+  // doc["Servo_B6"]  = B6_.read();
+  // doc["Servo_C6"]  = C6_.read();
+  // doc["Servo_D1"]  = D1_.read();
 
   
  
