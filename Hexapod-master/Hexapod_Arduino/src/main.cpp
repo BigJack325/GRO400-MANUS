@@ -587,10 +587,6 @@ void loop() {
     command = WAIT;
   }
   
-  Serial.println(command);
-  Serial.println(real_voltage);
-  Serial.println(electrical_shutdown);
-  delay(500);
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
     {
