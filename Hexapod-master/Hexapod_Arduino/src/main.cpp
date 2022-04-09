@@ -598,7 +598,7 @@ void loop() {
         stepsequence(4, step_delay, &B236_, initial_angle_B);
         stepsequence(5, step_delay, &C145_, initial_angle_C);
         stepsequence(6, step_delay, &C236_, initial_angle_C);
-        D1_.write(90);  
+        D1_.write(initial_angle_D);  
         D2_.write(mandible_open_angle);  
 
           if (step == 7)

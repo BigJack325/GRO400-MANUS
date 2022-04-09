@@ -705,7 +705,7 @@ class VideoTracking(QLabel):
     def __init__(self,parent):
         super().__init__(parent)
 
-        # self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
+        self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
         self.camTimer = QTimer()
         
         self.new_width = 320
@@ -726,8 +726,8 @@ class VideoTracking(QLabel):
         self.focal_length = self.Focal_Length_Finder(self.real_distance,self.real_img_width,self.pixel_width)
 
         time.sleep(1)
-        # self.camTimer.timeout.connect(self.OnPeriodicEvent)
-        # self.camTimer.start(CAM_UPDATE_RATE)
+        self.camTimer.timeout.connect(self.OnPeriodicEvent)
+        self.camTimer.start(CAM_UPDATE_RATE)
 
     def OnPeriodicEvent(self):
         frame = self.capwebcam.read()
