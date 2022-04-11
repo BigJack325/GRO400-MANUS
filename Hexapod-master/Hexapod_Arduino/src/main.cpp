@@ -536,7 +536,7 @@ void setup() {
   B6_.attach(B6_Pin);         
   C6_.attach(C6_Pin);
   D1_.attach(D1_Pin); 
-  D1_.attach(D2_Pin);
+  D2_.attach(D2_Pin);
 
   command = INITIALIZATION;
   t = millis();
@@ -565,21 +565,21 @@ void loop() {
   }
   
 
-  if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
-  { 
-    current_overload = true;
-  }
+  // if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
+  // { 
+  //   current_overload = true;
+  // }
 
   if(real_voltage <= min_battery_voltage)             // If voltage reaches lower limit
   { 
     insufficient_voltage = true;
   }
 
-  if(current_overload == true || insufficient_voltage == true)  // if "voltage or current error" trigger shutdown
-  {
-    electrical_shutdown = true;
-    command = WAIT;
-  }
+  // if(current_overload == true || insufficient_voltage == true)  // if "voltage or current error" trigger shutdown
+  // {
+  //   electrical_shutdown = true;
+  //   command = WAIT;
+  // }
   
 
   if(robot_is_standing == false && (command != STAND && command != INITIALIZATION))
@@ -620,10 +620,10 @@ void loop() {
             
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
-              while (1)
-              {
-                //Stop things from happening to prevent current flow
-              }
+              // while (1)
+              // {
+              //   //Stop things from happening to prevent current flow
+              // }
             }
             
         break;
@@ -917,33 +917,34 @@ void sendMsg(){
   StaticJsonDocument<500> doc;
   // Elements du message
 
-  // doc["time"]      = (millis()/1000.0);
-  // doc["cur_x"]  = current_position_x; 
-  // doc["cur_y"]  = current_position_y;
-  // doc["cur_angle"]  = current_orientation;
-  // doc["Case"] = command;
-  // doc["current"] = real_current;
-  // doc["voltage"] = real_voltage;
+  doc["time"]      = (millis()/1000.0);
+  doc["cur_x"]  = current_position_x; 
+  doc["cur_y"]  = current_position_y;
+  doc["cur_angle"]  = current_orientation;
+  doc["Case"] = command;
+  doc["current"] = real_current;
+  doc["voltage"] = real_voltage;
+  doc["shutdown"] = electrical_shutdown;
 
-  // doc["Servo_A1"]  = A1_.read();
-  // doc["Servo_B1"]  = B1_.read();
-  // doc["Servo_C1"]  = C1_.read();
-  // doc["Servo_A2"]  = A2_.read();
-  // doc["Servo_B2"]  = B2_.read();
-  // doc["Servo_C2"]  = C2_.read();
-  // doc["Servo_A3"]  = A3_.read();
-  // doc["Servo_B3"]  = B3_.read();
-  // doc["Servo_C3"]  = C3_.read();
-  // doc["Servo_A4"]  = A4_.read();
-  // doc["Servo_B4"]  = B4_.read();
-  // doc["Servo_C4"]  = C4_.read();
-  // doc["Servo_A5"]  = A5_.read();
-  // doc["Servo_B5"]  = B5_.read();
-  // doc["Servo_C5"]  = C5_.read();
-  // doc["Servo_A6"]  = A6_.read();
-  // doc["Servo_B6"]  = B6_.read();
-  // doc["Servo_C6"]  = C6_.read();
-  // doc["Servo_D1"]  = D1_.read();
+  doc["Servo_A1"]  = A1_.read();
+  doc["Servo_B1"]  = B1_.read();
+  doc["Servo_C1"]  = C1_.read();
+  doc["Servo_A2"]  = A2_.read();
+  doc["Servo_B2"]  = B2_.read();
+  doc["Servo_C2"]  = C2_.read();
+  doc["Servo_A3"]  = A3_.read();
+  doc["Servo_B3"]  = B3_.read();
+  doc["Servo_C3"]  = C3_.read();
+  doc["Servo_A4"]  = A4_.read();
+  doc["Servo_B4"]  = B4_.read();
+  doc["Servo_C4"]  = C4_.read();
+  doc["Servo_A5"]  = A5_.read();
+  doc["Servo_B5"]  = B5_.read();
+  doc["Servo_C5"]  = C5_.read();
+  doc["Servo_A6"]  = A6_.read();
+  doc["Servo_B6"]  = B6_.read();
+  doc["Servo_C6"]  = C6_.read();
+  doc["Servo_D1"]  = D1_.read();
 
   
  
@@ -973,6 +974,8 @@ void readMsg(){
   }
 
   command = doc["CASE"];
+  target_distance = doc["VISION_DIS"];
+  which_image = doc["VISION_OBJ"];
 
 }
 

@@ -1,5 +1,6 @@
 from cmath import cos, pi, sin
 import encodings
+from lib2to3.pgen2.pgen import ParserGenerator
 import cv2
 import re
 import time
@@ -19,7 +20,7 @@ import sys, os, json, math
 
 BAUD_RATE = 115200
 UI_UPDATE_RATE = 1000# Ms
-CAM_UPDATE_RATE = 10
+CAM_UPDATE_RATE = 20
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
@@ -40,6 +41,7 @@ paths = {
  }
 
 
+
 class Ui_MainWindow(QMainWindow):
 
     def __init__(self):
@@ -54,92 +56,92 @@ class Ui_MainWindow(QMainWindow):
         self.centralWidget = QWidget(self)
         self.gridLayout = QGridLayout(self.centralWidget)
 
-        self.widget = QWidget(self.centralWidget)
-        self.line = QFrame(self.widget)
-        self.Hexapod_Pic = QLabel(self.widget)
+        # self.widget = QWidget(self.centralWidget)
+        self.line = QFrame(self.centralWidget)
+        self.Hexapod_Pic = QLabel(self.centralWidget)
         self.Servo = dict()
 
         for idx in range(1,NUM_SERVOS+1):
-            self.Servo[idx] = QLineEdit(self.widget)
+            self.Servo[idx] = QLineEdit(self.centralWidget)
 
-        self.RightButton = QPushButton(self.widget)
+        self.RightButton = QPushButton(self.centralWidget)
         self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right.png")))
         self.RightButton.setIconSize(QSize(61,61))
         self.RightButton.setAutoRepeat(True)
         self.RightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RightButton.setAutoRepeatInterval(1000)#mseconds
-        self.RotateRightButton = QPushButton(self.widget)
+        self.RotateRightButton = QPushButton(self.centralWidget)
         self.RotateRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
         self.RotateRightButton.setIconSize(QSize(61,61))
         self.RotateRightButton.setAutoRepeat(True)
         self.RotateRightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RotateRightButton.setAutoRepeatInterval(1000)#mseconds
-        self.LeftButton = QPushButton(self.widget)
+        self.LeftButton = QPushButton(self.centralWidget)
         self.LeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Left.png")))
         self.LeftButton.setIconSize(QSize(61,61))
         self.LeftButton.setAutoRepeat(True)
         self.LeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds        
         self.LeftButton.setAutoRepeatInterval(1000)#mseconds
-        self.RotateLeftButton = QPushButton(self.widget)
+        self.RotateLeftButton = QPushButton(self.centralWidget)
         self.RotateLeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateL.png")))
         self.RotateLeftButton.setIconSize(QSize(61,61))
         self.RotateLeftButton.setAutoRepeat(True)
         self.RotateLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RotateLeftButton.setAutoRepeatInterval(1000)#mseconds
-        self.FrontButton = QPushButton(self.widget)
+        self.FrontButton = QPushButton(self.centralWidget)
         self.FrontButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Front.png")))
         self.FrontButton.setIconSize(QSize(61,61))
         self.FrontButton.setAutoRepeat(True)
         self.FrontButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
         self.FrontButton.setAutoRepeatInterval(1000)#mseconds
-        self.BackButton = QPushButton(self.widget)
+        self.BackButton = QPushButton(self.centralWidget)
         self.BackButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Back.png")))
         self.BackButton.setIconSize(QSize(61,61))
         self.BackButton.setAutoRepeat(True)
         self.BackButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
         self.BackButton.setAutoRepeatInterval(1000)#mseconds
-        self.RotateHeadRightButton = QPushButton(self.widget)
+        self.RotateHeadRightButton = QPushButton(self.centralWidget)
         self.RotateHeadRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
         self.RotateHeadRightButton.setIconSize(QSize(61,61))
         self.RotateHeadRightButton.setAutoRepeat(True)
         self.RotateHeadRightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RotateHeadRightButton.setAutoRepeatInterval(1000)#mseconds
-        self.RotateHeadLeftButton = QPushButton(self.widget)
+        self.RotateHeadLeftButton = QPushButton(self.centralWidget)
         self.RotateHeadLeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateL.png")))
         self.RotateHeadLeftButton.setIconSize(QSize(61,61))
         self.RotateHeadLeftButton.setAutoRepeat(True)
         self.RotateHeadLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
         self.RotateHeadLeftButton.setAutoRepeatInterval(1000)#mseconds
 
-        self.PickDropButton = QPushButton(self.widget)
+        self.PickDropButton = QPushButton(self.centralWidget)
 
-        self.StandLayButton = QPushButton(self.widget)
+        self.StandLayButton = QPushButton(self.centralWidget)
 
-        self.Port_label = QLabel(self.widget)
-        self.comboBoxPort = QComboBox(self.widget)
+        self.Port_label = QLabel(self.centralWidget)
+        self.comboBoxPort = QComboBox(self.centralWidget)
 
-        self.Map_label = QLabel(self.widget)
-        self.MapView = Map(self.widget)
+        self.Map_label = QLabel(self.centralWidget)
+        self.MapView = Map(self.centralWidget)
 
-        self.Graph_label = QLabel(self.widget)
+        self.Graph_label = QLabel(self.centralWidget)
         self.graph = QChart()
-        self.graphView = QChartView(self.widget)
+        self.graphView = QChartView(self.centralWidget)
         self.series_ = QLineSeries()
 
-        self.Donnees_label = QLabel(self.widget)
-        self.JsonKey = QLineEdit(self.widget)
+        self.Donnees_label = QLabel(self.centralWidget)
+        self.JsonKey = QLineEdit(self.centralWidget)
 
-        self.Cam_label = QLabel(self.widget)
-        self.Cam = VideoTracking(self.widget)
-        self.CamDistance_label = QLabel(self.widget)
+        self.Cam_label = QLabel(self.centralWidget)
+        self.Cam = VideoTracking(self.centralWidget)
+        self.CamDistance_label = QLabel(self.centralWidget)
 
-        self.Angle_label = QLabel(self.widget)
-        self.AngleBox = QDoubleSpinBox(self.widget)
+        self.Angle_label = QLabel(self.centralWidget)
+        self.AngleBox = QDoubleSpinBox(self.centralWidget)
 
-        self.Json_label = QLabel(self.widget)
-        self.Json_Browser = QTextBrowser(self.widget)
+        self.Json_label = QLabel(self.centralWidget)
+        self.Json_Browser = QTextBrowser(self.centralWidget)
 
-        self.Manual_mode = QCheckBox(self.widget)
+        self.Manual_mode = QCheckBox(self.centralWidget)
 
         self.setupUi()
 
@@ -240,7 +242,7 @@ class Ui_MainWindow(QMainWindow):
         self.Manual_mode.setGeometry(QRect(840, 720, 120, 50))
         self.Manual_mode.setChecked(True)
 
-        self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
+        # self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
         self.setCentralWidget(self.centralWidget)
         self.retranslateUi()
 
@@ -270,9 +272,7 @@ class Ui_MainWindow(QMainWindow):
         self.portCensus()
         self.connectMotorLabels()
         self.checkManual()
-        self.connectButtons()
-        if self.Manual_mode.checkState() == 0:
-            self.MapView.auto_map_movement(self.jsondata)
+        self.connectPeriodicButtons()
 
         print('*')
 
@@ -290,40 +290,50 @@ class Ui_MainWindow(QMainWindow):
     def connectUpdateTimer(self, updateTime):
         self.updateTimer.timeout.connect(self.OnPeriodicEvent)
         self.updateTimer.start(updateTime)
+
+    def connectPeriodicButtons(self):
+
+        if self.Manual_mode.checkState() == 0:
+            self.MapView.auto_map_movement(self.jsondata)
+
+        if self.PickDropButton.text() == "PICK":
+
+            self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("PICK",1))
+
+            self.PickDropButton.clicked.connect(lambda: self.RobotMessage("PICK"))
+
+
+        if self.PickDropButton.text() == "DROP":
+
+            self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("DROP",1))
+
+            self.PickDropButton.clicked.connect(lambda: self.RobotMessage("DROP"))
+
+        if self.StandLayButton.text() == "STAND":
+
+            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("STAND",1))
+
+            self.StandLayButton.clicked.connect(lambda: self.RobotMessage("STAND"))
+
+        elif self.StandLayButton.text() == "LAY":
+
+            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("LAY",1))
+
+            self.StandLayButton.clicked.connect(lambda: self.RobotMessage("LAY"))
     
 
 
     def connectButtons(self):
 
         #Send message to Arduino for manual movement
-        self.RightButton.pressed.connect(lambda: self.ManualMessage("RIGHT"))
-        self.LeftButton.pressed.connect(lambda: self.ManualMessage("LEFT"))
-        self.FrontButton.pressed.connect(lambda: self.ManualMessage("FRONT"))
-        self.BackButton.pressed.connect(lambda: self.ManualMessage("BACK"))
-        self.RotateLeftButton.pressed.connect(lambda: self.ManualMessage("RLEFT"))
-        self.RotateRightButton.pressed.connect(lambda: self.ManualMessage("RRIGHT"))
-        self.RotateHeadLeftButton.pressed.connect(lambda: self.ManualMessage("HEADRLEFT"))
-        self.RotateHeadRightButton.pressed.connect(lambda: self.ManualMessage("HEADRRIGHT"))
-
-        if self.PickDropButton.text() == "PICK":
-
-            self.PickDropButton.clicked.connect(lambda: self.ManualMessage("PICK"))
-            self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("PICK",1))
-
-        elif self.PickDropButton.text() == "DROP":
-
-            self.PickDropButton.clicked.connect(lambda: self.ManualMessage("DROP"))
-            self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("DROP",1))
-
-        if self.StandLayButton.text() == "STAND":
-
-            self.StandLayButton.clicked.connect(lambda: self.ManualMessage("STAND"))
-            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("STAND",1))
-
-        elif self.StandLayButton.text() == "LAY":
-
-            self.StandLayButton.clicked.connect(lambda: self.ManualMessage("LAY"))
-            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("LAY",1))
+        self.RightButton.pressed.connect(lambda: self.RobotMessage("RIGHT"))
+        self.LeftButton.pressed.connect(lambda: self.RobotMessage("LEFT"))
+        self.FrontButton.pressed.connect(lambda: self.RobotMessage("FRONT"))
+        self.BackButton.pressed.connect(lambda: self.RobotMessage("BACK"))
+        self.RotateLeftButton.pressed.connect(lambda: self.RobotMessage("RLEFT"))
+        self.RotateRightButton.pressed.connect(lambda: self.RobotMessage("RRIGHT"))
+        self.RotateHeadLeftButton.pressed.connect(lambda: self.RobotMessage("HEADRLEFT"))
+        self.RotateHeadRightButton.pressed.connect(lambda: self.RobotMessage("HEADRRIGHT"))
 
 
         # Change button image when pressed
@@ -415,11 +425,13 @@ class Ui_MainWindow(QMainWindow):
         
 
 
-    def ManualMessage(self,msg):
+    def RobotMessage(self,msg):
         if msg == "STAND":
             msg_array = {"CASE":10}
+            self.StandLayButton.clicked.disconnect()
         elif msg == "LAY":
             msg_array = {"CASE":11}
+            self.StandLayButton.clicked.disconnect()
         elif msg == "RIGHT":
             msg_array = {"CASE":5}
         elif msg == "LEFT":
@@ -433,13 +445,20 @@ class Ui_MainWindow(QMainWindow):
         elif msg == "RRIGHT":
             msg_array = {"CASE":7}
         elif msg == "HEADRRIGHT":
-            msg_array = {"CASE":7}
+            msg_array = {"CASE":13}
         elif msg == "HEADRLEFT":
-            msg_array = {"CASE":6}
+            msg_array = {"CASE":12}
         elif msg == "PICK":
             msg_array = {"CASE":8}
-        elif msg == "LAY":
+            self.PickDropButton.clicked.disconnect()
+        elif msg == "DROP":
             msg_array = {"CASE":9}
+            self.PickDropButton.clicked.disconnect()
+        elif msg == "AUTOMATIC":
+            msg_array = {"CASE":15}
+        else:
+            msg_array = msg
+
 
         print(msg)
         
@@ -504,6 +523,7 @@ class Ui_MainWindow(QMainWindow):
 
     def connectSerialPortRead(self):
         self.serialCom_.newMessage.connect(self.receiveFromSerial)
+        self.Cam.msg_signal.connect(self.RobotMessage)
 
     def receiveFromSerial(self,msg):
 
@@ -529,6 +549,8 @@ class Ui_MainWindow(QMainWindow):
                 if key == "Servo_A1" or key=="Servo_A2" or key=="Servo_A3" or key=="Servo_A4" or key=="Servo_A5" or key=="Servo_A6" or key=="Servo_B1" or key=="Servo_B2" or key=="Servo_B3"or key=="Servo_B4" or key=="Servo_B5" or key=="Servo_B6" or key=="Servo_C1" or key=="Servo_C2" or key=="Servo_C3" or key=="Servo_C4" or key=="Servo_C5" or key=="Servo_C6" or key=="Servo_D1" :
                     del jsonBrowserText[key]
                 if key == "Case":
+                    if jsonBrowserText[key] == 0:
+                        jsonBrowserText[key] = "INITIALIZE"
                     if jsonBrowserText[key] == 1:
                         jsonBrowserText[key] = "WAIT"
                     if jsonBrowserText[key] == 2:
@@ -551,6 +573,12 @@ class Ui_MainWindow(QMainWindow):
                         jsonBrowserText[key] = "STAND"
                     if jsonBrowserText[key] == 11:
                         jsonBrowserText[key] = "LAY"
+                    if jsonBrowserText[key] == 12:
+                        jsonBrowserText[key] = "HEADLEFT"
+                    if jsonBrowserText[key] == 13:
+                        jsonBrowserText[key] = "HEADRIGHT"
+
+
                     
 
             jsondataString = json.dumps(jsonBrowserText,indent=2)
@@ -601,6 +629,8 @@ class SerialProtocol(QComboBox):
         else:
             raise IOError("Cannot connect to device on port {}".format(portName))
 
+    def getSerialName(self):
+        return self.serial_.portName()
 
     def sendMessage(self,msg):
         if self.serial_.isOpen:
@@ -702,6 +732,9 @@ class Target(QGraphicsPixmapItem):
     pass
 
 class VideoTracking(QLabel):
+
+    msg_signal = pyqtSignal(str)
+
     def __init__(self,parent):
         super().__init__(parent)
 
@@ -730,8 +763,10 @@ class VideoTracking(QLabel):
         self.camTimer.start(CAM_UPDATE_RATE)
 
     def OnPeriodicEvent(self):
+
         frame = self.capwebcam.read()
         self.vision(frame)
+
 
     def load_labels(self,path=os.path.join(paths['TFLITE_PATH'],"labelmap.txt")):
 
@@ -801,7 +836,13 @@ class VideoTracking(QLabel):
             xmax = int(min(320, xmax * 320))
 
         return xmax-xmin
-    
+
+    def VisionMessage(self,distance,object):
+
+        msg_array = {"VISION_DIS":distance,"VISION_OBJ":object}
+
+        self.msg_signal.emit(str(msg_array))
+
 
     def vision(self,frame):
 
@@ -811,6 +852,8 @@ class VideoTracking(QLabel):
         res = self.detect_objects(self.interpreter, img, 0.5)
         # print(res)
 
+        if not res:
+            self.VisionMessage(0.0,2)
 
 
         for result in res:
@@ -829,10 +872,13 @@ class VideoTracking(QLabel):
 
             self.CamDistanceText.setPlainText("Image Distance: "+str(round(distance,2)))
 
+            self.VisionMessage(round(distance,2),int(result['class_id']))
+
         imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
 
         self.setPixmap(QPixmap.fromImage(imageframe))
+
 
 
 
@@ -846,3 +892,12 @@ if __name__ == "__main__":
     app.aboutToQuit.connect(ui.cleanUp)
 
     sys.exit(app.exec_())
+
+    '''
+    bool object_detected
+    int object_aim  centrer=2,gauche=1,droite=3,non vue=0
+    int angry_or_happy
+    float distance_objet
+
+    
+    '''
