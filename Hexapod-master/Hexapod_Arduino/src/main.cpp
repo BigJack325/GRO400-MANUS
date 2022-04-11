@@ -84,6 +84,7 @@ SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_
   offset2 = offset_2;
   offset3 = offset_3;
 
+
   //dimensions of the 3 pieces of the leg for inverse kinematics
    L1x = 0;
    L1y = 1;
@@ -168,16 +169,8 @@ int SynchServo::cinematic_inverse(int left_or_right, float X, float Y, float Z)
 
 void SynchServo::move_angle(int angle_selon_patte_gauche)
 {
-  //int micro_selon_patte_gauche = angle_selon_patte_gauche * 2400 / 544;
-  //float old_percent = .99;
-  //float new_percent = 1- old_percent;
-
   if (group == 1)
   {
-    // float angle_servo1 = (micro_selon_patte_gauche * new_percent) + (servo1->readMicroseconds() *old_percent);
-    // float angle_servo2 = (micro_selon_patte_gauche * new_percent) + ((2400 - servo2->readMicroseconds()) *old_percent);
-    // float angle_servo3 = (micro_selon_patte_gauche * new_percent) + (servo3->readMicroseconds() *old_percent);
-
     servo1->write(angle_selon_patte_gauche + offset1);
     servo2->write(180 - (angle_selon_patte_gauche + offset2)); //2400
     servo3->write(angle_selon_patte_gauche + offset3);
@@ -185,10 +178,6 @@ void SynchServo::move_angle(int angle_selon_patte_gauche)
   
   if (group == 2)
   {
-    // float angle_servo1 = (micro_selon_patte_gauche* new_percent) + ((2400 - servo1->readMicroseconds()) *old_percent);
-    // float angle_servo2 = (micro_selon_patte_gauche* new_percent) + ( servo2->readMicroseconds() *old_percent);
-    // float angle_servo3 = (micro_selon_patte_gauche* new_percent) + ((2400 - servo3->readMicroseconds()) *old_percent);
-
     servo1->write(180 - (angle_selon_patte_gauche + offset1));
     servo2->write(angle_selon_patte_gauche + offset2);
     servo3->write(180 - (angle_selon_patte_gauche + offset3));
@@ -241,18 +230,18 @@ using namespace std;
 #define BAUD                           115200  // Frequence de transmission serielle
 #define UPDATE_PERIODE                 100     // Periode (ms) d'envoie d'etat general
 
-#define MODE_MANUEL                         1         // Used to set robot in manuel mode
-#define MODE_AUTOMATIC                      2         // Used to set robot in automatic mode
+#define MODE_MANUEL                    1         // Used to set robot in manuel mode
+#define MODE_AUTOMATIC                 2         // Used to set robot in automatic mode
 
 #define initial_angle_A                90         //Angle of servo A in initialized state
 #define initial_angle_B                180         //Angle of servo B in initialized state
 #define initial_angle_C                145       //Angle of servo C in initialized state
-#define initial_angle_D                83         //Angle of the neck
+#define initial_angle_D1               83         //Angle of the neck
 
 #define standing_angle_B               140        // Angle for B servos in standing position
 #define standing_angle_C               140        // Angle for C servos in standing position
 
-#define walking_angle_B                160        // Angle to lift up B when walking
+#define walking_angle_B_increase       20         // Angle to lift up B when walking
 #define Walking_angle_A_increase       10         // Angle of servo A used in forward movements
 
 #define sidestep_angle                 10         // Angle used in sidestepping
@@ -266,17 +255,20 @@ using namespace std;
 #define mandible_open_angle            97         //Servo angle for mandibles to be open
 #define mandible_close_angle           130        //Servo angle for mandibles to be closed for grabbing
 
+#define head_turn_angle                45         // Angle the head turns by when calling head to turn
+
 #define arena_sizex                    200                //Width of the arena (cm)
 #define arena_sizey                    200                //length of the arena (cm)
 #define initial_position_x             arena_sizex/2      //Initial position of the robot on the x axis (cm)
 #define initial_position_y             arena_sizey/2      //Initial position of the robot on the y-axis (cm)
 
-#define offset_A1                      6    //ok
-#define offset_A2                      -3   //ok
+#define offset_front_back              25                 // Angle of offset from middle legs of front and back legs
+#define offset_A1                      6  + offset_front_back   //ok
+#define offset_A2                      -3 + offset_front_back //ok
 #define offset_A3                      2    //ok
 #define offset_A4                      -5   //ok
-#define offset_A5                      0    //ok
-#define offset_A6                      -6   //ok  
+#define offset_A5                      0  - offset_front_back //ok
+#define offset_A6                      -6 - offset_front_back //ok  
 #define offset_B1                      0    //ok
 #define offset_B2                      -2   //ok
 #define offset_B3                      8    //ok
@@ -288,18 +280,14 @@ using namespace std;
 #define offset_C3                      4    //ok
 #define offset_C4                      7    //
 #define offset_C5                      -1   //ok 
-#define offset_C6                      13    //ok
+#define offset_C6                      13   //ok
 #define offset_D1                      0
 #define offset_D2                      0
-
-
-
-
 
 #define step_delay                     300               // delay between each steps
 
 #define max_current_b4_forced_stop     9.8
-#define min_battery_voltage            9.5
+#define min_battery_voltage            9.1
 
 #define dropoff_angle_tolerance        10
 #define dropoff_x_tolerance            5
@@ -315,12 +303,13 @@ using namespace std;
 #define TURN_LEFT                      6         // Case for robot to spin on itself left
 #define TURN_RIGHT                     7         // Case for robot to spin on itself right
 #define PICKUP                         8         // Case for robot to pick up object
-#define DROP                           9        // Case for robot to drop object
+#define DROP                           9         // Case for robot to drop object
 #define STAND                          10        // Case for robot to get up off the ground
 #define LAYDOWN                        11        // Case for robot to gently drop to ground
 #define HEAD_LEFT                      12        // Case to turn the head to the left
 #define HEAD_RIGHT                     13        // Case to turn the head to the right
-#define AUTOMATIC                      14        // Case for when the robot is in automatic mode
+#define HEAD_CENTRE                    14        // Case to turn head back tostraight position
+#define AUTOMATIC                      15        // Case for when the robot is in automatic mode
 
 // --- Class constants
 #define A                              1         // Variable to identify which motors is associated with object synchservo
@@ -415,13 +404,18 @@ float real_voltage;                                       //Present battery volt
 
 bool in_possession =                   false;             // Variable to indicate if target object is being grabbed by robot (Automatic mode)
 bool object_detected =                 false;             // Variable to indicate if camera is identifying the target object (automatic mode)
-int  object_aim =                      0;                 // Indicates if robot is to the left (1), dead center (2), to the right (3), undetected (0) (mode automatic)
+int  object_aim =                      0;                 // Indicates if robot is to the left (1), dead center (2), to the right (3) of the camera, undetected (0) (mode automatic)
 bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
 float grab_range =                     5;                 // How close robot has to be to be able to grab object   
 float target_distance =                1000.0;            // The distance the camera detects the object to be from the robot 
-int which_image =                      0;                 // Inidcates which of the images is being seen (1= happy 2=angry)
+int which_image =                      0;                 // Inidcates which of the images is being seen (0= happy 1=angry 2 = nothing)
+int automatic_search_count =           0;                 // Indicates which process to do when seraching for object in automatic mode
+int head_orientation =                 2;                 // Indicates if the head it turned or not (1 = left) (2 = centre) (3 = right)
+float go_to_angle =                    0;                 // Indicate to which angle reach when searching in automatic mode
+int spin_until_object_aligned =        0;                 // Indicates if robot is aligning itself towards the detected object (1 = left) (2 = right)
 bool automatic_done =                  false;             // Indicates if the automatic mode has drop the target at the dropoff point
 
+int test_variable =                   0;                 // This variable can be used to conduct tests while debugging. It should not be in the code if not presently using it in a test
 /*---------------------------- Objects ---------------------------*/
 
 //Create an object for each servo 
@@ -536,7 +530,7 @@ void setup() {
   B6_.attach(B6_Pin);         
   C6_.attach(C6_Pin);
   D1_.attach(D1_Pin); 
-  D1_.attach(D2_Pin);
+  D2_.attach(D2_Pin);
 
   command = INITIALIZATION;
   t = millis();
@@ -562,24 +556,32 @@ void loop() {
   if(operation_mode == MODE_MANUEL) // if in manuel mode reset mode automatic
   {
     automatic_done = false;
-  }
-  
+  } 
 
-  if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
-  { 
-    current_overload = true;
+  if(which_image != 2)
+  {
+    object_detected = true;
   }
+  else
+  {
+    object_detected = false;
+  }
+
+  // if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
+  // { 
+  //   current_overload = true;
+  // }
 
   if(real_voltage <= min_battery_voltage)             // If voltage reaches lower limit
   { 
     insufficient_voltage = true;
   }
 
-  if(current_overload == true || insufficient_voltage == true)  // if "voltage or current error" trigger shutdown
-  {
-    electrical_shutdown = true;
-    command = WAIT;
-  }
+  // if(current_overload == true || insufficient_voltage == true)  // if "voltage or current error" trigger shutdown
+  // {
+  //   electrical_shutdown = true;
+  //   command = WAIT;
+  // }
   
 
   if(robot_is_standing == false && (command != STAND && command != INITIALIZATION))
@@ -598,7 +600,7 @@ void loop() {
         stepsequence(4, step_delay, &B236_, initial_angle_B);
         stepsequence(5, step_delay, &C145_, initial_angle_C);
         stepsequence(6, step_delay, &C236_, initial_angle_C);
-        D1_.write(initial_angle_D);  
+        D1_.write(initial_angle_D1);  
         D2_.write(mandible_open_angle);  
 
           if (step == 7)
@@ -620,23 +622,19 @@ void loop() {
             
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
-              while (1)
-              {
-                //Stop things from happening to prevent current flow
-              }
             }
             
         break;
 
         case MOVE_FORWARD :                // Move one step forward sequence
-          stepsequence(1, step_delay, &B145_, walking_angle_B);
+          stepsequence(1, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           stepsequence(2, step_delay, &A145_, initial_angle_A + Walking_angle_A_increase);
           stepsequence(3, step_delay, &B145_, standing_angle_B);
-          stepsequence(4, step_delay, &B236_, walking_angle_B);
+          stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
           stepsequence(5, 0, &A145_, initial_angle_A);
           stepsequence(6, step_delay, &A236_, initial_angle_A + Walking_angle_A_increase);
           stepsequence(7, step_delay, &B236_, standing_angle_B);
-          stepsequence(8, step_delay, &B145_, walking_angle_B);
+          stepsequence(8, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           stepsequence(9, step_delay, &A236_, initial_angle_A);
           stepsequence(10, step_delay, &B145_, standing_angle_B);
 
@@ -649,16 +647,16 @@ void loop() {
         break;
 
         case MOVE_BACKWARD :                // Move one step backward sequence
-          stepsequence(1, step_delay, &B145_, walking_angle_B);
+          stepsequence(1, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           stepsequence(2, step_delay, &A145_, initial_angle_A - Walking_angle_A_increase);
           stepsequence(3, step_delay, &B145_, standing_angle_B);
-          stepsequence(4, step_delay, &B236_, walking_angle_B);
-          stepsequence(5, 0, &A145_, initial_angle_A);
+          stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
+          stepsequence(5, 0,          &A145_, initial_angle_A);
           stepsequence(6, step_delay, &A236_, initial_angle_A - Walking_angle_A_increase);
           stepsequence(7, step_delay, &B236_, standing_angle_B);
-          stepsequence(8, step_delay, &B145_, walking_angle_B);
+          stepsequence(8, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           stepsequence(9, step_delay, &A236_, initial_angle_A);
-          stepsequence(10, step_delay, &B145_, standing_angle_B);
+          stepsequence(10,step_delay, &B145_, standing_angle_B);
 
           if (step == 11)
           {
@@ -669,10 +667,10 @@ void loop() {
         break;
 
         case SIDESTEP_LEFT :                // Lateral step left sequence
-          stepsequence(1, step_delay, &B236_, walking_angle_B);
+          stepsequence(1, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
           sidestepsequence(2, step_delay, &C145_, sidestep_angle);
           stepsequence(3, step_delay, &B236_, standing_angle_B);
-          stepsequence(4, step_delay, &B145_, walking_angle_B);
+          stepsequence(4, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           sidestepsequence(5, step_delay, &C145_, 0);
           stepsequence(6, step_delay, &B145_, standing_angle_B);
 
@@ -686,10 +684,10 @@ void loop() {
 
         case SIDESTEP_RIGHT :                // Lateral step right sequence
 
-          stepsequence(1, step_delay, &B145_, walking_angle_B);
+          stepsequence(1, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           sidestepsequence(2, step_delay, &C236_, sidestep_angle);
           stepsequence(3, step_delay, &B145_, standing_angle_B);
-          stepsequence(4, step_delay, &B236_, walking_angle_B);
+          stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
           sidestepsequence(5, step_delay, &C236_, 0);
           stepsequence(6, step_delay, &B236_, standing_angle_B);
       
@@ -701,10 +699,10 @@ void loop() {
         break;
 
         case TURN_LEFT :                // Pivot counter-clockwise sequence
-          stepsequence(1, step_delay, &B236_, walking_angle_B);
+          stepsequence(1, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
           turnstepsequence(2, step_delay, &A236_, -turn_angle);
           stepsequence(3, step_delay, &B236_, standing_angle_B);
-          stepsequence(4, step_delay, &B145_, walking_angle_B);
+          stepsequence(4, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           turnstepsequence(5, step_delay, &A236_, 0);
           stepsequence(6, step_delay, &B145_, standing_angle_B);
 
@@ -717,10 +715,10 @@ void loop() {
         break;
 
         case TURN_RIGHT :                // Pivot clockwise sequence
-          stepsequence(1, step_delay, &B236_, walking_angle_B);
+          stepsequence(1, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
           turnstepsequence(2, step_delay, &A236_, turn_angle);
           stepsequence(3, step_delay, &B236_, standing_angle_B);
-          stepsequence(4, step_delay, &B145_, walking_angle_B);
+          stepsequence(4, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
           turnstepsequence(5, step_delay, &A236_, 0);
           stepsequence(6, step_delay, &B145_, standing_angle_B);
 
@@ -733,12 +731,20 @@ void loop() {
 
         case PICKUP :                // Pickup object sequence
           D2_.write(mandible_close_angle); 
-          command = WAIT;       
+          if(millis() > (t + step_delay))
+            {
+              t = millis();
+              command = WAIT; 
+            }      
         break;
 
         case DROP :                // Drop object sequence
           D2_.write(mandible_open_angle);  
-          command = WAIT;
+          if(millis() > (t + step_delay))
+            {
+              t = millis();
+              command = WAIT; 
+            } 
         break;
 
         case STAND :               // Get up off ground
@@ -769,6 +775,33 @@ void loop() {
             }
         break;
 
+        case HEAD_LEFT :
+          D1_.write(initial_angle_D1 + head_turn_angle);  
+          if(millis() > (t + 5* step_delay))
+            {
+              head_orientation = 1;
+              command = WAIT; 
+            } 
+        break;
+
+        case HEAD_RIGHT :
+          D1_.write(initial_angle_D1 - head_turn_angle);  
+          if(millis() > (t + 5* step_delay))
+            {
+              head_orientation = 3;
+              command = WAIT; 
+            } 
+        break;
+
+        case HEAD_CENTRE :
+          D1_.write(initial_angle_D1);  
+          if(millis() > (t + step_delay))
+            {
+              t = millis();
+              head_orientation = 2;
+              command = WAIT; 
+            } 
+        break;
 
         case AUTOMATIC :
 
@@ -776,15 +809,95 @@ void loop() {
           if(in_possession == false)
           {
               // if object not detected 
-              if(object_detected == false)
+              if(object_detected == false && spin_until_object_aligned == 0)
               {
+                if (automatic_search_count == 6)
+                {
+                    command = MOVE_FORWARD;
+                    automatic_search_count = 0;
+                    
+                }
+                if (automatic_search_count == 5)
+                {
+                    command = TURN_LEFT;
+                    if( abs(current_orientation - go_to_angle) < 5 )
+                    {
+                      automatic_search_count++;
+                    }  
+                }
+                
+                if (automatic_search_count == 4)
+                {
+                    go_to_angle = (current_orientation + 90) % 360;
+                    automatic_search_count++;
+                }
+                if (automatic_search_count == 3)
+                {
+                  command = MOVE_FORWARD;
+                  if ( (arena_sizex - current_position_x) < (arena_sizex/4) || current_position_x < (arena_sizex/4) || (arena_sizey - current_position_y) < (arena_sizey/4) || current_position_y < (arena_sizey/4) )
+                  {
+                    automatic_search_count++;
+                  }
+                }
+                if (automatic_search_count == 2)
+                {
+                  command = HEAD_CENTRE;
+                  automatic_search_count++;
+                }
+                
+                if (automatic_search_count == 1)
+                {
+                  command = HEAD_RIGHT;
+                  automatic_search_count++;
+                }
+                if (automatic_search_count == 0)
+                {
+                  command = HEAD_LEFT;
+                  automatic_search_count++;
+                }
+            }
 
 
+              // if object detected and head is not looking forward
+              if ((object_detected == true && head_orientation != 2) || spin_until_object_aligned != 0)
+              {
+                    if (head_orientation == 1)
+                    {
+                      spin_until_object_aligned = 1;
+                    }
+                    if (head_orientation == 3)
+                    {
+                      spin_until_object_aligned = 2;
+                    }
+
+                    if (spin_until_object_aligned == 1)
+                    {
+                      command = TURN_LEFT;
+                      if(object_detected ==true)
+                      {
+                        spin_until_object_aligned = 0;
+                      }
+                    }
+                     if (spin_until_object_aligned == 2)
+                    {
+                      command = TURN_RIGHT;
+                      if(object_detected ==true)
+                      {
+                        spin_until_object_aligned = 0;
+                      }
+                    }
+
+                     if(head_orientation !=2)
+                    {
+                      command = HEAD_CENTRE;
+                    }
               }
+              
                
-              // if object detected
-              if(object_detected == true)
+              // if object detected and head is looking forward
+              if(object_detected == true && head_orientation == 2 && spin_until_object_aligned == 0)
               {
+                automatic_search_count = 0;
                     //check if object is left, right or center of camera
                     //if left turn left until center
                     if(object_aim == 1)
@@ -829,7 +942,7 @@ void loop() {
           if(in_possession == true)
           {
             //if happy
-              if(which_image == 1)
+              if(which_image == 0)
               {
                
               float distancex_from_dropoff = drop_off1x - current_position_x; 
@@ -864,7 +977,7 @@ void loop() {
               }
 
               //if angry
-              if(which_image == 2)
+              if(which_image == 1)
               {
                
               float distancex_from_dropoff = drop_off2x - current_position_x; 
@@ -898,10 +1011,8 @@ void loop() {
                 }
               }
           }
-
         break;
     }
-
   timerSendMsg_.update();
 }
 
@@ -917,33 +1028,34 @@ void sendMsg(){
   StaticJsonDocument<500> doc;
   // Elements du message
 
-  // doc["time"]      = (millis()/1000.0);
-  // doc["cur_x"]  = current_position_x; 
-  // doc["cur_y"]  = current_position_y;
-  // doc["cur_angle"]  = current_orientation;
-  // doc["Case"] = command;
-  // doc["current"] = real_current;
-  // doc["voltage"] = real_voltage;
+  doc["time"]      = (millis()/1000.0);
+  doc["cur_x"]  = current_position_x; 
+  doc["cur_y"]  = current_position_y;
+  doc["cur_angle"]  = current_orientation;
+  doc["Case"] = command;
+  doc["current"] = real_current;
+  doc["voltage"] = real_voltage;
+  doc["shutdown"] = electrical_shutdown;
 
-  // doc["Servo_A1"]  = A1_.read();
-  // doc["Servo_B1"]  = B1_.read();
-  // doc["Servo_C1"]  = C1_.read();
-  // doc["Servo_A2"]  = A2_.read();
-  // doc["Servo_B2"]  = B2_.read();
-  // doc["Servo_C2"]  = C2_.read();
-  // doc["Servo_A3"]  = A3_.read();
-  // doc["Servo_B3"]  = B3_.read();
-  // doc["Servo_C3"]  = C3_.read();
-  // doc["Servo_A4"]  = A4_.read();
-  // doc["Servo_B4"]  = B4_.read();
-  // doc["Servo_C4"]  = C4_.read();
-  // doc["Servo_A5"]  = A5_.read();
-  // doc["Servo_B5"]  = B5_.read();
-  // doc["Servo_C5"]  = C5_.read();
-  // doc["Servo_A6"]  = A6_.read();
-  // doc["Servo_B6"]  = B6_.read();
-  // doc["Servo_C6"]  = C6_.read();
-  // doc["Servo_D1"]  = D1_.read();
+  doc["Servo_A1"]  = A1_.read();
+  doc["Servo_B1"]  = B1_.read();
+  doc["Servo_C1"]  = C1_.read();
+  doc["Servo_A2"]  = A2_.read();
+  doc["Servo_B2"]  = B2_.read();
+  doc["Servo_C2"]  = C2_.read();
+  doc["Servo_A3"]  = A3_.read();
+  doc["Servo_B3"]  = B3_.read();
+  doc["Servo_C3"]  = C3_.read();
+  doc["Servo_A4"]  = A4_.read();
+  doc["Servo_B4"]  = B4_.read();
+  doc["Servo_C4"]  = C4_.read();
+  doc["Servo_A5"]  = A5_.read();
+  doc["Servo_B5"]  = B5_.read();
+  doc["Servo_C5"]  = C5_.read();
+  doc["Servo_A6"]  = A6_.read();
+  doc["Servo_B6"]  = B6_.read();
+  doc["Servo_C6"]  = C6_.read();
+  doc["Servo_D1"]  = D1_.read();
 
   
  
@@ -973,6 +1085,8 @@ void readMsg(){
   }
 
   command = doc["CASE"];
+  target_distance = doc["VISION_DIS"];
+  which_image = doc["VISION_OBJ"];
 
 }
 
@@ -1019,7 +1133,6 @@ bool isinarena(){
   {
     return true;
   }
-
  return false;
 }
 
