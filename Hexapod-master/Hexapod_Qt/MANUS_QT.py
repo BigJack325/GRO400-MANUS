@@ -291,7 +291,10 @@ class Ui_MainWindow(QMainWindow):
         self.connectBatteryVoltage()
 
         if self.Manual_mode.checkState() == 0:
-            self.CamThread.msg_signal.connect(self.RobotMessageAutomatic)
+            if self.jsondata["CASE"] != 15:
+                self.RobotMessageManual("AUTOMATIC")
+            else:
+                self.CamThread.msg_signal.connect(self.RobotMessageAutomatic)
         elif self.Manual_mode.checkState() == 2:
             try:
                 self.CamThread.msg_signal.disconnect()
@@ -761,14 +764,14 @@ class Robot(QGraphicsPixmapItem):
         pixmap = QPixmap(os.path.join(paths['DISPLAY_IMAGE_PATH'],"hexapod.png"))
         pixmap_resized = pixmap.scaled(66,73,Qt.KeepAspectRatio)
         self.setPixmap(pixmap_resized)
-        self.setPos(130, 120)
+        self.setPos(100, 100)
         self.setTransformOriginPoint(33,51.5)#image is 66 by 103 pixel
         self.angle = 0
 
     def move(self,xpos,ypos):
 
         if self.angle == 0:
-            self.setPos(xpos+self.x(),ypos+self.y())
+            self.setPos(xpos,ypos)
         elif self.angle > 0:
             x = xpos*cos(math.radians(self.angle))-ypos*sin(math.radians(self.angle))
             y = xpos*sin(math.radians(self.angle))+ypos*cos(math.radians(self.angle))
