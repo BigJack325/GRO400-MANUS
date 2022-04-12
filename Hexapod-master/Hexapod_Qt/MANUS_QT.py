@@ -20,7 +20,7 @@ import sys, os, json, math
 
 BAUD_RATE = 115200
 UI_UPDATE_RATE = 100# Ms
-CAM_UPDATE_RATE = 100
+CAM_UPDATE_RATE = 1000
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
@@ -52,6 +52,7 @@ class Ui_MainWindow(QMainWindow):
         self.counter = 0
         self.jsondata = None
         self.serialCom_ = None
+        self.oldCamMessage = ""
 
         self.centralWidget = QWidget(self)
         self.gridLayout = QGridLayout(self.centralWidget)
@@ -92,8 +93,8 @@ class Ui_MainWindow(QMainWindow):
         self.FrontButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Front.png")))
         self.FrontButton.setIconSize(QSize(61,61))
         self.FrontButton.setAutoRepeat(True)
-        self.FrontButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
-        self.FrontButton.setAutoRepeatInterval(1000)#mseconds
+        self.FrontButton.setAutoRepeatDelay(4000)#mseconds  
+        self.FrontButton.setAutoRepeatInterval(4000)#mseconds
         self.BackButton = QPushButton(self.centralWidget)
         self.BackButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Back.png")))
         self.BackButton.setIconSize(QSize(61,61))
@@ -138,13 +139,16 @@ class Ui_MainWindow(QMainWindow):
         self.CamDistance_label = QLabel(self.centralWidget)
         self.CamDistanceText = QPlainTextEdit(self.centralWidget)
 
-        self.Angle_label = QLabel(self.centralWidget)
-        self.AngleBox = QDoubleSpinBox(self.centralWidget)
+        # self.Angle_label = QLabel(self.centralWidget)
+        # self.AngleBox = QDoubleSpinBox(self.centralWidget)
 
         self.Json_label = QLabel(self.centralWidget)
         self.Json_Browser = QTextBrowser(self.centralWidget)
 
         self.Manual_mode = QCheckBox(self.centralWidget)
+
+        self.BatteryPower_label = QLabel(self.centralWidget)
+        self.BatteryPower = QLineEdit(self.centralWidget)
 
         self.setupUi()
 
@@ -229,19 +233,23 @@ class Ui_MainWindow(QMainWindow):
         self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
         self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
-        self.Angle_label.setGeometry(QRect(615, 735, 94, 22))
-        self.AngleBox.setGeometry(QRect(710, 735, 124, 22))
-        self.AngleBox.setMinimum(0)
-        self.AngleBox.setMaximum(180)
-        self.AngleBox.setDecimals(0)
-        self.AngleBox.setValue(10)
-        self.AngleBox.setSingleStep(1)
+        # self.Angle_label.setGeometry(QRect(615, 735, 94, 22))
+        # self.AngleBox.setGeometry(QRect(710, 735, 124, 22))
+        # self.AngleBox.setMinimum(0)
+        # self.AngleBox.setMaximum(180)
+        # self.AngleBox.setDecimals(0)
+        # self.AngleBox.setValue(10)
+        # self.AngleBox.setSingleStep(1)
 
         self.Json_label.setGeometry(QRect(388, 10, 218, 22))
         self.Json_Browser.setGeometry(QRect(388, 30, 200, 201))
         font = QFont()
         font.setPointSize(9)
         self.Json_Browser.setFont(font)
+
+        self.BatteryPower_label.setGeometry(QRect(0, 0, 50, 25))
+        self.BatteryPower.setGeometry(QRect(60, 0, 60, 25))
+        self.BatteryPower.setReadOnly(True) 
 
         self.Manual_mode.setGeometry(QRect(840, 720, 120, 50))
         self.Manual_mode.setChecked(True)
@@ -254,7 +262,7 @@ class Ui_MainWindow(QMainWindow):
         self.connectSerialComboBox()
         self.connectButtons()
         self.CamThread.ImageUpdate.connect(self.connectCamera)
-        self.CamThread.ObjectDistance.connect(self.connectCameraDistance)
+        self.CamThread.ObjectDistanceMove.connect(self.connectCameraDistanceMove)
 
 
         # QMetaObject.connectSlotsByName(Self)
@@ -268,18 +276,19 @@ class Ui_MainWindow(QMainWindow):
         self.StandLayButton.setText(_translate("MainWindow", "STAND"))
         self.Port_label.setText(_translate("MainWindow", "Port:"))
         self.Donnees_label.setText(_translate("MainWindow", "Donnees brutes:"))
-        self.Angle_label.setText(_translate("MainWindow", "Angle[0,360]"))
+        # self.Angle_label.setText(_translate("MainWindow", "Angle[0,360]"))
         self.Json_label.setText(_translate("MainWindow", "Messages Json de l\'Arduino:"))
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
         self.Manual_mode.setText(_translate("MainWindow", "Manual Mode"))
         self.PickDropButton.setText(_translate("MainWindow", "PICK"))
+        self.BatteryPower_label.setText(_translate("MainWindow", "Power: "))
 
     def OnPeriodicEvent(self):
         self.portCensus()
-        self.connectMotorLabels()
         self.checkManual()
         self.connectPeriodicButtons()
+        self.connectBatteryVoltage()
 
         if self.Manual_mode.checkState() == 0:
             self.CamThread.msg_signal.connect(self.RobotMessageAutomatic)
@@ -306,6 +315,12 @@ class Ui_MainWindow(QMainWindow):
     def connectUpdateTimer(self, updateTime):
         self.updateTimer.timeout.connect(self.OnPeriodicEvent)
         self.updateTimer.start(updateTime)
+
+    def connectBatteryVoltage(self):
+        if self.jsondata is not None:
+            BatteryPercent = round((self.jsondata["voltage"]*100)/12,2)
+            self.BatteryPower.setText(str(BatteryPercent)+"%")
+
 
     def connectPeriodicButtons(self):
 
@@ -442,12 +457,22 @@ class Ui_MainWindow(QMainWindow):
     def connectCamera(self,Image):
         self.CamImage.setPixmap(QPixmap.fromImage(Image))
 
-    def connectCameraDistance(self,Distance):
-        self.CamDistanceText.setPlainText("Image Distance: "+Distance)
+    def connectCameraDistanceMove(self,DistanceMove):
+
+        if DistanceMove[1] == 0:
+            self.CamDistanceText.setPlainText("Image Distance: "+DistanceMove[0]+"\n"+"Robot Move: "+"NO_IMG")
+        elif DistanceMove[1] == 1:
+            self.CamDistanceText.setPlainText("Image Distance: "+DistanceMove[0]+"\n"+"Robot Move: "+"LEFT")
+        elif DistanceMove[1] == 2:
+            self.CamDistanceText.setPlainText("Image Distance: "+DistanceMove[0]+"\n"+"Robot Move: "+"CENTER")
+        elif DistanceMove[1] == 3:
+            self.CamDistanceText.setPlainText("Image Distance: "+DistanceMove[0]+"\n"+"Robot Move: "+"RIGHT")
 
     def RobotMessageAutomatic(self,msg):
 
-        if self.serialCom_ is not None:
+        if self.serialCom_ is not None and self.oldCamMessage != msg:
+            
+            self.oldCamMessage = msg
             data_out = json.dumps(msg)
             print(data_out)
             self.serialCom_.sendMessage(data_out)
@@ -489,31 +514,6 @@ class Ui_MainWindow(QMainWindow):
         data_out = json.dumps(msg_array)
         print(data_out)
         self.serialCom_.sendMessage(data_out)
-
-
-
-    def connectMotorLabels(self):
-        pass
-        # if self.jsondata is not None:
-        #     self.Servo[1].setText(str(self.jsondata["Servo_A1"]))
-        #     self.Servo[2].setText(str(self.jsondata["Servo_B1"]))
-        #     self.Servo[3].setText(str(self.jsondata["Servo_C1"]))
-        #     self.Servo[4].setText(str(self.jsondata["Servo_A2"]))
-        #     self.Servo[5].setText(str(self.jsondata["Servo_B2"]))
-        #     self.Servo[6].setText(str(self.jsondata["Servo_C2"]))
-        #     self.Servo[7].setText(str(self.jsondata["Servo_A3"]))
-        #     self.Servo[8].setText(str(self.jsondata["Servo_B3"]))
-        #     self.Servo[9].setText(str(self.jsondata["Servo_C3"]))
-        #     self.Servo[10].setText(str(self.jsondata["Servo_A4"]))
-        #     self.Servo[11].setText(str(self.jsondata["Servo_B4"]))
-        #     self.Servo[12].setText(str(self.jsondata["Servo_C4"]))
-        #     self.Servo[13].setText(str(self.jsondata["Servo_A5"]))
-        #     self.Servo[14].setText(str(self.jsondata["Servo_B5"]))
-        #     self.Servo[15].setText(str(self.jsondata["Servo_C5"]))
-        #     self.Servo[16].setText(str(self.jsondata["Servo_A6"]))
-        #     self.Servo[17].setText(str(self.jsondata["Servo_B6"]))
-        #     self.Servo[18].setText(str(self.jsondata["Servo_C6"]))
-        #     self.Servo[19].setText(str(self.jsondata["Servo_D1"]))
 
     def checkManual(self):
         if self.Manual_mode.checkState() == 0:
@@ -613,6 +613,15 @@ class Ui_MainWindow(QMainWindow):
                             jsonBrowserText[key] = "ANGRY"
                         if jsonBrowserText[key] == 2:
                             jsonBrowserText[key] = "NOTHING"
+                    if key == "VISION_MOVE":
+                        if jsonBrowserText[key] == 0:
+                            jsonBrowserText[key] = "NO_OBJET"
+                        if jsonBrowserText[key] == 1:
+                            jsonBrowserText[key] = "LEFT"
+                        if jsonBrowserText[key] == 2:
+                            jsonBrowserText[key] = "CENTER"
+                        if jsonBrowserText[key] == 3:
+                            jsonBrowserText[key] = "RIGHT"
           
 
                 jsondataString = json.dumps(jsonBrowserText,indent=2)
@@ -773,19 +782,6 @@ class Robot(QGraphicsPixmapItem):
         self.angle = angle
         self.setRotation(self.angle)
 
-    # def keyPressEvent(self, event:QKeyEvent):
-    #     # print('lol')
-
-    #     if event.key() == Qt.Key_Left:
-    #         if self.pos().x()>0:
-    #             self.setPos(self.x()-MANUAL_SIDE_MOVEMENT, self.y())
-    #     elif event.key() == Qt.Key_Right:
-    #         if self.pos().x() < 780:
-    #             self.setPos(self.x()+MANUAL_SIDE_MOVEMENT, self.y())
-
-    #     return super().keyPressEvent(event)
-
-
 class Target(QGraphicsPixmapItem):
     pass
 
@@ -793,7 +789,7 @@ class VideoTracking(QThread):
 
     msg_signal = pyqtSignal(str)
     ImageUpdate = pyqtSignal(QImage)
-    ObjectDistance = pyqtSignal(str)
+    ObjectDistanceMove = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -801,7 +797,7 @@ class VideoTracking(QThread):
         self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
         self.camTimer = QTimer()
 
-        self.ThreadActive = True
+        self.oldDistance = 0.0
         
         self.new_width = 320
         self.real_img_width = 5.7
@@ -900,11 +896,12 @@ class VideoTracking(QThread):
 
         return xmax-xmin
 
-    def VisionMessage(self,distance,object):
+    def VisionMessage(self,move,distance,object):
 
-        msg_array = {"VISION_DIS":distance,"VISION_OBJ":object}
+        if self.oldDistance != distance:
+            msg_array = {"VISION_MOVE":move,"VISION_DIS":distance,"VISION_OBJ":object}
 
-        self.msg_signal.emit(str(msg_array))
+            self.msg_signal.emit(str(msg_array))
 
 
     def vision(self,frame):
@@ -916,7 +913,7 @@ class VideoTracking(QThread):
         # print(res)
 
         if not res:
-            self.VisionMessage(0.0,2)
+            self.VisionMessage(0,0.0,2)
 
 
         for result in res:
@@ -933,20 +930,24 @@ class VideoTracking(QThread):
             
             distance = self.Distance_finder(self.focal_length,self.real_img_width,(xmax-xmin))
 
-            self.ObjectDistance.emit(str(round(distance,2)))
+            xmoy = (xmin+xmax)/2
+            if (195>xmoy>135):
+                movetodo = 2
+            elif (xmoy>195):
+                movetodo = 3
+            elif (xmoy<135):
+                movetodo = 1
+            else:
+                movetodo = 0
+                
+            self.ObjectDistanceMove.emit([str(round(distance,2)),int(movetodo)])
 
-            # self.CamDistanceText.setPlainText("Image Distance: "+str(round(distance,2)))
-
-            self.VisionMessage(round(distance,2),int(result['class_id']))
+            self.VisionMessage(int(movetodo),round(distance,2),int(result['class_id']))
 
         imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
 
         self.ImageUpdate.emit(imageframe)
-        # self.setPixmap(QPixmap.fromImage(imageframe))
-
-
-
 
 if __name__ == "__main__":
 
