@@ -41,21 +41,33 @@
 #### <a id="SetupContrib"></a>Setup for Contributors
 
 ## <a id="Documentation"></a>Documentation
-Numéro des pattes du robot:
+Classification of the robot servos:
 
-![image](https://user-images.githubusercontent.com/48064854/157464345-55dbc51c-fd1a-4533-8910-a199ca5e8740.png)
+![photo patte hexapod](https://user-images.githubusercontent.com/48064854/162976618-52e0769e-27ba-48a6-97b3-df437f16bacd.PNG)
+
+
+Electrical Diagram of the Shield: 
+![image](https://user-images.githubusercontent.com/48064854/163028957-0d5c8229-0cb9-4d3b-a6ca-b984c7e7bd09.png)
+
 
 ## <a id="Operation"></a>Robot Operation
 
 #### <a id="Movement"></a>Robot Movement
+The robot can move forward, backward and sideways.  It can also rotate clockwise and counterclockwise.
 
 #### <a id="Vision"></a>Robot Vision
+The robot has a vision algorithm that detects these two images: 
+
+![happy](https://user-images.githubusercontent.com/48064854/163003461-6ebe9cd6-cc70-48df-82ff-0c2a40982960.jpg)![angry](https://user-images.githubusercontent.com/48064854/163003538-dd7039e3-41dc-485b-952a-bf78a2d1049d.jpg)
+
+
+
 
 #### <a id="Mods"></a>Robot Mods
 
 #### <a id="Controls"></a>HMI And Robot Controls
 
-## <a id="Ressources"></a>Exeternal ressources
+## <a id="Ressources"></a>External ressources
 
 Under this section, you will find external links and descriptions of the project's external resources.
 
@@ -88,13 +100,16 @@ Under this section, you will find external links and descriptions of the project
 - ASIN: B01LPLPBS8
 - Information / Resources: [Raspberry Pi Webpage](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
 
-#### <a id="Servo"></a>Servomotor
+#### <a id="Servo"></a>Servomotor for the legs
 
 - Brand Name : VIPMOON
 - Model : MG996R
-- ASIN :
 - Information / Resources : [Amazon Webpage](https://www.amazon.ca/-/fr/gp/product/B07VT5T9JC/ref=ewc_pr_img_1?smid=A2FI4MJY3VQVX5&psc=1)
 
+#### <a id="Servo"></a>Servomotor for the mandibles
+
+- Model : MG90S
+- Information / Resources : [Amazon Webpage](https://www.amazon.ca/servomoteur-h%C3%A9licopt%C3%A8re-m%C3%A9tallique-intelligent-commandes/dp/B08W26FNQD/)
 #### <a id="Current"></a>Current sensor
 
 - Brand Name : ROBOJAX
