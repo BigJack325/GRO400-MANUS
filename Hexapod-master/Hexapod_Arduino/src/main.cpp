@@ -651,17 +651,6 @@ void loop() {
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
             }
-
-            if( test_variable > 0)
-            {
-              command = MOVE_FORWARD;
-              test_variable++;
-            }
-            if(test_variable == 0)
-            {
-              command = STAND;
-              test_variable++;
-            }
             
         break;
 
@@ -752,6 +741,7 @@ void loop() {
           if (step == 7)
           {
             step = 1;
+            current_orientation = current_orientation + (turn_angle * turn_left_drift_error_factor);
             command = WAIT;
           }
         break;
