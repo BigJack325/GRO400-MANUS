@@ -20,7 +20,8 @@ class SynchServo
     SynchServo();
     SynchServo(MegaServo* servo_1, MegaServo* servo_2,  MegaServo* servo_3, int A_B_or_C, int either_145_or_236, int offset_1, int offset_2, int offset_3);
 
-    int cinematic_inverse(int left_or_right, float X, float Y, float Z);
+    int direct_kinematics(int output_dimension, int angleA, int angleB, int angleC);
+    int inverse_kinematics(int left_or_right, float X, float Y, float Z);
     void move_angle(int angle_selon__patte_gauche);
     void move_position(float X, float Y, float Z);            // X Y and Z values must be according to left leg
     bool readall(int angle_check);
@@ -29,14 +30,12 @@ class SynchServo
     MegaServo* servo2;
     MegaServo* servo3;
 
-    // MegaServo* servo1 = & servo_1;
-    // MegaServo* servo2 = & servo_2;
-    // MegaServo* servo3 = & servo_3;
-
     int letter;
     int group;
 
-  private:
+    int offset1;
+    int offset2;
+    int offset3;
 
     float L1x;
     float L1y;
@@ -48,9 +47,9 @@ class SynchServo
     float L3y;
     float L3z;
 
-    int offset1;
-    int offset2;
-    int offset3;
+  private:
+
+ 
 };
 
 //constructor
@@ -59,16 +58,15 @@ SynchServo::SynchServo()
   letter = 0;
   group  = 0;
 
-  //dimensions of the 3 pieces of the leg for inverse kinematics
-   L1x = 0;
-   L1y = 1;
-   L1z = 0;
-   L2x = 0;
-   L2y = 1;
-   L2z = 0;
-   L3x = 0;
-   L3y = 1;
-   L3z = 0;
+  L1x = 1.6;
+  L1y = 5.55;
+  L1z = 4.72;
+  L2x = 0;
+  L2y = 7.2;
+  L2z = 0;
+  L3x = 0;
+  L3y = 11.47;
+  L3z = -0.5;
 }
 
 SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_3, int  A_B_or_C, int either_145_or_236, int offset_1, int offset_2, int offset_3)
@@ -84,20 +82,42 @@ SynchServo::SynchServo(MegaServo *servo_1, MegaServo *servo_2, MegaServo *servo_
   offset2 = offset_2;
   offset3 = offset_3;
 
-
-  //dimensions of the 3 pieces of the leg for inverse kinematics
-   L1x = 0;
-   L1y = 1;
-   L1z = 0;
-   L2x = 0;
-   L2y = 1;
-   L2z = 0;
-   L3x = 0;
-   L3y = 1;
-   L3z = 0;
+  L1x = 1.6;
+  L1y = 5.55;
+  L1z = 4.72;
+  L2x = 0;
+  L2y = 7.2;
+  L2z = 0;
+  L3x = 0;
+  L3y = 11.47;
+  L3z = -0.5;
 }
 
-int SynchServo::cinematic_inverse(int left_or_right, float X, float Y, float Z)
+int SynchServo::direct_kinematics(int output_dimension, int angleA, int angleB, int angleC)
+{
+  //cinematic_direct based on left side 
+  float theta1 = (angleA)  *2 *PI /360;
+  float theta2 = (angleB)  *2 *PI /360;
+  float theta3 = (angleC)  *2 *PI /360;
+
+  float length_from_top = L1y + L2y*sin(theta2) + L3y*sin(theta2 + (PI - theta3)); 
+
+  float x_pos = sin(theta1 - PI/2) * length_from_top;
+  float y_pos = cos(theta1 - PI/2) * length_from_top;
+
+  if(output_dimension == 1)
+  {
+    return x_pos;
+  }
+  if (output_dimension == 2)
+  {
+    return y_pos;
+  }
+  
+
+}
+
+int SynchServo::inverse_kinematics(int left_or_right, float X, float Y, float Z)
 {  
   float theta1;
   float theta2;
@@ -188,17 +208,17 @@ void SynchServo::move_position(float X, float Y, float Z)
 {
   if(group == 1) //group145
   {
-    servo1->write(        cinematic_inverse(left,   X, Y, Z)       );
-    servo2->write(        cinematic_inverse(right, -X, Y, Z)       );
-    servo3->write(        cinematic_inverse(left,   X, Y, Z)       );
+    servo1->write(        inverse_kinematics(left,   X, Y, Z)       );
+    servo2->write(        inverse_kinematics(right, -X, Y, Z)       );
+    servo3->write(        inverse_kinematics(left,   X, Y, Z)       );
 
   }
 
   if(group == 2) //group236
   {
-    servo1->write(        cinematic_inverse( right, -X, Y, Z)       );
-    servo2->write(        cinematic_inverse( left ,  X, Y, Z)       );
-    servo3->write(        cinematic_inverse( right, -X, Y, Z)       );
+    servo1->write(        inverse_kinematics( right, -X, Y, Z)       );
+    servo2->write(        inverse_kinematics( left ,  X, Y, Z)       );
+    servo3->write(        inverse_kinematics( right, -X, Y, Z)       );
   }
 }
 
@@ -242,13 +262,13 @@ using namespace std;
 #define standing_angle_C               140        // Angle for C servos in standing position
 
 #define walking_angle_B_increase       20         // Angle to lift up B when walking
-#define Walking_angle_A_increase       10         // Angle of servo A used in forward movements
+#define Walking_angle_A_increase       20         // Angle of servo A used in forward movements
 
 #define sidestep_angle                 10         // Angle used in sidestepping
-#define turn_angle                     10         // angle used in turning
+#define turn_angle                     20         // angle used in turning
 
-#define angle_backward                 10         // Angle of servo A used in backward movements
-#define angle_rotation                 10         // Angle of servo A used in spinning movements
+#define angle_backward                 20         // Angle of servo A used in backward movements
+#define angle_rotation                 20         // Angle of servo A used in spinning movements
 
 #define angle_laydown_B                160          // Angle used to lay robot on ground
 
@@ -263,8 +283,8 @@ using namespace std;
 #define initial_position_y             arena_sizey/2      //Initial position of the robot on the y-axis (cm)
 
 #define offset_front_back              25                 // Angle of offset from middle legs of front and back legs
-#define offset_A1                      6  + offset_front_back   //ok
-#define offset_A2                      -3 + offset_front_back //ok
+#define offset_A1                      3  + offset_front_back   //ok
+#define offset_A2                      20 + offset_front_back //ok
 #define offset_A3                      2    //ok
 #define offset_A4                      -5   //ok
 #define offset_A5                      0  - offset_front_back //ok
@@ -369,20 +389,23 @@ int time =                             0;        // Loop timer
 uint32_t Time;                                   // Timer for SmoothMovementWhileV2
 
 int operation_mode =                   MODE_MANUEL;       //Determines whether robot is in automatic or manuel mode
-int command =                          0;                 //Variable to give command (inicate which case to do)
+int command =                          INITIALIZATION;    //Variable to give command (inicate which case to do)
 bool robot_is_standing =               false;             //Varibale indicates if robot is standing or lying down
 
 bool current_overload =                false;
 bool insufficient_voltage =            false;
 bool electrical_shutdown =             false;
 
-int current_position_x =               0;                 //Current position of the robot on the x axis (cm)
-int current_position_y =               0;                 //Current position of the robot on the y-axis (cm)
-int current_orientation =              90;                //Current angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
+int current_position_x =               arena_sizex/2;                 //Current position of the robot on the x axis (cm)
+int current_position_y =               arena_sizey/2;                 //Current position of the robot on the y-axis (cm)
+int current_orientation =              0;                //Current angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
+int current_orientation_rad =          0;                //Current angle of orientation of robot (rad) in a counterclockwise rotation of x-axis
 
 int future_position_x =                0;                 //Calculated future position of the robot on the x axis (cm)
 int future_position_y =                0;                 //Calculated future of the robot on the y-axis (cm)
-int future_orientation =               0;                //Calculated future angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
+int future_orientation =               0;                 //Calculated future angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
+
+bool mouvement_ok =                    false;             //Indicates if mouvement will make robot leave designated arena
 
 float distance_from_target =           300;               //Distance robot must cover to reach target object (cm)
 float drop_off1x =                      0;                //Coordinate on x-axis of object 1 drop location
@@ -401,6 +424,8 @@ float t;                                                  //Variable to use as t
 
 float real_current;                                       //Current consumption in amps
 float real_voltage;                                       //Present battery voltage
+
+float step_distance =                  0;                 // Theoretical distance made by current case
 
 bool in_possession =                   false;             // Variable to indicate if target object is being grabbed by robot (Automatic mode)
 bool object_detected =                 false;             // Variable to indicate if camera is identifying the target object (automatic mode)
@@ -558,12 +583,6 @@ void loop() {
     automatic_done = false;
   } 
 
-<<<<<<< HEAD
-  // if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
-  // { 
-  //   current_overload = true;
-  // }
-=======
   if(which_image != 2)
   {
     object_detected = true;
@@ -572,7 +591,6 @@ void loop() {
   {
     object_detected = false;
   }
->>>>>>> 2ndpartautomatic
 
   // if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
   // { 
@@ -595,7 +613,10 @@ void loop() {
   {
     command = WAIT;
   }
+
   
+  
+
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
     {
@@ -629,34 +650,57 @@ void loop() {
             
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
-<<<<<<< HEAD
-              // while (1)
-              // {
-              //   //Stop things from happening to prevent current flow
-              // }
-=======
->>>>>>> 2ndpartautomatic
+            }
+
+            if( test_variable > 0)
+            {
+              command = MOVE_FORWARD;
+              test_variable++;
+            }
+            if(test_variable == 0)
+            {
+              command = STAND;
+              test_variable++;
             }
             
         break;
 
         case MOVE_FORWARD :                // Move one step forward sequence
-          stepsequence(1, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
-          stepsequence(2, step_delay, &A145_, initial_angle_A + Walking_angle_A_increase);
-          stepsequence(3, step_delay, &B145_, standing_angle_B);
-          stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
-          stepsequence(5, 0, &A145_, initial_angle_A);
-          stepsequence(6, step_delay, &A236_, initial_angle_A + Walking_angle_A_increase);
-          stepsequence(7, step_delay, &B236_, standing_angle_B);
-          stepsequence(8, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
-          stepsequence(9, step_delay, &A236_, initial_angle_A);
-          stepsequence(10, step_delay, &B145_, standing_angle_B);
 
-          if (step == 11)
+          step_distance = A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+          current_orientation_rad = current_orientation /360 * 2* PI;
+          
+          if(current_position_x + 2*step_distance * cos(current_orientation_rad) < arena_sizex && current_position_x + step_distance * cos(current_orientation_rad) > 0)
           {
-            step = 1;
-            command = WAIT;
+            if(current_position_y + 2*step_distance * sin(current_orientation_rad) < arena_sizey && current_position_y + step_distance * sin(current_orientation_rad) > 0)
+            {
+              mouvement_ok = true;
+            }
           }
+
+          if(mouvement_ok)
+          {
+            stepsequence(1, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
+            stepsequence(2, step_delay, &A145_, initial_angle_A + Walking_angle_A_increase);
+            stepsequence(3, step_delay, &B145_, standing_angle_B);
+            stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
+            stepsequence(5, step_delay, &A145_, initial_angle_A);
+            stepsequence(6, step_delay, &A236_, initial_angle_A + Walking_angle_A_increase);
+            stepsequence(7, step_delay, &B236_, standing_angle_B);
+            stepsequence(8, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
+            stepsequence(9, step_delay, &A236_, initial_angle_A);
+            stepsequence(10, step_delay, &B145_, standing_angle_B);
+
+            if (step == 11)
+            {
+              step = 1;
+              current_position_x = current_position_x + 2* step_distance * cos(current_orientation_rad);
+              current_position_y = current_position_y + 2*step_distance * sin(current_orientation_rad);
+              mouvement_ok = false;
+              command = WAIT;
+            }
+          }
+          
 
         break;
 
@@ -665,7 +709,7 @@ void loop() {
           stepsequence(2, step_delay, &A145_, initial_angle_A - Walking_angle_A_increase);
           stepsequence(3, step_delay, &B145_, standing_angle_B);
           stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
-          stepsequence(5, 0,          &A145_, initial_angle_A);
+          stepsequence(5, step_delay, &A145_, initial_angle_A);
           stepsequence(6, step_delay, &A236_, initial_angle_A - Walking_angle_A_increase);
           stepsequence(7, step_delay, &B236_, standing_angle_B);
           stepsequence(8, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
@@ -916,13 +960,13 @@ void loop() {
                     //if left turn left until center
                     if(object_aim == 1)
                     {
-                      command = TURN_RIGHT;
+                      command = TURN_LEFT;
                     }
 
                     //if right turn right until center
                     if(object_aim == 3)
                     {
-                      command = TURN_LEFT;
+                      command = TURN_RIGHT;
                     }
 
                     //if center move forward
@@ -1110,6 +1154,7 @@ void readMsg(){
 void futureposition(int movement)   //    TO DO
 {
 
+
 if(movement == 1) //forward
  {
   future_position_x = current_position_x;
@@ -1143,10 +1188,11 @@ return;
 
 // If robot is still within arena limits return true else return false
 bool isinarena(){
- if((-arena_sizex < current_position_x) && (current_position_x < arena_sizex) && (-arena_sizey < current_position_y) && (current_position_y < arena_sizey))
+ if((0 < current_position_x) && (current_position_x < arena_sizex) && (0 < current_position_y) && (current_position_y < arena_sizey))
   {
     return true;
   }
+
  return false;
 }
 
@@ -1170,16 +1216,16 @@ void sidestepsequence(int step_number, int delay_microseconds, SynchServo* servo
         {
           if(servos->group == 1)
           {
-            servos->servo1->write(standing_angle_C + angle);
-            servos->servo2->write(180 - standing_angle_C + angle);
-            servos->servo3->write(standing_angle_C + angle);
+            servos->servo1->write(standing_angle_C + angle + servos->offset1 );
+            servos->servo2->write(180 - standing_angle_C + angle - servos->offset2 );
+            servos->servo3->write(standing_angle_C + angle + servos->offset3 );
           }
 
           if(servos->group == 2)
           {
-            servos->servo1->write(180 - standing_angle_C - angle);
-            servos->servo2->write(standing_angle_C - angle);
-            servos->servo3->write(180 - standing_angle_C - angle);
+            servos->servo1->write(180 - standing_angle_C - angle - servos->offset1);
+            servos->servo2->write(standing_angle_C - angle + servos->offset2);
+            servos->servo3->write(180 - standing_angle_C - angle - servos->offset3);
           }
           
           if(millis() > (t + delay_microseconds))
@@ -1197,16 +1243,16 @@ void turnstepsequence(int step_number, int delay_microseconds, SynchServo* servo
         {
           if(servos->group == 1)
           {
-            servos->servo1->write(initial_angle_A + angle);
-            servos->servo2->write(180 - initial_angle_A + angle);
-            servos->servo3->write(initial_angle_A + angle);
+            servos->servo1->write(initial_angle_A + angle + servos->offset1 );
+            servos->servo2->write(180 - initial_angle_A + angle + servos->offset2);
+            servos->servo3->write(initial_angle_A + angle + servos->offset3 );
           }
 
           if(servos->group == 2)
           {
-            servos->servo1->write(180 - initial_angle_A + angle);
-            servos->servo2->write(initial_angle_A + angle);
-            servos->servo3->write(180 - initial_angle_A + angle);
+            servos->servo1->write(180 - initial_angle_A + angle - servos->offset1 );
+            servos->servo2->write(initial_angle_A + angle + servos->offset2 );
+            servos->servo3->write(180 - initial_angle_A + angle - servos->offset3 );
           }
           
           if(millis() > (t + delay_microseconds))
