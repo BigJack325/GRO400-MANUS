@@ -13,14 +13,14 @@ from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
                              QLineEdit, QPushButton, QWidget,
                               QFrame, QComboBox, QGraphicsView, QGraphicsItem, QGraphicsScene,
                                QGraphicsPixmapItem, QPlainTextEdit, QDoubleSpinBox, QTextBrowser, QCheckBox, QSlider)
-from PyQt5.QtCore import QRect,QIODevice, QCoreApplication, pyqtSignal, Qt, QTimer, QSize
+from PyQt5.QtCore import QRect,QIODevice, QCoreApplication, pyqtSignal, Qt, QTimer, QSize, QThread
 from PyQt5.QtGui import QPixmap, QFont, QBrush, QImage, QKeyEvent, QIcon
 from PyQt5.QtChart import QChart,QChartView,QLineSeries
 import sys, os, json, math
 
 BAUD_RATE = 115200
-UI_UPDATE_RATE = 1000# Ms
-CAM_UPDATE_RATE = 20
+UI_UPDATE_RATE = 100# Ms
+CAM_UPDATE_RATE = 100
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
@@ -132,8 +132,11 @@ class Ui_MainWindow(QMainWindow):
         self.JsonKey = QLineEdit(self.centralWidget)
 
         self.Cam_label = QLabel(self.centralWidget)
-        self.Cam = VideoTracking(self.centralWidget)
+        self.CamThread = VideoTracking()
+        self.CamThread.start()
+        self.CamImage = QLabel(self.centralWidget)
         self.CamDistance_label = QLabel(self.centralWidget)
+        self.CamDistanceText = QPlainTextEdit(self.centralWidget)
 
         self.Angle_label = QLabel(self.centralWidget)
         self.AngleBox = QDoubleSpinBox(self.centralWidget)
@@ -222,8 +225,9 @@ class Ui_MainWindow(QMainWindow):
         self.graphView.setGeometry(QRect(620, 30, 341, 211))
 
         self.Cam_label.setGeometry(QRect(0, 170, 50, 22))
-        self.Cam.setGeometry(QRect(0, 160, 320, 320))
+        self.CamImage.setGeometry(QRect(0, 160, 320, 320))
         self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
+        self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
         self.Angle_label.setGeometry(QRect(615, 735, 94, 22))
         self.AngleBox.setGeometry(QRect(710, 735, 124, 22))
@@ -249,6 +253,9 @@ class Ui_MainWindow(QMainWindow):
         self.connectUpdateTimer(UI_UPDATE_RATE)
         self.connectSerialComboBox()
         self.connectButtons()
+        self.CamThread.ImageUpdate.connect(self.connectCamera)
+        self.CamThread.ObjectDistance.connect(self.connectCameraDistance)
+
 
         # QMetaObject.connectSlotsByName(Self)
 
@@ -274,7 +281,16 @@ class Ui_MainWindow(QMainWindow):
         self.checkManual()
         self.connectPeriodicButtons()
 
-        print('*')
+        if self.Manual_mode.checkState() == 0:
+            self.CamThread.msg_signal.connect(self.RobotMessageAutomatic)
+        elif self.Manual_mode.checkState() == 2:
+            try:
+                self.CamThread.msg_signal.disconnect()
+            except:
+                pass
+        
+
+        # print('*')
 
 
     def portCensus(self):
@@ -300,40 +316,40 @@ class Ui_MainWindow(QMainWindow):
 
             self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("PICK",1))
 
-            self.PickDropButton.clicked.connect(lambda: self.RobotMessage("PICK"))
+            self.PickDropButton.clicked.connect(lambda: self.RobotMessageManual("PICK"))
 
 
         if self.PickDropButton.text() == "DROP":
 
             self.PickDropButton.clicked.connect(lambda: self.changeButtonIcon("DROP",1))
 
-            self.PickDropButton.clicked.connect(lambda: self.RobotMessage("DROP"))
+            self.PickDropButton.clicked.connect(lambda: self.RobotMessageManual("DROP"))
 
         if self.StandLayButton.text() == "STAND":
 
             self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("STAND",1))
 
-            self.StandLayButton.clicked.connect(lambda: self.RobotMessage("STAND"))
+            self.StandLayButton.clicked.connect(lambda: self.RobotMessageManual("STAND"))
 
         elif self.StandLayButton.text() == "LAY":
 
             self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("LAY",1))
 
-            self.StandLayButton.clicked.connect(lambda: self.RobotMessage("LAY"))
+            self.StandLayButton.clicked.connect(lambda: self.RobotMessageManual("LAY"))
     
 
 
     def connectButtons(self):
 
         #Send message to Arduino for manual movement
-        self.RightButton.pressed.connect(lambda: self.RobotMessage("RIGHT"))
-        self.LeftButton.pressed.connect(lambda: self.RobotMessage("LEFT"))
-        self.FrontButton.pressed.connect(lambda: self.RobotMessage("FRONT"))
-        self.BackButton.pressed.connect(lambda: self.RobotMessage("BACK"))
-        self.RotateLeftButton.pressed.connect(lambda: self.RobotMessage("RLEFT"))
-        self.RotateRightButton.pressed.connect(lambda: self.RobotMessage("RRIGHT"))
-        self.RotateHeadLeftButton.pressed.connect(lambda: self.RobotMessage("HEADRLEFT"))
-        self.RotateHeadRightButton.pressed.connect(lambda: self.RobotMessage("HEADRRIGHT"))
+        self.RightButton.pressed.connect(lambda: self.RobotMessageManual("RIGHT"))
+        self.LeftButton.pressed.connect(lambda: self.RobotMessageManual("LEFT"))
+        self.FrontButton.pressed.connect(lambda: self.RobotMessageManual("FRONT"))
+        self.BackButton.pressed.connect(lambda: self.RobotMessageManual("BACK"))
+        self.RotateLeftButton.pressed.connect(lambda: self.RobotMessageManual("RLEFT"))
+        self.RotateRightButton.pressed.connect(lambda: self.RobotMessageManual("RRIGHT"))
+        self.RotateHeadLeftButton.pressed.connect(lambda: self.RobotMessageManual("HEADRLEFT"))
+        self.RotateHeadRightButton.pressed.connect(lambda: self.RobotMessageManual("HEADRRIGHT"))
 
 
         # Change button image when pressed
@@ -422,10 +438,21 @@ class Ui_MainWindow(QMainWindow):
             self.StandLayButton.setText("LAY")
         elif button == "LAY":
             self.StandLayButton.setText("STAND")
-        
 
+    def connectCamera(self,Image):
+        self.CamImage.setPixmap(QPixmap.fromImage(Image))
 
-    def RobotMessage(self,msg):
+    def connectCameraDistance(self,Distance):
+        self.CamDistanceText.setPlainText("Image Distance: "+Distance)
+
+    def RobotMessageAutomatic(self,msg):
+
+        if self.serialCom_ is not None:
+            data_out = json.dumps(msg)
+            print(data_out)
+            self.serialCom_.sendMessage(data_out)
+
+    def RobotMessageManual(self,msg):
         if msg == "STAND":
             msg_array = {"CASE":10}
             self.StandLayButton.clicked.disconnect()
@@ -458,36 +485,35 @@ class Ui_MainWindow(QMainWindow):
             msg_array = {"CASE":15}
         else:
             msg_array = msg
-
-
-        print(msg)
         
         data_out = json.dumps(msg_array)
+        print(data_out)
         self.serialCom_.sendMessage(data_out)
 
 
 
     def connectMotorLabels(self):
-        if self.jsondata is not None:
-            self.Servo[1].setText(str(self.jsondata["Servo_A1"]))
-            self.Servo[2].setText(str(self.jsondata["Servo_B1"]))
-            self.Servo[3].setText(str(self.jsondata["Servo_C1"]))
-            self.Servo[4].setText(str(self.jsondata["Servo_A2"]))
-            self.Servo[5].setText(str(self.jsondata["Servo_B2"]))
-            self.Servo[6].setText(str(self.jsondata["Servo_C2"]))
-            self.Servo[7].setText(str(self.jsondata["Servo_A3"]))
-            self.Servo[8].setText(str(self.jsondata["Servo_B3"]))
-            self.Servo[9].setText(str(self.jsondata["Servo_C3"]))
-            self.Servo[10].setText(str(self.jsondata["Servo_A4"]))
-            self.Servo[11].setText(str(self.jsondata["Servo_B4"]))
-            self.Servo[12].setText(str(self.jsondata["Servo_C4"]))
-            self.Servo[13].setText(str(self.jsondata["Servo_A5"]))
-            self.Servo[14].setText(str(self.jsondata["Servo_B5"]))
-            self.Servo[15].setText(str(self.jsondata["Servo_C5"]))
-            self.Servo[16].setText(str(self.jsondata["Servo_A6"]))
-            self.Servo[17].setText(str(self.jsondata["Servo_B6"]))
-            self.Servo[18].setText(str(self.jsondata["Servo_C6"]))
-            self.Servo[19].setText(str(self.jsondata["Servo_D1"]))
+        pass
+        # if self.jsondata is not None:
+        #     self.Servo[1].setText(str(self.jsondata["Servo_A1"]))
+        #     self.Servo[2].setText(str(self.jsondata["Servo_B1"]))
+        #     self.Servo[3].setText(str(self.jsondata["Servo_C1"]))
+        #     self.Servo[4].setText(str(self.jsondata["Servo_A2"]))
+        #     self.Servo[5].setText(str(self.jsondata["Servo_B2"]))
+        #     self.Servo[6].setText(str(self.jsondata["Servo_C2"]))
+        #     self.Servo[7].setText(str(self.jsondata["Servo_A3"]))
+        #     self.Servo[8].setText(str(self.jsondata["Servo_B3"]))
+        #     self.Servo[9].setText(str(self.jsondata["Servo_C3"]))
+        #     self.Servo[10].setText(str(self.jsondata["Servo_A4"]))
+        #     self.Servo[11].setText(str(self.jsondata["Servo_B4"]))
+        #     self.Servo[12].setText(str(self.jsondata["Servo_C4"]))
+        #     self.Servo[13].setText(str(self.jsondata["Servo_A5"]))
+        #     self.Servo[14].setText(str(self.jsondata["Servo_B5"]))
+        #     self.Servo[15].setText(str(self.jsondata["Servo_C5"]))
+        #     self.Servo[16].setText(str(self.jsondata["Servo_A6"]))
+        #     self.Servo[17].setText(str(self.jsondata["Servo_B6"]))
+        #     self.Servo[18].setText(str(self.jsondata["Servo_C6"]))
+        #     self.Servo[19].setText(str(self.jsondata["Servo_D1"]))
 
     def checkManual(self):
         if self.Manual_mode.checkState() == 0:
@@ -501,6 +527,7 @@ class Ui_MainWindow(QMainWindow):
             self.RotateHeadRightButton.setEnabled(False)
             self.StandLayButton.setEnabled(False)
             self.PickDropButton.setEnabled(False)
+
         elif self.Manual_mode.checkState() == 2 and  self.serialCom_  is not None:
             self.RightButton.setEnabled(True)
             self.LeftButton.setEnabled(True)
@@ -513,6 +540,7 @@ class Ui_MainWindow(QMainWindow):
             self.StandLayButton.setEnabled(True)
             self.PickDropButton.setEnabled(True)
 
+
     def connectSerialComboBox(self):
         self.comboBoxPort.activated.connect(lambda: self.startSerialCom(self.comboBoxPort.currentText()))
     
@@ -523,82 +551,112 @@ class Ui_MainWindow(QMainWindow):
 
     def connectSerialPortRead(self):
         self.serialCom_.newMessage.connect(self.receiveFromSerial)
-        self.Cam.msg_signal.connect(self.RobotMessage)
 
     def receiveFromSerial(self,msg):
 
-
-        for word in msg:
-            if word != '}':
-                self.msgBuffer_ += word
-            if word == '}':
-                self.msgBuffer_ += '}\n'
-                break
+        # print("Message\n")
         # print(msg)
-        # print(self.msgBuffer_)
 
-        if not self.msgBuffer_.startswith("{"):
-            self.msgBuffer_ = ""
+        msg = self.msgBuffer_+msg
 
-        if self.msgBuffer_.endswith('\n') and self.msgBuffer_.startswith("{"):
+        msg_residue = msg.split("*")
+        # print("Residue 0\n")
+        # print(msg_residue[0])
+        # print("Residue 1\n")
+        # print(msg_residue[1])
 
-            self.jsondata = json.loads(self.msgBuffer_)
-            jsonBrowserText = json.loads(self.msgBuffer_)
+        
+        for message in msg_residue:
+            # print("Message For\n")
+            # print(message)
 
-            for key in list(self.jsondata):
-                if key == "Servo_A1" or key=="Servo_A2" or key=="Servo_A3" or key=="Servo_A4" or key=="Servo_A5" or key=="Servo_A6" or key=="Servo_B1" or key=="Servo_B2" or key=="Servo_B3"or key=="Servo_B4" or key=="Servo_B5" or key=="Servo_B6" or key=="Servo_C1" or key=="Servo_C2" or key=="Servo_C3" or key=="Servo_C4" or key=="Servo_C5" or key=="Servo_C6" or key=="Servo_D1" :
-                    del jsonBrowserText[key]
-                if key == "Case":
-                    if jsonBrowserText[key] == 0:
-                        jsonBrowserText[key] = "INITIALIZE"
-                    if jsonBrowserText[key] == 1:
-                        jsonBrowserText[key] = "WAIT"
-                    if jsonBrowserText[key] == 2:
-                        jsonBrowserText[key] = "FRONT"
-                    if jsonBrowserText[key] == 3:
-                        jsonBrowserText[key] = "BACK"
-                    if jsonBrowserText[key] == 4:
-                        jsonBrowserText[key] = "LEFT"
-                    if jsonBrowserText[key] == 5:
-                        jsonBrowserText[key] = "RIGHT"
-                    if jsonBrowserText[key] == 6:
-                        jsonBrowserText[key] = "RLEFT"
-                    if jsonBrowserText[key] == 7:
-                        jsonBrowserText[key] = "RRIGHT"
-                    if jsonBrowserText[key] == 8:
-                        jsonBrowserText[key] = "PICK"
-                    if jsonBrowserText[key] == 9:
-                        jsonBrowserText[key] = "DROP"
-                    if jsonBrowserText[key] == 10:
-                        jsonBrowserText[key] = "STAND"
-                    if jsonBrowserText[key] == 11:
-                        jsonBrowserText[key] = "LAY"
-                    if jsonBrowserText[key] == 12:
-                        jsonBrowserText[key] = "HEADLEFT"
-                    if jsonBrowserText[key] == 13:
-                        jsonBrowserText[key] = "HEADRIGHT"
+            try:
+                self.jsondata = json.loads(message)
+                jsonBrowserText = json.loads(message)
 
+                for key in list(self.jsondata):
+                    if key == "Servo_A1" or key=="Servo_A2" or key=="Servo_A3" or key=="Servo_A4" or key=="Servo_A5" or key=="Servo_A6" or key=="Servo_B1" or key=="Servo_B2" or key=="Servo_B3"or key=="Servo_B4" or key=="Servo_B5" or key=="Servo_B6" or key=="Servo_C1" or key=="Servo_C2" or key=="Servo_C3" or key=="Servo_C4" or key=="Servo_C5" or key=="Servo_C6" or key=="Servo_D1" :
+                        del jsonBrowserText[key]
+                    if key == "Case":
+                        if jsonBrowserText[key] == 0:
+                            jsonBrowserText[key] = "INITIALIZE"
+                        if jsonBrowserText[key] == 1:
+                            jsonBrowserText[key] = "WAIT"
+                        if jsonBrowserText[key] == 2:
+                            jsonBrowserText[key] = "FRONT"
+                        if jsonBrowserText[key] == 3:
+                            jsonBrowserText[key] = "BACK"
+                        if jsonBrowserText[key] == 4:
+                            jsonBrowserText[key] = "LEFT"
+                        if jsonBrowserText[key] == 5:
+                            jsonBrowserText[key] = "RIGHT"
+                        if jsonBrowserText[key] == 6:
+                            jsonBrowserText[key] = "RLEFT"
+                        if jsonBrowserText[key] == 7:
+                            jsonBrowserText[key] = "RRIGHT"
+                        if jsonBrowserText[key] == 8:
+                            jsonBrowserText[key] = "PICK"
+                        if jsonBrowserText[key] == 9:
+                            jsonBrowserText[key] = "DROP"
+                        if jsonBrowserText[key] == 10:
+                            jsonBrowserText[key] = "STAND"
+                        if jsonBrowserText[key] == 11:
+                            jsonBrowserText[key] = "LAY"
+                        if jsonBrowserText[key] == 12:
+                            jsonBrowserText[key] = "HEADLEFT"
+                        if jsonBrowserText[key] == 13:
+                            jsonBrowserText[key] = "HEADRIGHT"
+                    if key == "VISION_OBJ":
+                        if jsonBrowserText[key] == 0:
+                            jsonBrowserText[key] = "HAPPY"
+                        if jsonBrowserText[key] == 1:
+                            jsonBrowserText[key] = "ANGRY"
+                        if jsonBrowserText[key] == 2:
+                            jsonBrowserText[key] = "NOTHING"
+          
 
+                jsondataString = json.dumps(jsonBrowserText,indent=2)
+
+                self.Json_Browser.setText(jsondataString)
+        
+                for key in self.jsondata.keys():
+                    if self.JsonKey.text() == key:
+                        self.series_.append(self.jsondata['time'], float(self.jsondata[key]))
+                        self.graph.removeSeries(self.series_)
+                        self.graph.addSeries(self.series_)
+                        self.graph.legend().hide()
+                        self.graph.setTitle(str(key))
+                        self.graph.createDefaultAxes()
+                        self.graphView.setChart(self.graph)
                     
-
-            jsondataString = json.dumps(jsonBrowserText,indent=2)
-
-            self.Json_Browser.setText(jsondataString)
-     
-            for key in self.jsondata.keys():
-                if self.JsonKey.text() == key:
-                    self.series_.append(self.jsondata['time'], float(self.jsondata[key]))
-                    self.graph.removeSeries(self.series_)
-                    self.graph.addSeries(self.series_)
-                    self.graph.legend().hide()
-                    self.graph.setTitle(str(key))
-                    self.graph.createDefaultAxes()
-                    self.graphView.setChart(self.graph)
+                if self.JsonKey.text() not in self.jsondata.keys():
+                    self.series_.clear()
                 
-            if self.JsonKey.text() not in self.jsondata.keys():
-                self.series_.clear()
+                self.Servo[1].setText(str(self.jsondata["Servo_A1"]))
+                self.Servo[2].setText(str(self.jsondata["Servo_B1"]))
+                self.Servo[3].setText(str(self.jsondata["Servo_C1"]))
+                self.Servo[4].setText(str(self.jsondata["Servo_A2"]))
+                self.Servo[5].setText(str(self.jsondata["Servo_B2"]))
+                self.Servo[6].setText(str(self.jsondata["Servo_C2"]))
+                self.Servo[7].setText(str(self.jsondata["Servo_A3"]))
+                self.Servo[8].setText(str(self.jsondata["Servo_B3"]))
+                self.Servo[9].setText(str(self.jsondata["Servo_C3"]))
+                self.Servo[10].setText(str(self.jsondata["Servo_A4"]))
+                self.Servo[11].setText(str(self.jsondata["Servo_B4"]))
+                self.Servo[12].setText(str(self.jsondata["Servo_C4"]))
+                self.Servo[13].setText(str(self.jsondata["Servo_A5"]))
+                self.Servo[14].setText(str(self.jsondata["Servo_B5"]))
+                self.Servo[15].setText(str(self.jsondata["Servo_C5"]))
+                self.Servo[16].setText(str(self.jsondata["Servo_A6"]))
+                self.Servo[17].setText(str(self.jsondata["Servo_B6"]))
+                self.Servo[18].setText(str(self.jsondata["Servo_C6"]))
+                self.Servo[19].setText(str(self.jsondata["Servo_D1"]))
+
+            except:
+                self.msgBuffer_ = message
+                # print("EXCEPT")
+                # print(self.msgBuffer_)
             
-            self.msgBuffer_ =""
 
 
     def cleanUp(self):
@@ -606,7 +664,7 @@ class Ui_MainWindow(QMainWindow):
         print("Exiting program...")
         self.serialCom_.serialQuit()
         self.updateTimer.stop()
-        self.Cam.capwebcam.stop()
+        self.CamThread.stop()
         print("END")
 
 class SerialProtocol(QComboBox):
@@ -731,23 +789,24 @@ class Robot(QGraphicsPixmapItem):
 class Target(QGraphicsPixmapItem):
     pass
 
-class VideoTracking(QLabel):
+class VideoTracking(QThread):
 
     msg_signal = pyqtSignal(str)
+    ImageUpdate = pyqtSignal(QImage)
+    ObjectDistance = pyqtSignal(str)
 
-    def __init__(self,parent):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
 
         self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
         self.camTimer = QTimer()
+
+        self.ThreadActive = True
         
         self.new_width = 320
         self.real_img_width = 5.7
         self.real_distance = 50.0
         self.font = cv2.FONT_HERSHEY_COMPLEX
-
-        self.CamDistanceText = QPlainTextEdit(parent)
-        self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
         self.labels = self.load_labels()
         self.interpreter = Interpreter(model_path=os.path.join(paths['TFLITE_PATH'],"detect.tflite"))
@@ -762,10 +821,14 @@ class VideoTracking(QLabel):
         self.camTimer.timeout.connect(self.OnPeriodicEvent)
         self.camTimer.start(CAM_UPDATE_RATE)
 
+
     def OnPeriodicEvent(self):
 
         frame = self.capwebcam.read()
         self.vision(frame)
+
+    def stop(self):
+        self.capwebcam.stop()
 
 
     def load_labels(self,path=os.path.join(paths['TFLITE_PATH'],"labelmap.txt")):
@@ -846,7 +909,7 @@ class VideoTracking(QLabel):
 
     def vision(self,frame):
 
-        # frame = cv2.flip(frame,0)
+        frame = cv2.flip(frame,0)
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
         res = self.detect_objects(self.interpreter, img, 0.5)
@@ -870,14 +933,17 @@ class VideoTracking(QLabel):
             
             distance = self.Distance_finder(self.focal_length,self.real_img_width,(xmax-xmin))
 
-            self.CamDistanceText.setPlainText("Image Distance: "+str(round(distance,2)))
+            self.ObjectDistance.emit(str(round(distance,2)))
+
+            # self.CamDistanceText.setPlainText("Image Distance: "+str(round(distance,2)))
 
             self.VisionMessage(round(distance,2),int(result['class_id']))
 
         imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
 
-        self.setPixmap(QPixmap.fromImage(imageframe))
+        self.ImageUpdate.emit(imageframe)
+        # self.setPixmap(QPixmap.fromImage(imageframe))
 
 
 

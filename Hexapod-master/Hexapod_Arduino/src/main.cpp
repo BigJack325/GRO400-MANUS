@@ -239,7 +239,7 @@ using namespace std;
 
 #define VIN                            A0
 #define BAUD                           115200  // Frequence de transmission serielle
-#define UPDATE_PERIODE                 100     // Periode (ms) d'envoie d'etat general
+#define UPDATE_PERIODE                 100    // Periode (ms) d'envoie d'etat general
 
 #define MODE_MANUEL                         1         // Used to set robot in manuel mode
 #define MODE_AUTOMATIC                      2         // Used to set robot in automatic mode
@@ -419,7 +419,7 @@ int  object_aim =                      0;                 // Indicates if robot 
 bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
 float grab_range =                     5;                 // How close robot has to be to be able to grab object   
 float target_distance =                1000.0;            // The distance the camera detects the object to be from the robot 
-int which_image =                      0;                 // Inidcates which of the images is being seen (1= happy 2=angry)
+int which_image =                      2;                 // Inidcates which of the images is being seen (1= happy 2=angry)
 bool automatic_done =                  false;             // Indicates if the automatic mode has drop the target at the dropoff point
 
 /*---------------------------- Objects ---------------------------*/
@@ -924,7 +924,8 @@ void sendMsg(){
   doc["Case"] = command;
   doc["current"] = real_current;
   doc["voltage"] = real_voltage;
-  doc["shutdown"] = electrical_shutdown;
+  doc["VISION_DIS"] = target_distance;
+  doc["VISION_OBJ"] = which_image;
 
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
@@ -951,7 +952,7 @@ void sendMsg(){
   // Serialisation
   serializeJson(doc, Serial);
   // Envoit
-  Serial.println();
+  Serial.print("*");
   shouldSend_ = false;
 }
 
