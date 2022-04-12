@@ -282,6 +282,8 @@ using namespace std;
 #define initial_position_x             arena_sizex/2      //Initial position of the robot on the x axis (cm)
 #define initial_position_y             arena_sizey/2      //Initial position of the robot on the y-axis (cm)
 
+#define turn_left_drift_error_factor   1                  // Error factor when calculating change in orientatio when turning left
+
 #define offset_front_back              25                 // Angle of offset from middle legs of front and back legs
 #define offset_A1                      3  + offset_front_back   //ok
 #define offset_A2                      20 + offset_front_back //ok
