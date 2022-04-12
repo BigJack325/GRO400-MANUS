@@ -22,7 +22,8 @@
     - [Battery, Power Source, and Charger](#Battery)
     - [Microcontroller Board](#Controller)
     - [On-Board Computer](#Computer)
-    - [Servomotor](#Servo)
+    - [Servomotor for the legs](#Servo1)
+    - [Servomotor for the mandibles](#Servo2)
     - [Current Sensor](#Current)
     - [DC/DC Converter](#DCDC)
 
@@ -66,6 +67,16 @@ The robot has a vision algorithm that detects these two images:
 #### <a id="Mods"></a>Robot Mods
 
 #### <a id="Controls"></a>HMI And Robot Controls
+Our HMI shows:
+- the current view of the cam
+- the position of all the servos;
+- a map of the arena with the position of the hexapod;
+- informations for the camera and messages from the Arduino
+- a graphic that shows the the value of a variable over time
+- buttons to move the robots
+
+![image](https://user-images.githubusercontent.com/48064854/163049332-fb5af359-9492-4097-8c6c-b21095a80209.png)
+
 
 ## <a id="Ressources"></a>External ressources
 
@@ -100,13 +111,13 @@ Under this section, you will find external links and descriptions of the project
 - ASIN: B01LPLPBS8
 - Information / Resources: [Raspberry Pi Webpage](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)
 
-#### <a id="Servo"></a>Servomotor for the legs
+#### <a id="Servo1"></a>Servomotor for the legs
 
 - Brand Name : VIPMOON
 - Model : MG996R
 - Information / Resources : [Amazon Webpage](https://www.amazon.ca/-/fr/gp/product/B07VT5T9JC/ref=ewc_pr_img_1?smid=A2FI4MJY3VQVX5&psc=1)
 
-#### <a id="Servo"></a>Servomotor for the mandibles
+#### <a id="Servo2"></a>Servomotor for the mandibles
 
 - Model : MG90S
 - Information / Resources : [Amazon Webpage](https://www.amazon.ca/servomoteur-h%C3%A9licopt%C3%A8re-m%C3%A9tallique-intelligent-commandes/dp/B08W26FNQD/)
