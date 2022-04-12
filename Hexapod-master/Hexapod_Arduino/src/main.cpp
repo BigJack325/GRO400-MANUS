@@ -248,7 +248,7 @@ using namespace std;
 
 #define VIN                            A0
 #define BAUD                           115200  // Frequence de transmission serielle
-#define UPDATE_PERIODE                 100     // Periode (ms) d'envoie d'etat general
+#define UPDATE_PERIODE                 100    // Periode (ms) d'envoie d'etat general
 
 #define MODE_MANUEL                    1         // Used to set robot in manuel mode
 #define MODE_AUTOMATIC                 2         // Used to set robot in automatic mode
@@ -433,7 +433,7 @@ int  object_aim =                      0;                 // Indicates if robot 
 bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
 float grab_range =                     5;                 // How close robot has to be to be able to grab object   
 float target_distance =                1000.0;            // The distance the camera detects the object to be from the robot 
-int which_image =                      0;                 // Inidcates which of the images is being seen (0= happy 1=angry 2 = nothing)
+int which_image =                      2;                 // Inidcates which of the images is being seen (0= happy 1=angry 2 = nothing)
 int automatic_search_count =           0;                 // Indicates which process to do when seraching for object in automatic mode
 int head_orientation =                 2;                 // Indicates if the head it turned or not (1 = left) (2 = centre) (3 = right)
 float go_to_angle =                    0;                 // Indicate to which angle reach when searching in automatic mode
@@ -1093,7 +1093,8 @@ void sendMsg(){
   doc["Case"] = command;
   doc["current"] = real_current;
   doc["voltage"] = real_voltage;
-  doc["shutdown"] = electrical_shutdown;
+  doc["VISION_DIS"] = target_distance;
+  doc["VISION_OBJ"] = which_image;
 
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
@@ -1120,7 +1121,7 @@ void sendMsg(){
   // Serialisation
   serializeJson(doc, Serial);
   // Envoit
-  Serial.println();
+  Serial.print("*");
   shouldSend_ = false;
 }
 
