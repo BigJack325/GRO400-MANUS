@@ -743,7 +743,6 @@ void loop() {
           if (step == 7)
           {
             step = 1;
-            current_orientation = current_orientation + (turn_angle * turn_left_drift_error_factor);
             command = WAIT;
           }
         break;
@@ -759,6 +758,7 @@ void loop() {
            if (step == 7)
           {
             step = 1;
+            current_orientation = current_orientation + (turn_angle * turn_left_drift_error_factor);
             command = WAIT;
           }
     
@@ -775,6 +775,7 @@ void loop() {
            if (step == 7)
           {
             step = 1;
+            current_orientation = current_orientation - (turn_angle * turn_left_drift_error_factor);
             command = WAIT;
           }
         break;
