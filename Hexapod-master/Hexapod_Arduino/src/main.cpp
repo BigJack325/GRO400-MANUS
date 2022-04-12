@@ -856,6 +856,8 @@ void loop() {
 
         case AUTOMATIC :
 
+          operation_mode = MODE_AUTOMATIC;
+
           //if object is not in robots possession
           if(in_possession == false)
           {
