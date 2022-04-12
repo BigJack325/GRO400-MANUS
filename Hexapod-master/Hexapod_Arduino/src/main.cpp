@@ -442,7 +442,7 @@ float go_to_angle =                    0;                 // Indicate to which a
 int spin_until_object_aligned =        0;                 // Indicates if robot is aligning itself towards the detected object (1 = left) (2 = right)
 bool automatic_done =                  false;             // Indicates if the automatic mode has drop the target at the dropoff point
 
-int test_variable =                   0;                 // This variable can be used to conduct tests while debugging. It should not be in the code if not presently using it in a test
+bool test_variable =                   0;                 // This variable can be used to conduct tests while debugging. It should not be in the code if not presently using it in a test
 /*---------------------------- Objects ---------------------------*/
 
 //Create an object for each servo 
@@ -567,6 +567,7 @@ void setup() {
 
 // Main loop (infinite) 
 void loop() {
+
   
   if(shouldRead_){
     readMsg();
@@ -1138,9 +1139,26 @@ void readMsg(){
     return;
   }
 
-  command = doc["CASE"];
-  target_distance = doc["VISION_DIS"];
-  which_image = doc["VISION_OBJ"];
+  parse_msg = doc["CASE"];
+
+   if(!parse_msg.isNull()){
+     command = doc["CASE"].as<int>();
+  }
+
+  parse_msg = doc["VISION_DIS"];
+  if(!parse_msg.isNull()){
+     target_distance = doc["VISION_DIS"].as<float>();
+  }
+
+  parse_msg = doc["VISION_OBJ"];
+  if(!parse_msg.isNull()){
+     which_image = doc["VISION_OBJ"].as<float>();
+  }
+
+  parse_msg = doc["VISION_MOVE"];
+  if(!parse_msg.isNull()){
+     object_aim = doc["VISION_MOVE"].as<float>();
+  }
 
 }
 
@@ -1347,5 +1365,5 @@ float battery_voltage()
         digitalWrite(pin_voltage_LED, LOW);
     }
 
-    return  voltage;
+    return voltage;
 }
