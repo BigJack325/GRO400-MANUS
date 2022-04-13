@@ -506,11 +506,9 @@ class Ui_MainWindow(QMainWindow):
 
     def RobotMessageManual(self,msg):
         if msg == "STAND":
-            msg_array = {"CASE":10}
-        
+            msg_array = {"CASE":10}  
         elif msg == "LAY":
             msg_array = {"CASE":11}
-
         elif msg == "RIGHT":
             msg_array = {"CASE":5}
         elif msg == "LEFT":
@@ -529,10 +527,8 @@ class Ui_MainWindow(QMainWindow):
             msg_array = {"CASE":12}
         elif msg == "PICK":
             msg_array = {"CASE":8}
-            
         elif msg == "DROP":
             msg_array = {"CASE":9}
-  
         elif msg == "AUTOMATIC":
             msg_array = {"MODE":2}
         elif msg == "MANUAL":

@@ -1175,8 +1175,8 @@ void sendMsg(){
   doc["Case"] = command;
   doc["current"] = real_current;
   doc["voltage"] = real_voltage;
-  // doc["VISION_DIS"] = target_distance;
-  // doc["VISION_OBJ"] = which_image;
+  doc["VISION_DIS"] = target_distance;
+  doc["VISION_OBJ"] = which_image;
   doc["Mode"] = operation_mode;
   doc["cur_x_map"] = cur_position_x_pixel;
   doc["cur_y_map"] = cur_position_y_pixel;
