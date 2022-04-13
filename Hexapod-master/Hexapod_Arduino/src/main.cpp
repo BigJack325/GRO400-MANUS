@@ -449,9 +449,12 @@ float step_distance =                  0;                 // Theoretical distanc
 bool in_possession =                   false;             // Variable to indicate if target object is being grabbed by robot (Automatic mode)
 bool object_detected =                 false;             // Variable to indicate if camera is identifying the target object (automatic mode)
 int  object_aim =                      0;                 // Indicates if robot is to the left (1), dead center (2), to the right (3) of the camera, undetected (0) (mode automatic)
-bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
+float min_detect_distance =            20;                // Distance where robot can't detect when object is closer
 float grab_range =                     5;                 // How close robot has to be to be able to grab object   
+bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
+bool object_close =                    false;             // if object is closer than detection limit
 float target_distance =                1000.0;            // The distance the camera detects the object to be from the robot 
+float target_distance_not_read =       1000.0;            // Distance from target when the robot is closer than the camera can detect object
 int which_image =                      2;                 // Inidcates which of the images is being seen (0= happy 1=angry 2 = nothing)
 int automatic_search_count =           0;                 // Indicates which process to do when seraching for object in automatic mode
 int head_orientation =                 2;                 // Indicates if the head it turned or not (1 = left) (2 = centre) (3 = right)
@@ -768,8 +771,8 @@ void loop() {
             if (step == 11)
             {
               step = 1;
-              current_position_x = current_position_x + 2* step_distance * cos(current_orientation_rad);
-              current_position_y = current_position_y + 2* step_distance * sin(current_orientation_rad);
+              current_position_x = current_position_x + 2* step_distance * sin(-current_orientation_rad);
+              current_position_y = current_position_y + 2* step_distance * cos(-current_orientation_rad);
               mouvement_ok = false;
               command = WAIT;
             }
@@ -1019,26 +1022,29 @@ void loop() {
                     //if left turn left until center
                     if(object_aim == 1)
                     {
-                      command = TURN_LEFT;
+                      command = SIDESTEP_LEFT;
                     }
 
                     //if right turn right until center
                     if(object_aim == 3)
                     {
-                      command = TURN_RIGHT;
+                      command = SIDESTEP_RIGHT;
                     }
 
                     //if center move forward
-                    if(object_aim == 2 && in_grab_range == false)
+                    if((object_aim == 2 && in_grab_range == false && object_close == false) )
                     {
                       command = MOVE_FORWARD;
                     }
 
-                
-                    
+                    if(target_distance < min_detect_distance )
+                    {
+                      object_close = true;
+                      target_distance_not_read = target_distance;
+                    }
 
                     //check if object is in pickup distance                
-                    if (target_distance < grab_range)
+                    if (target_distance_not_read < grab_range)
                     {
                       in_grab_range = true;
                     }
@@ -1046,13 +1052,20 @@ void loop() {
                     {
                       in_grab_range = false;
                     }
-                    
+
+                    if( object_close == true)
+                    {
+                      command = MOVE_FORWARD;
+                      step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+                      target_distance_not_read = target_distance_not_read - 2* step_distance;
+                    }
 
                     //if in grab distance grab target
                     if(in_grab_range == true)
                     {
                       command = PICKUP;
                       in_possession = true;
+                      in_grab_range = false;
                     }
               }
           }
