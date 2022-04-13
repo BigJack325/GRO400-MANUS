@@ -104,6 +104,7 @@ int SynchServo::direct_kinematics(int output_dimension, int angleA, int angleB, 
 
   float x_pos = sin(theta1 - PI/2) * length_from_top;
   float y_pos = cos(theta1 - PI/2) * length_from_top;
+  float z_pos = 1;
 
   if(output_dimension == 1)
   {
@@ -112,6 +113,10 @@ int SynchServo::direct_kinematics(int output_dimension, int angleA, int angleB, 
   if (output_dimension == 2)
   {
     return y_pos;
+  }
+  else
+  {
+    return z_pos;
   }
   
 
@@ -454,7 +459,7 @@ float go_to_angle =                    0;                 // Indicate to which a
 int spin_until_object_aligned =        0;                 // Indicates if robot is aligning itself towards the detected object (1 = left) (2 = right)
 bool automatic_done =                  false;             // Indicates if the automatic mode has drop the target at the dropoff point
 
-bool test_variable =                   0;                 // This variable can be used to conduct tests while debugging. It should not be in the code if not presently using it in a test
+int test_variable =                   0;                 // This variable can be used to conduct tests while debugging. It should not be in the code if not presently using it in a test
 /*---------------------------- Objects ---------------------------*/
 
 //Create an object for each servo 
@@ -628,6 +633,14 @@ void loop() {
   {
     command = WAIT;
   }
+  
+  Serial.println(" ");
+  Serial.println(test_variable);
+  Serial.println(command);
+  Serial.println(current_position_x);
+  Serial.println(current_position_y);
+  Serial.println(current_orientation);
+  delay(500);
 
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
@@ -663,6 +676,22 @@ void loop() {
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
             }
+            
+            if (test_variable > 1)
+            {
+              command = MOVE_FORWARD;
+              test_variable++;
+            }
+            if (test_variable == 1)
+            {
+              command = TURN_RIGHT;
+              test_variable++;
+            }
+            if (test_variable == 0)
+            {
+              command = STAND;
+              test_variable++;
+            }
 
         break;
 
@@ -695,8 +724,8 @@ void loop() {
             if (step == 11)
             {
               step = 1;
-              current_position_x = current_position_x + 2* step_distance * sin(current_orientation_rad);
-              current_position_y = current_position_y - 2* step_distance * cos(current_orientation_rad);
+              current_position_x = current_position_x + 2* step_distance * sin(-current_orientation_rad);
+              current_position_y = current_position_y - 2* step_distance * cos(-current_orientation_rad);
               mouvement_ok = false;
               command = WAIT;
             }
@@ -916,7 +945,7 @@ void loop() {
                 
                 if (automatic_search_count == 4)
                 {
-                  //  go_to_angle = (current_orientation + 90) % 360;
+                    //go_to_angle = (current_orientation + 90) % 360;    ________________________-------------------------------------
                     automatic_search_count++;
                 }
                 if (automatic_search_count == 3)
