@@ -1089,8 +1089,9 @@ void sendMsg(){
   doc["Case"] = command;
   doc["current"] = real_current;
   doc["voltage"] = real_voltage;
-  doc["VISION_DIS"] = target_distance;
-  doc["VISION_OBJ"] = which_image;
+  // doc["VISION_DIS"] = target_distance;
+  // doc["VISION_OBJ"] = which_image;
+  doc["Mode"] = operation_mode;
 
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
@@ -1139,6 +1140,11 @@ void readMsg(){
     return;
   }
 
+  parse_msg = doc["MODE"];
+
+   if(!parse_msg.isNull()){
+     operation_mode = doc["MODE"].as<int>();
+  }
   parse_msg = doc["CASE"];
 
    if(!parse_msg.isNull()){

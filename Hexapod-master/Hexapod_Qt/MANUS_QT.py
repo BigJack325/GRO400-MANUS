@@ -248,7 +248,7 @@ class Ui_MainWindow(QMainWindow):
         self.Json_Browser.setFont(font)
 
         self.BatteryPower_label.setGeometry(QRect(0, 0, 50, 25))
-        self.BatteryPower.setGeometry(QRect(60, 0, 60, 25))
+        self.BatteryPower.setGeometry(QRect(60, 0, 80, 25))
         self.BatteryPower.setReadOnly(True) 
 
         self.Manual_mode.setGeometry(QRect(840, 720, 120, 50))
@@ -257,7 +257,6 @@ class Ui_MainWindow(QMainWindow):
         # self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
         self.setCentralWidget(self.centralWidget)
         self.retranslateUi()
-
         self.connectUpdateTimer(UI_UPDATE_RATE)
         self.connectSerialComboBox()
         self.connectButtons()
@@ -288,19 +287,36 @@ class Ui_MainWindow(QMainWindow):
         self.portCensus()
         self.checkManual()
         self.connectPeriodicButtons()
-        self.connectBatteryVoltage()
+
+        if self.serialCom_ is not None:
+            self.MapView.auto_map_movement(self.jsondata)
 
         if self.Manual_mode.checkState() == 0:
-            if self.jsondata["CASE"] != 15:
-                self.RobotMessageManual("AUTOMATIC")
-            else:
+
+            
+            if self.jsondata is not None:
+                
+
+                if self.jsondata["Mode"] != 2:
+
+                    self.RobotMessageManual("AUTOMATIC")
+
                 self.CamThread.msg_signal.connect(self.RobotMessageAutomatic)
+
         elif self.Manual_mode.checkState() == 2:
-            try:
-                self.CamThread.msg_signal.disconnect()
-            except:
-                pass
-        
+
+            if self.jsondata is not None:
+
+                if self.jsondata["Mode"] != 1:
+                    print("Lol")
+
+                    self.RobotMessageManual("MANUAL")
+
+                try:
+                    self.CamThread.msg_signal.disconnect()
+                except:
+                    pass
+
 
         # print('*')
 
@@ -319,16 +335,8 @@ class Ui_MainWindow(QMainWindow):
         self.updateTimer.timeout.connect(self.OnPeriodicEvent)
         self.updateTimer.start(updateTime)
 
-    def connectBatteryVoltage(self):
-        if self.jsondata is not None:
-            BatteryPercent = round((self.jsondata["voltage"]*100)/12,2)
-            self.BatteryPower.setText(str(BatteryPercent)+"%")
-
-
     def connectPeriodicButtons(self):
 
-        if self.Manual_mode.checkState() == 0:
-            self.MapView.auto_map_movement(self.jsondata)
 
         if self.PickDropButton.text() == "PICK":
 
@@ -391,12 +399,12 @@ class Ui_MainWindow(QMainWindow):
         self.RotateHeadRightButton.released.connect(lambda: self.changeButtonIcon("HEADRRIGHT",0))
 
         #Change robot position on map
-        self.RightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RIGHT",0))
-        self.LeftButton.pressed.connect(lambda: self.MapView.manual_map_movement("LEFT",0))
-        self.FrontButton.pressed.connect(lambda: self.MapView.manual_map_movement("FRONT",0))
-        self.BackButton.pressed.connect(lambda: self.MapView.manual_map_movement("BACK",0))
-        self.RotateLeftButton.pressed.connect(lambda: self.MapView.manual_map_movement("RLEFT",int(self.AngleBox.text())))
-        self.RotateRightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RRIGHT",int(self.AngleBox.text())))
+        # self.RightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RIGHT",0))
+        # self.LeftButton.pressed.connect(lambda: self.MapView.manual_map_movement("LEFT",0))
+        # self.FrontButton.pressed.connect(lambda: self.MapView.manual_map_movement("FRONT",0))
+        # self.BackButton.pressed.connect(lambda: self.MapView.manual_map_movement("BACK",0))
+        # self.RotateLeftButton.pressed.connect(lambda: self.MapView.manual_map_movement("RLEFT",int(self.AngleBox.text())))
+        # self.RotateRightButton.pressed.connect(lambda: self.MapView.manual_map_movement("RRIGHT",int(self.AngleBox.text())))
 
     def changeButtonIcon(self,button,state):
 
@@ -477,7 +485,7 @@ class Ui_MainWindow(QMainWindow):
             
             self.oldCamMessage = msg
             data_out = json.dumps(msg)
-            print(data_out)
+            # print(data_out)
             self.serialCom_.sendMessage(data_out)
 
     def RobotMessageManual(self,msg):
@@ -510,12 +518,13 @@ class Ui_MainWindow(QMainWindow):
             msg_array = {"CASE":9}
             self.PickDropButton.clicked.disconnect()
         elif msg == "AUTOMATIC":
-            msg_array = {"CASE":15}
-        else:
-            msg_array = msg
+            msg_array = {"MODE":2}
+        elif msg == "MANUAL":
+            msg_array = {"MODE":1}
+
         
         data_out = json.dumps(msg_array)
-        print(data_out)
+        # print(data_out)
         self.serialCom_.sendMessage(data_out)
 
     def checkManual(self):
@@ -574,6 +583,7 @@ class Ui_MainWindow(QMainWindow):
             # print(message)
 
             try:
+
                 self.jsondata = json.loads(message)
                 jsonBrowserText = json.loads(message)
 
@@ -609,6 +619,8 @@ class Ui_MainWindow(QMainWindow):
                             jsonBrowserText[key] = "HEADLEFT"
                         if jsonBrowserText[key] == 13:
                             jsonBrowserText[key] = "HEADRIGHT"
+                        if jsonBrowserText[key] == 15:
+                            jsonBrowserText[key] = "AUTOMATIC"
                     if key == "VISION_OBJ":
                         if jsonBrowserText[key] == 0:
                             jsonBrowserText[key] = "HAPPY"
@@ -663,6 +675,9 @@ class Ui_MainWindow(QMainWindow):
                 self.Servo[17].setText(str(self.jsondata["Servo_B6"]))
                 self.Servo[18].setText(str(self.jsondata["Servo_C6"]))
                 self.Servo[19].setText(str(self.jsondata["Servo_D1"]))
+
+                BatteryPercent = round((self.jsondata["voltage"]*100)/12,2)
+                self.BatteryPower.setText(str(BatteryPercent)+"%")
 
             except:
                 self.msgBuffer_ = message
@@ -754,7 +769,6 @@ class Map(QGraphicsView):
             self.hexapod.move(0,MANUAL_VERTICAL_MOVEMENT)
         if key == "RLEFT":
             self.hexapod.rotate(-angle)
-
         if key == "RRIGHT":
             self.hexapod.rotate(angle)
 
@@ -764,22 +778,29 @@ class Robot(QGraphicsPixmapItem):
         pixmap = QPixmap(os.path.join(paths['DISPLAY_IMAGE_PATH'],"hexapod.png"))
         pixmap_resized = pixmap.scaled(66,73,Qt.KeepAspectRatio)
         self.setPixmap(pixmap_resized)
-        self.setPos(100, 100)
+        self.setPos(127, 123.5)
         self.setTransformOriginPoint(33,51.5)#image is 66 by 103 pixel
         self.angle = 0
 
     def move(self,xpos,ypos):
 
         if self.angle == 0:
+            # self.setPos(xpos+self.x(),ypos+self.y())
             self.setPos(xpos,ypos)
         elif self.angle > 0:
             x = xpos*cos(math.radians(self.angle))-ypos*sin(math.radians(self.angle))
             y = xpos*sin(math.radians(self.angle))+ypos*cos(math.radians(self.angle))
-            self.setPos(self.x()+ x.real,self.y()+y.real)
+            # self.setPos(self.x()+ x.real,self.y()+y.real)
+            self.setPos(x.real,y.real)
         elif self.angle < 0:
             x = xpos*cos(-math.radians(self.angle))+ypos*sin(-math.radians(self.angle))
             y = -xpos*sin(-math.radians(self.angle))+ypos*cos(-math.radians(self.angle))
-            self.setPos(self.x()+ x.real,self.y()+y.real)
+            # self.setPos(self.x()+ x.real,self.y()+y.real)
+            self.setPos(x.real,y.real)
+        # print("X POS")
+        # print(self.x())
+        # print("Y POS")
+        # print(self.y())
 
     def rotate(self,angle):
         self.angle = angle
