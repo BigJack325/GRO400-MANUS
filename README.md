@@ -11,7 +11,6 @@
 ## Table of Contents
 - [Setup](#Setup)
     - [Setup for Users](#SetupUsers)
-    - [Setup for Repository Contributors](#SetupContrib)
 - [Documentation](#Documentation)
     - [Servos Classification](#Servosclassification)
     - [Assembly Guide](#assemblyguide)
@@ -21,7 +20,6 @@
 - [Robot Operation](#Operation)
     - [Robot Movement](#Movement)
     - [Robot Vision](#Vision)
-    - [Robot Mods](#Mods)
     - [HMI And Robot Controls](#Controls)
 - [External Resources](#Ressources)
     - [Battery, Power Source, and Charger](#Battery)
@@ -45,8 +43,6 @@
 - Verify your Python version (3.5 and above) and verify if the OpenCV and PyQt5 librairies are present in the Raspberry Pi with ```Import``` command ;
 - Run the file ```MANUS_QT``` in the *./Hexapod-Master/Hexapod_Qt* folder;
 - Initialize the serial communication.
-
-#### <a id="SetupContrib"></a>Setup for Contributors
 
 ## <a id="Documentation"></a>Documentation
 #### <a id = "Servosclassification">Classification of the robot servos:</a>
@@ -76,10 +72,6 @@ The robot can move forward, backward and sideways.  It can also rotate clockwise
 The robot has a vision algorithm that detects these two images: 
 
 ![happy](https://user-images.githubusercontent.com/48064854/163003461-6ebe9cd6-cc70-48df-82ff-0c2a40982960.jpg)![angry](https://user-images.githubusercontent.com/48064854/163003538-dd7039e3-41dc-485b-952a-bf78a2d1049d.jpg)
-
-
-
-#### <a id="Mods"></a>Robot Mods
 
 #### <a id="Controls"></a>HMI And Robot Controls
 Our HMI shows:
