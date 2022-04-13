@@ -20,7 +20,7 @@ import sys, os, json, math
 
 BAUD_RATE = 115200
 UI_UPDATE_RATE = 100# Ms
-CAM_UPDATE_RATE = 1000
+CAM_UPDATE_RATE = 20
 NUM_SERVOS = 19
 MANUAL_SIDE_MOVEMENT  = 10 #pixels
 MANUAL_VERTICAL_MOVEMENT = 10 #pixels
@@ -53,6 +53,9 @@ class Ui_MainWindow(QMainWindow):
         self.jsondata = None
         self.serialCom_ = None
         self.oldCamMessage = ""
+
+        self.PickDropButtonStatus = "PICK"
+        self.StandLayButtonStatus = "STAND"
 
         self.centralWidget = QWidget(self)
         self.gridLayout = QGridLayout(self.centralWidget)
@@ -286,7 +289,7 @@ class Ui_MainWindow(QMainWindow):
     def OnPeriodicEvent(self):
         self.portCensus()
         self.checkManual()
-        self.connectPeriodicButtons()
+        # self.connectPeriodicButtons()
 
         if self.serialCom_ is not None:
             self.MapView.map_movement(self.jsondata)
@@ -352,9 +355,9 @@ class Ui_MainWindow(QMainWindow):
 
         if self.StandLayButton.text() == "STAND":
 
-            self.StandLayButton.pressed.connect(lambda: self.changeButtonIcon("STAND",1))
+            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("STAND",1))
 
-            self.StandLayButton.pressed.connect(lambda: self.RobotMessageManual("STAND"))
+            self.StandLayButton.clicked.connect(lambda: self.RobotMessageManual("STAND"))
 
         elif self.StandLayButton.text() == "LAY":
 
@@ -376,6 +379,10 @@ class Ui_MainWindow(QMainWindow):
         self.RotateHeadLeftButton.pressed.connect(lambda: self.RobotMessageManual("HEADRLEFT"))
         self.RotateHeadRightButton.pressed.connect(lambda: self.RobotMessageManual("HEADRRIGHT"))
 
+        self.PickDropButton.pressed.connect(lambda: self.RobotMessageManual(self.PickDropButtonStatus))
+
+        self.StandLayButton.pressed.connect(lambda: self.RobotMessageManual(self.StandLayButtonStatus))
+
 
         # Change button image when pressed
         self.RightButton.pressed.connect(lambda: self.changeButtonIcon("RIGHT",1))
@@ -386,6 +393,9 @@ class Ui_MainWindow(QMainWindow):
         self.RotateRightButton.pressed.connect(lambda: self.changeButtonIcon("RRIGHT",1))
         self.RotateHeadLeftButton.pressed.connect(lambda: self.changeButtonIcon("HEADRLEFT",1))
         self.RotateHeadRightButton.pressed.connect(lambda: self.changeButtonIcon("HEADRRIGHT",1))
+
+        self.PickDropButton.pressed.connect(lambda: self.changeButtonIcon(self.PickDropButtonStatus,1))
+        self.StandLayButton.pressed.connect(lambda: self.changeButtonIcon(self.StandLayButtonStatus,1))
 
         # Change button image when released
         self.RightButton.released.connect(lambda: self.changeButtonIcon("RIGHT",0))
@@ -407,6 +417,7 @@ class Ui_MainWindow(QMainWindow):
 
     def changeButtonIcon(self,button,state):
 
+ 
         if button == "RIGHT" and state == 1:
             self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right_pressed.png")))
             self.RightButton.setIconSize(QSize(61,61))
@@ -457,14 +468,20 @@ class Ui_MainWindow(QMainWindow):
             self.RotateHeadRightButton.setIconSize(QSize(61,61))
         elif button == "PICK":
             self.PickDropButton.setText("DROP")
+            self.PickDropButtonStatus = "DROP"
         elif button == "DROP":
             self.PickDropButton.setText("PICK")
+            self.PickDropButtonStatus = "PICK"
+
         elif button == "STAND":
             self.StandLayButton.setText("LAY")
+            self.StandLayButtonStatus = "LAY"
         elif button == "LAY":
             self.StandLayButton.setText("STAND")
+            self.StandLayButtonStatus = "STAND"
 
     def connectCamera(self,Image):
+
         self.CamImage.setPixmap(QPixmap.fromImage(Image))
 
     def connectCameraDistanceMove(self,DistanceMove):
@@ -490,10 +507,10 @@ class Ui_MainWindow(QMainWindow):
     def RobotMessageManual(self,msg):
         if msg == "STAND":
             msg_array = {"CASE":10}
-            self.StandLayButton.clicked.disconnect()
+        
         elif msg == "LAY":
             msg_array = {"CASE":11}
-            self.StandLayButton.clicked.disconnect()
+
         elif msg == "RIGHT":
             msg_array = {"CASE":5}
         elif msg == "LEFT":
@@ -512,10 +529,10 @@ class Ui_MainWindow(QMainWindow):
             msg_array = {"CASE":12}
         elif msg == "PICK":
             msg_array = {"CASE":8}
-            self.PickDropButton.clicked.disconnect()
+            
         elif msg == "DROP":
             msg_array = {"CASE":9}
-            self.PickDropButton.clicked.disconnect()
+  
         elif msg == "AUTOMATIC":
             msg_array = {"MODE":2}
         elif msg == "MANUAL":
@@ -523,7 +540,7 @@ class Ui_MainWindow(QMainWindow):
 
         
         data_out = json.dumps(msg_array)
-        # print(data_out)
+        print(data_out)
         self.serialCom_.sendMessage(data_out)
 
     def checkManual(self):
