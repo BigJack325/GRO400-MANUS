@@ -769,19 +769,19 @@ class Robot(QGraphicsPixmapItem):
 
     def move(self,xpos,ypos):
 
-        if self.angle == 0:
+        # if self.angle == 0:
             # self.setPos(xpos+self.x(),ypos+self.y())
-            self.setPos(xpos,ypos)
-        elif self.angle > 0:
-            x = xpos*cos(math.radians(self.angle))-ypos*sin(math.radians(self.angle))
-            y = xpos*sin(math.radians(self.angle))+ypos*cos(math.radians(self.angle))
-            # self.setPos(self.x()+ x.real,self.y()+y.real)
-            self.setPos(x.real,y.real)
-        elif self.angle < 0:
-            x = xpos*cos(-math.radians(self.angle))+ypos*sin(-math.radians(self.angle))
-            y = -xpos*sin(-math.radians(self.angle))+ypos*cos(-math.radians(self.angle))
-            # self.setPos(self.x()+ x.real,self.y()+y.real)
-            self.setPos(x.real,y.real)
+        self.setPos(xpos,ypos)
+        # elif self.angle > 0:
+        #     x = xpos*cos(math.radians(self.angle))-ypos*sin(math.radians(self.angle))
+        #     y = xpos*sin(math.radians(self.angle))+ypos*cos(math.radians(self.angle))
+        #     self.setPos(self.x()+ x.real,self.y()+y.real)
+        #     # self.setPos(x.real,y.real)
+        # elif self.angle < 0:
+        #     x = xpos*cos(-math.radians(self.angle))+ypos*sin(-math.radians(self.angle))
+        #     y = -xpos*sin(-math.radians(self.angle))+ypos*cos(-math.radians(self.angle))
+        #     self.setPos(self.x()+ x.real,self.y()+y.real)
+            # self.setPos(x.real,y.real)
         # print("X POS")
         # print(self.x())
         # print("Y POS")
