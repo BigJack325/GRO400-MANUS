@@ -445,14 +445,12 @@ float real_current;                                       //Current consumption 
 float real_voltage;                                       //Present battery voltage
 
 float step_distance =                  0;                 // Theoretical distance made by current case
-float step_distance_sidestep_left =    0;                 // Theoretical distance made by current case
-float step_distance_sidestep_right =   0;                 // Theoretical distance made by current case
-
+float step_distance_sidestep =         0;                 // Theoretical distance made by current case
 
 bool in_possession =                   false;             // Variable to indicate if target object is being grabbed by robot (Automatic mode)
 bool object_detected =                 false;             // Variable to indicate if camera is identifying the target object (automatic mode)
 int  object_aim =                      0;                 // Indicates if robot is to the left (1), dead center (2), to the right (3) of the camera, undetected (0) (mode automatic)
-float min_detect_distance =            20;                // Distance where robot can't detect when object is closer
+float min_detect_distance =            15;                // Distance where robot can't detect when object is closer
 float grab_range =                     5;                 // How close robot has to be to be able to grab object   
 bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
 bool object_close =                    false;             // if object is closer than detection limit
@@ -1247,38 +1245,98 @@ void readMsg(){
 
 /* ------------------Fonction Definition ----------------------------*/
 //Calculate the coordinate and orientation of the robot if the commanded action is taken
-void futureposition(int movement)   //    TO DO
+void update_position(int movement)   
 {
-
+  current_orientation_rad = current_orientation /360 * 2* PI;
 
 if(movement == 1) //forward
  {
-  future_position_x = current_position_x;
-  future_position_y = current_position_y;
-  future_orientation = current_orientation;
- } 
+  step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
 
-if(movement == 1) //backward
- {
-  current_position_x = current_position_x;
-  current_position_y = current_position_y;
+  current_position_x = current_position_x + 2* step_distance * sin(-current_orientation_rad);
+  current_position_y = current_position_y - 2* step_distance * cos(-current_orientation_rad);
   current_orientation = current_orientation;
  } 
 
-if(movement == 1) //turn left
+if(movement == 2) //backward
  {
-  current_position_x = current_position_x;
-  current_position_y = current_position_y;
+  step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+
+  current_position_x = current_position_x + 2* step_distance * sin(-current_orientation_rad);
+  current_position_y = current_position_y + 2* step_distance * cos(-current_orientation_rad);
   current_orientation = current_orientation;
  } 
 
- if(movement == 1) //turn right
+if(movement == 3) //sidestep left
+ {
+  step_distance_sidestep_left = A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C + sidestep_angle) - A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C);
+
+  current_position_x = current_position_x -  step_distance_sidestep_left * cos(-current_orientation_rad);
+  current_position_y = current_position_y +  step_distance_sidestep_left * sin(current_orientation_rad);
+  current_orientation = current_orientation;
+ } 
+
+ if(movement == 4) //sidestep right
+ {
+   step_distance_sidestep_right = A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C + sidestep_angle) - A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C);
+
+  current_position_x = current_position_x +  step_distance_sidestep_right * cos(-current_orientation_rad);
+  current_position_y = current_position_y -  step_distance_sidestep_right * sin(current_orientation_rad);
+  current_orientation = current_orientation;
+ } 
+
+ if(movement == 5) //turn left
  {
   current_position_x = current_position_x;
   current_position_y = current_position_y;
-  current_orientation = current_orientation;
+  current_orientation = current_orientation - (turn_angle * turn_left_drift_error_factor);
  } 
+ if(movement == 6) //turn right
+ {
+  current_position_x = current_position_x;
+  current_position_y = current_position_y;
+  current_orientation = current_orientation + (turn_angle * turn_left_drift_error_factor);
+ } 
+return;
+}
+
+void future_position(int movement)   
+{
+  float future_position_x;
+  float future_positoin_y;
+
+if(movement == 1) //forward
+ {
+  step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+
+  future_position_x = current_position_x + 2* step_distance * sin(-current_orientation_rad);
+  future_position_y = current_position_y - 2* step_distance * cos(-current_orientation_rad);
   
+ } 
+
+if(movement == 2) //backward
+ {
+  step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+
+  future_position_x = current_position_x + 2* step_distance * sin(-current_orientation_rad);
+  future_position_y = current_position_y + 2* step_distance * cos(-current_orientation_rad);
+ } 
+
+if(movement == 3) //sidestep left
+ {
+  step_distance_sidestep_left = A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C + sidestep_angle) - A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C);
+
+  future_position_x = current_position_x -  step_distance_sidestep_left * cos(-current_orientation_rad);
+  future_position_y = current_position_y +  step_distance_sidestep_left * sin(current_orientation_rad);
+ } 
+
+ if(movement == 4) //sidestep right
+ {
+   step_distance_sidestep = A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C + sidestep_angle) - A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C);
+
+  current_position_x = current_position_x +  step_distance_sidestep_right * cos(-current_orientation_rad);
+  current_position_y = current_position_y -  step_distance_sidestep_right * sin(current_orientation_rad);
+ } 
 return;
 }
 
