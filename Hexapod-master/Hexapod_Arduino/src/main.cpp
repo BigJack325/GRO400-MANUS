@@ -612,7 +612,7 @@ void loop() {
   }
   else
   {
-    object_detected = false;
+    //object_detected = false;
   }
 
   // if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
@@ -637,13 +637,6 @@ void loop() {
     command = WAIT;
   }
   
-  Serial.println(" ");
-  Serial.println(test_variable);
-  Serial.println(command);
-  Serial.println(current_position_x);
-  Serial.println(current_position_y);
-  Serial.println(current_orientation);
-  delay(500);
 
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
@@ -678,22 +671,6 @@ void loop() {
             
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
-            }
-            
-            if (test_variable > 1)
-            {
-              command = MOVE_FORWARD;
-              test_variable++;
-            }
-            if (test_variable == 1)
-            {
-              command = TURN_RIGHT;
-              test_variable++;
-            }
-            if (test_variable == 0)
-            {
-              command = STAND;
-              test_variable++;
             }
 
         break;
@@ -940,7 +917,7 @@ void loop() {
                 if (automatic_search_count == 5)
                 {
                     command = TURN_LEFT;
-                    if( abs(current_orientation - go_to_angle) < 5 )
+                    if( abs(current_orientation - go_to_angle) <= turn_angle/2 )
                     {
                       automatic_search_count++;
                     }  
@@ -948,7 +925,7 @@ void loop() {
                 
                 if (automatic_search_count == 4)
                 {
-                    //go_to_angle = (current_orientation + 90) % 360;    ________________________-------------------------------------
+            //        go_to_angle = (current_orientation + 90.0) % 360.0;    fmod()________________________-------------------------------------
                     automatic_search_count++;
                 }
                 if (automatic_search_count == 3)
