@@ -696,30 +696,57 @@ void loop() {
             {
               step = 1;
               current_position_x = current_position_x + 2* step_distance * cos(current_orientation_rad);
-              current_position_y = current_position_y + 2*step_distance * sin(current_orientation_rad);
+              current_position_y = current_position_y + 2* step_distance * sin(current_orientation_rad);
               mouvement_ok = false;
               command = WAIT;
             }
+          }
+          else
+          {
+            command = WAIT;
           }
           
 
         break;
 
         case MOVE_BACKWARD :                // Move one step backward sequence
-          stepsequence(1, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
-          stepsequence(2, step_delay, &A145_, initial_angle_A - Walking_angle_A_increase);
-          stepsequence(3, step_delay, &B145_, standing_angle_B);
-          stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
-          stepsequence(5, step_delay, &A145_, initial_angle_A);
-          stepsequence(6, step_delay, &A236_, initial_angle_A - Walking_angle_A_increase);
-          stepsequence(7, step_delay, &B236_, standing_angle_B);
-          stepsequence(8, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
-          stepsequence(9, step_delay, &A236_, initial_angle_A);
-          stepsequence(10,step_delay, &B145_, standing_angle_B);
 
-          if (step == 11)
+          step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+          current_orientation_rad = current_orientation /360 * 2* PI;
+          
+          if(current_position_x + 2*step_distance * cos(current_orientation_rad) < arena_sizex && current_position_x + step_distance * cos(current_orientation_rad) > 0)
           {
-            step = 1;
+            if(current_position_y + 2*step_distance * sin(current_orientation_rad) < arena_sizey && current_position_y + step_distance * sin(current_orientation_rad) > 0)
+            {
+              mouvement_ok = true;
+            }
+          }
+
+          if(mouvement_ok)
+          {
+
+            stepsequence(1, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
+            stepsequence(2, step_delay, &A145_, initial_angle_A - Walking_angle_A_increase);
+            stepsequence(3, step_delay, &B145_, standing_angle_B);
+            stepsequence(4, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
+            stepsequence(5, step_delay, &A145_, initial_angle_A);
+            stepsequence(6, step_delay, &A236_, initial_angle_A - Walking_angle_A_increase);
+            stepsequence(7, step_delay, &B236_, standing_angle_B);
+            stepsequence(8, step_delay, &B145_, standing_angle_B + walking_angle_B_increase);
+            stepsequence(9, step_delay, &A236_, initial_angle_A);
+            stepsequence(10,step_delay, &B145_, standing_angle_B);
+
+            if (step == 11)
+            {
+              step = 1;
+              current_position_x = current_position_x + 2* step_distance * cos(current_orientation_rad);
+              current_position_y = current_position_y + 2* step_distance * sin(current_orientation_rad);
+              mouvement_ok = false;
+              command = WAIT;
+            }
+          }
+          else
+          {
             command = WAIT;
           }
 
@@ -768,7 +795,7 @@ void loop() {
            if (step == 7)
           {
             step = 1;
-            current_orientation = current_orientation + (turn_angle * turn_left_drift_error_factor);
+            current_orientation = current_orientation - (turn_angle * turn_left_drift_error_factor);
             command = WAIT;
           }
     
@@ -785,7 +812,7 @@ void loop() {
            if (step == 7)
           {
             step = 1;
-            current_orientation = current_orientation - (turn_angle * turn_left_drift_error_factor);
+            current_orientation = current_orientation + (turn_angle * turn_left_drift_error_factor);
             command = WAIT;
           }
         break;
@@ -865,7 +892,7 @@ void loop() {
         break;
 
         case AUTOMATIC :
-        
+
           //if object is not in robots possession
           if(in_possession == false)
           {
@@ -1075,8 +1102,9 @@ void loop() {
         break;
     }
 
-    cur_position_x_pixel = map_limit_left_x + (current_position_x/arena_sizex) * (map_limit_right_x - map_limit_left_x);
-    cur_position_y_pixel = map_limit_bottom_y - (current_position_y/arena_sizey) * (map_limit_bottom_y - map_limit_top_y);
+    cur_position_x_pixel = map_limit_bottom_y - (current_position_y/arena_sizey) * (map_limit_bottom_y - map_limit_top_y);
+    cur_position_y_pixel = map_limit_left_x + (current_position_x/arena_sizex) * (map_limit_right_x - map_limit_left_x);
+    
 
   timerSendMsg_.update();
 }
