@@ -13,12 +13,17 @@
     - [Setup for Users](#SetupUsers)
     - [Setup for Repository Contributors](#SetupContrib)
 - [Documentation](#Documentation)
+    - [Servos Classification](#Servosclassification)
+    - [Assembly Guide](#assemblyguide)
+    - [Electrical Schematic](#electricalschematic)
+    - [Electrical Diagram of the Shield](#electrical)
+    - [Code Overview](#Codeexplication)
 - [Robot Operation](#Operation)
     - [Robot Movement](#Movement)
     - [Robot Vision](#Vision)
     - [Robot Mods](#Mods)
     - [HMI And Robot Controls](#Controls)
-- [External Resources](#Resources)
+- [External Resources](#Ressources)
     - [Battery, Power Source, and Charger](#Battery)
     - [Microcontroller Board](#Controller)
     - [On-Board Computer](#Computer)
@@ -26,6 +31,8 @@
     - [Servomotor for the mandibles](#Servo2)
     - [Current Sensor](#Current)
     - [DC/DC Converter](#DCDC)
+    - [Fuse 10 Amp](#Fuse)
+ 
 
 ## <a id="Setup"></a>Setup
 
@@ -42,25 +49,33 @@
 #### <a id="SetupContrib"></a>Setup for Contributors
 
 ## <a id="Documentation"></a>Documentation
-Classification of the robot servos:
+#### <a id = "Servosclassification">Classification of the robot servos:</a>
 
 ![photo patte hexapod](https://user-images.githubusercontent.com/48064854/162976618-52e0769e-27ba-48a6-97b3-df437f16bacd.PNG)
 
+#### <a id= "assemblyguide">Assembly Guide</a>
+You need to 3D print the necessary parts that you can find in the *./CAD* folder.   
+We have a complete assembly guide [here](https://github.com/EDP325/GRO400-MANUS/wiki):
 
-Electrical Diagram of the Shield: 
+#### <a id = "electricalschematic"> Electrical Schematic</a>
+Photo to be inserted here.
+#### <a id= "electrical">Electrical Diagram of the Shield: </a>
 ![image](https://user-images.githubusercontent.com/48064854/163028957-0d5c8229-0cb9-4d3b-a6ca-b984c7e7bd09.png)
 
+#### <a id="Codeexplication">Code Overview</a>
+
+The code is divided in two main sections.  The first one is all about the robot movment and is directly written in the Arduino.  This code is written in switch case depending one the manuel/automatic mode and which movment to do.
+The second section  includes the vision algorithm and the HMI.  It is written in the Raspberry Pi.  It is made to detect the chosen images and display some variable on the HMI, a screen connected to the Pi.  We chose to use VNCviewer to have a remote connection to the hexapod.
 
 ## <a id="Operation"></a>Robot Operation
 
 #### <a id="Movement"></a>Robot Movement
-The robot can move forward, backward and sideways.  It can also rotate clockwise and counterclockwise.
+The robot can move forward, backward and sideways.  It can also rotate clockwise and counterclockwise.  The head can rotate and the mandibles can open cand close.  
 
 #### <a id="Vision"></a>Robot Vision
 The robot has a vision algorithm that detects these two images: 
 
 ![happy](https://user-images.githubusercontent.com/48064854/163003461-6ebe9cd6-cc70-48df-82ff-0c2a40982960.jpg)![angry](https://user-images.githubusercontent.com/48064854/163003538-dd7039e3-41dc-485b-952a-bf78a2d1049d.jpg)
-
 
 
 
@@ -141,3 +156,10 @@ Under this section, you will find external links and descriptions of the project
 - Model : 8541582798
 - ASIN :
 - Information / Resources : [Amazon Webpage](https://www.amazon.ca/gp/product/B073RCXGQS/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
+    
+fuse 10 AMP
+#### <a id="Fuse">Fuse 10 AMP 250V</a>
+
+- Brand Name : Littelfuse
+- Model : Littelfuse 5x15MM. FAST ACTING 10A.250V.
+- Information / Resources :You can buy fuse at any electronics store near your house.  We bought ours [here](https://electro5.com/fr/product/231621/littlefuse-5x15mm-fast-acting-10a250v/) 
