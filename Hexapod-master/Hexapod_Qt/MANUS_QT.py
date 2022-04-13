@@ -308,7 +308,6 @@ class Ui_MainWindow(QMainWindow):
             if self.jsondata is not None:
 
                 if self.jsondata["Mode"] != 1:
-                    print("Lol")
 
                     self.RobotMessageManual("MANUAL")
 
