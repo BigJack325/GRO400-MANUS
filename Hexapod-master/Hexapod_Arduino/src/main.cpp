@@ -280,7 +280,7 @@ using namespace std;
 #define mandible_open_angle            97         //Servo angle for mandibles to be open
 #define mandible_close_angle           130        //Servo angle for mandibles to be closed for grabbing
 
-#define head_turn_angle                45         // Angle the head turns by when calling head to turn
+#define head_turn_angle                5         // Angle the head turns by when calling head to turn
 
 #define arena_sizex                    200                //Width of the arena (cm)
 #define arena_sizey                    200                //length of the arena (cm)
@@ -898,7 +898,7 @@ void loop() {
         break;
 
         case HEAD_LEFT :
-          D1_.write(initial_angle_D1 + head_turn_angle);  
+          D1_.write(current_head_orientation + head_turn_angle);  
           if(millis() > (t + 5* step_delay))
             {
               head_orientation = 1;
@@ -907,7 +907,7 @@ void loop() {
         break;
 
         case HEAD_RIGHT :
-          D1_.write(initial_angle_D1 - head_turn_angle);  
+          D1_.write(current_head_orientation - head_turn_angle);  
           if(millis() > (t + 5* step_delay))
             {
               head_orientation = 3;
@@ -1277,7 +1277,7 @@ if(movement == 2) //backward
  {
   step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
 
-  current_position_x = current_position_x + 2* step_distance * sin(-current_orientation_rad);
+  current_position_x = current_position_x - 2* step_distance * sin(-current_orientation_rad);
   current_position_y = current_position_y + 2* step_distance * cos(-current_orientation_rad);
   current_orientation = current_orientation;
  } 
