@@ -445,6 +445,9 @@ float real_current;                                       //Current consumption 
 float real_voltage;                                       //Present battery voltage
 
 float step_distance =                  0;                 // Theoretical distance made by current case
+float step_distance_sidestep_left =    0;                 // Theoretical distance made by current case
+float step_distance_sidestep_right =   0;                 // Theoretical distance made by current case
+
 
 bool in_possession =                   false;             // Variable to indicate if target object is being grabbed by robot (Automatic mode)
 bool object_detected =                 false;             // Variable to indicate if camera is identifying the target object (automatic mode)
@@ -762,6 +765,10 @@ void loop() {
         break;
 
         case SIDESTEP_LEFT :                // Lateral step left sequence
+
+          step_distance_sidestep_left = A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C + sidestep_angle) - A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C);
+          current_orientation_rad = current_orientation /360 * 2* PI;
+
           stepsequence(1, step_delay, &B236_, standing_angle_B + walking_angle_B_increase);
           sidestepsequence(2, step_delay, &C145_, sidestep_angle);
           stepsequence(3, step_delay, &B236_, standing_angle_B);
@@ -773,6 +780,9 @@ void loop() {
           if (step == 7)
           {
             step = 1;
+            current_position_x = current_position_x -  step_distance_sidestep_left * cos(-current_orientation_rad);
+            current_position_y = current_position_y +  step_distance_sidestep_left * sin(current_orientation_rad);
+            mouvement_ok = false;
             command = WAIT;
           }
         break;
@@ -789,6 +799,9 @@ void loop() {
           if (step == 7)
           {
             step = 1;
+            current_position_x = current_position_x +  step_distance_sidestep_left * cos(-current_orientation_rad);
+            current_position_y = current_position_y -  step_distance_sidestep_left * sin(current_orientation_rad);
+            mouvement_ok = false;
             command = WAIT;
           }
         break;
