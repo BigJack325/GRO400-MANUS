@@ -668,12 +668,12 @@ void loop() {
 
         case MOVE_FORWARD :                // Move one step forward sequence
 
-          step_distance = A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+          step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
           current_orientation_rad = current_orientation /360 * 2* PI;
           
-          if(current_position_x + 2*step_distance * cos(current_orientation_rad) < arena_sizex && current_position_x + step_distance * cos(current_orientation_rad) > 0)
+          if(current_position_x + 2*step_distance * sin(current_orientation_rad) < arena_sizex && current_position_x + step_distance * cos(current_orientation_rad) > 0)
           {
-            if(current_position_y + 2*step_distance * sin(current_orientation_rad) < arena_sizey && current_position_y + step_distance * sin(current_orientation_rad) > 0)
+            if(current_position_y + 2*step_distance * cos(current_orientation_rad) < arena_sizey && current_position_y + step_distance * sin(current_orientation_rad) > 0)
             {
               mouvement_ok = true;
             }
@@ -695,8 +695,8 @@ void loop() {
             if (step == 11)
             {
               step = 1;
-              current_position_x = current_position_x + 2* step_distance * cos(current_orientation_rad);
-              current_position_y = current_position_y + 2* step_distance * sin(current_orientation_rad);
+              current_position_x = current_position_x + 2* step_distance * sin(current_orientation_rad);
+              current_position_y = current_position_y - 2* step_distance * cos(current_orientation_rad);
               mouvement_ok = false;
               command = WAIT;
             }
@@ -711,7 +711,7 @@ void loop() {
 
         case MOVE_BACKWARD :                // Move one step backward sequence
 
-          step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+          step_distance = A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
           current_orientation_rad = current_orientation /360 * 2* PI;
           
           if(current_position_x + 2*step_distance * cos(current_orientation_rad) < arena_sizex && current_position_x + step_distance * cos(current_orientation_rad) > 0)
@@ -1102,8 +1102,8 @@ void loop() {
         break;
     }
 
-    cur_position_x_pixel = map_limit_bottom_y - (current_position_y/arena_sizey) * (map_limit_bottom_y - map_limit_top_y);
-    cur_position_y_pixel = map_limit_left_x + (current_position_x/arena_sizex) * (map_limit_right_x - map_limit_left_x);
+    cur_position_x_pixel = map_limit_left_x + (current_position_x/arena_sizex) * (map_limit_right_x - map_limit_left_x);
+    cur_position_y_pixel = map_limit_bottom_y - (current_position_y/arena_sizey) * (map_limit_bottom_y - map_limit_top_y);
     
 
   timerSendMsg_.update();
