@@ -352,9 +352,9 @@ class Ui_MainWindow(QMainWindow):
 
         if self.StandLayButton.text() == "STAND":
 
-            self.StandLayButton.clicked.connect(lambda: self.changeButtonIcon("STAND",1))
+            self.StandLayButton.pressed.connect(lambda: self.changeButtonIcon("STAND",1))
 
-            self.StandLayButton.clicked.connect(lambda: self.RobotMessageManual("STAND"))
+            self.StandLayButton.pressed.connect(lambda: self.RobotMessageManual("STAND"))
 
         elif self.StandLayButton.text() == "LAY":
 
