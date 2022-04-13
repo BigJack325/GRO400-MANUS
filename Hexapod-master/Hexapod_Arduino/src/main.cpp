@@ -957,7 +957,11 @@ void loop() {
                 
                 if (automatic_search_count == 4)
                 {
-            //        go_to_angle = (current_orientation + 90.0) % 360.0;    fmod()________________________-------------------------------------
+                    go_to_angle = (current_orientation + 90.0);
+                    if(go_to_angle > 360)
+                    {
+                      go_to_angle = go_to_angle - 360; 
+                    }
                     automatic_search_count++;
                 }
                 if (automatic_search_count == 3)
