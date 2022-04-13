@@ -280,7 +280,7 @@ using namespace std;
 #define mandible_open_angle            97         //Servo angle for mandibles to be open
 #define mandible_close_angle           130        //Servo angle for mandibles to be closed for grabbing
 
-#define head_turn_angle                5         // Angle the head turns by when calling head to turn
+#define head_turn_angle                15         // Angle the head turns by when calling head to turn
 
 #define arena_sizex                    200                //Width of the arena (cm)
 #define arena_sizey                    200                //length of the arena (cm)
@@ -416,7 +416,7 @@ bool electrical_shutdown =             false;
 float current_position_x =               arena_sizex/2;                 //Current position of the robot on the x axis (cm)
 float current_position_y =               arena_sizey/2;                 //Current position of the robot on the y-axis (cm)
 float current_orientation =              0;                //Current angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
-float current_head_orientation =         0;
+float current_head_orientation =         initial_angle_D1;
 float current_orientation_rad =          0;                //Current angle of orientation of robot (rad) in a counterclockwise rotation of x-axis
 float cur_position_x_pixel =             initial_pos_x_pixel;           //Current position of the robot on the x axis (cm)
 float cur_position_y_pixel =             initial_pos_y_pixel;           //Current position of the robot on the y-axis (cm)
@@ -899,20 +899,22 @@ void loop() {
 
         case HEAD_LEFT :
           D1_.write(current_head_orientation + head_turn_angle);  
-          if(millis() > (t + 5* step_delay))
-            {
+          //if(millis() > (t + 5* step_delay))
+            //{
+              current_head_orientation = current_head_orientation + head_turn_angle;
               head_orientation = 1;
               command = WAIT; 
-            } 
+            //} 
         break;
 
         case HEAD_RIGHT :
           D1_.write(current_head_orientation - head_turn_angle);  
-          if(millis() > (t + 5* step_delay))
-            {
+          //if(millis() > (t + 5* step_delay))
+            //{
+              current_head_orientation = current_head_orientation -head_turn_angle;
               head_orientation = 3;
               command = WAIT; 
-            } 
+            //} 
         break;
 
         case HEAD_CENTRE :
@@ -926,6 +928,11 @@ void loop() {
         break;
 
         case AUTOMATIC :
+
+          if(!robot_is_standing){
+            command = STAND;
+            break;
+          }
 
           //if object is not in robots possession
           if(in_possession == false)
@@ -1277,7 +1284,7 @@ if(movement == 2) //backward
  {
   step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
 
-  current_position_x = current_position_x - 2* step_distance * sin(-current_orientation_rad);
+  current_position_x = current_position_x + 2* step_distance * sin(current_orientation_rad);
   current_position_y = current_position_y + 2* step_distance * cos(-current_orientation_rad);
   current_orientation = current_orientation;
  } 
