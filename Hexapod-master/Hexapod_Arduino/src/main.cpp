@@ -1103,6 +1103,8 @@ void sendMsg(){
   // doc["VISION_DIS"] = target_distance;
   // doc["VISION_OBJ"] = which_image;
   doc["Mode"] = operation_mode;
+  doc["cur_x_map"] = cur_position_x_pixel;
+  doc["cur_y_map"] = cur_position_y_pixel;
 
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
