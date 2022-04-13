@@ -301,7 +301,7 @@ using namespace std;
 
 #define offset_front_back              25                 // Angle of offset from middle legs of front and back legs
 #define offset_A1                      3  + offset_front_back   //ok
-#define offset_A2                      20 + offset_front_back //ok
+#define offset_A2                      38 + offset_front_back //ok
 #define offset_A3                      2    //ok
 #define offset_A4                      -5   //ok
 #define offset_A5                      0  - offset_front_back //ok
