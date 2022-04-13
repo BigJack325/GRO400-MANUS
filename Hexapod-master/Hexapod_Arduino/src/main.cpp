@@ -281,6 +281,16 @@ using namespace std;
 #define arena_sizey                    200                //length of the arena (cm)
 #define initial_position_x             arena_sizex/2      //Initial position of the robot on the x axis (cm)
 #define initial_position_y             arena_sizey/2      //Initial position of the robot on the y-axis (cm)
+#define initial_pos_x_pixel            127                //Initial position x in pixels in hmi
+#define initial_pos_y_pixel            123.5              //Initial position y in pixels in hmi
+
+#define map_limit_top_y                43.5               // arena limit position in pixels on hmi
+#define map_limit_bottom_y             193.5              // arena limit position in pixels on hmi
+#define map_limit_left_x               57.5               // arena limit position in pixels on hmi
+#define map_limit_right_x              197                // arena limit position in pixels on hmi
+
+
+// 43.5 en haut en y ||    193.5 en bas y ||  gauche en x 57.5 || 197 a droite en x || centre 127 en x || centre 123.5 an y
 
 #define turn_left_drift_error_factor   1                  // Error factor when calculating change in orientatio when turning left
 
@@ -398,10 +408,12 @@ bool current_overload =                false;
 bool insufficient_voltage =            false;
 bool electrical_shutdown =             false;
 
-int current_position_x =               arena_sizex/2;                 //Current position of the robot on the x axis (cm)
-int current_position_y =               arena_sizey/2;                 //Current position of the robot on the y-axis (cm)
+float current_position_x =               arena_sizex/2;                 //Current position of the robot on the x axis (cm)
+float current_position_y =               arena_sizey/2;                 //Current position of the robot on the y-axis (cm)
 int current_orientation =              0;                //Current angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
-int current_orientation_rad =          0;                //Current angle of orientation of robot (rad) in a counterclockwise rotation of x-axis
+float current_orientation_rad =          0;                //Current angle of orientation of robot (rad) in a counterclockwise rotation of x-axis
+float cur_position_x_pixel =             initial_pos_x_pixel;           //Current position of the robot on the x axis (cm)
+float cur_position_y_pixel =             initial_pos_y_pixel;           //Current position of the robot on the y-axis (cm)
 
 int future_position_x =                0;                 //Calculated future position of the robot on the x axis (cm)
 int future_position_y =                0;                 //Calculated future of the robot on the y-axis (cm)
@@ -617,9 +629,6 @@ void loop() {
     command = WAIT;
   }
 
-  
-  
-
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
     {
@@ -654,7 +663,7 @@ void loop() {
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
             }
-            
+
         break;
 
         case MOVE_FORWARD :                // Move one step forward sequence
@@ -856,9 +865,7 @@ void loop() {
         break;
 
         case AUTOMATIC :
-
-          operation_mode = MODE_AUTOMATIC;
-
+        
           //if object is not in robots possession
           if(in_possession == false)
           {
@@ -988,7 +995,6 @@ void loop() {
                       command = PICKUP;
                       in_possession = true;
                     }
-
               }
           }
 
@@ -1062,11 +1068,16 @@ void loop() {
                 {
                   command = DROP;
                   automatic_done = true;
+                  operation_mode = MODE_MANUEL;
                 }
               }
           }
         break;
     }
+
+    cur_position_x_pixel = map_limit_left_x + (current_position_x/arena_sizex) * (map_limit_right_x - map_limit_left_x);
+    cur_position_y_pixel = map_limit_bottom_y - (current_position_y/arena_sizey) * (map_limit_bottom_y - map_limit_top_y);
+
   timerSendMsg_.update();
 }
 
