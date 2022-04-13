@@ -289,7 +289,7 @@ class Ui_MainWindow(QMainWindow):
         self.connectPeriodicButtons()
 
         if self.serialCom_ is not None:
-            self.MapView.auto_map_movement(self.jsondata)
+            self.MapView.map_movement(self.jsondata)
 
         if self.Manual_mode.checkState() == 0:
 
@@ -588,7 +588,7 @@ class Ui_MainWindow(QMainWindow):
                 jsonBrowserText = json.loads(message)
 
                 for key in list(self.jsondata):
-                    if key == "Servo_A1" or key=="Servo_A2" or key=="Servo_A3" or key=="Servo_A4" or key=="Servo_A5" or key=="Servo_A6" or key=="Servo_B1" or key=="Servo_B2" or key=="Servo_B3"or key=="Servo_B4" or key=="Servo_B5" or key=="Servo_B6" or key=="Servo_C1" or key=="Servo_C2" or key=="Servo_C3" or key=="Servo_C4" or key=="Servo_C5" or key=="Servo_C6" or key=="Servo_D1" :
+                    if key == "Servo_A1" or key=="Servo_A2" or key=="Servo_A3" or key=="Servo_A4" or key=="Servo_A5" or key=="Servo_A6" or key=="Servo_B1" or key=="Servo_B2" or key=="Servo_B3"or key=="Servo_B4" or key=="Servo_B5" or key=="Servo_B6" or key=="Servo_C1" or key=="Servo_C2" or key=="Servo_C3" or key=="Servo_C4" or key=="Servo_C5" or key=="Servo_C6" or key=="Servo_D1" or key=="cur_x_map" or key=="cur_y_map" :
                         del jsonBrowserText[key]
                     if key == "Case":
                         if jsonBrowserText[key] == 0:
@@ -752,25 +752,10 @@ class Map(QGraphicsView):
 
         #CREATE TARGET OBJECT WHEN DETECTED
 
-    def auto_map_movement(self,jsondata):
+    def map_movement(self,jsondata):
         if jsondata is not None:
-            self.hexapod.move(jsondata["cur_x"],jsondata["cur_y"])
+            self.hexapod.move(jsondata["cur_x_map"],jsondata["cur_y_map"])
             self.hexapod.rotate(jsondata["cur_angle"])
-
-    def manual_map_movement(self,key,angle):
-
-        if key == "RIGHT":
-            self.hexapod.move(MANUAL_SIDE_MOVEMENT,0)
-        if key == "LEFT":
-            self.hexapod.move(-MANUAL_SIDE_MOVEMENT,0)
-        if key == "FRONT":
-            self.hexapod.move(0,-MANUAL_VERTICAL_MOVEMENT)
-        if key == "BACK":
-            self.hexapod.move(0,MANUAL_VERTICAL_MOVEMENT)
-        if key == "RLEFT":
-            self.hexapod.rotate(-angle)
-        if key == "RRIGHT":
-            self.hexapod.rotate(angle)
 
 class Robot(QGraphicsPixmapItem):
     def __init__(self):
