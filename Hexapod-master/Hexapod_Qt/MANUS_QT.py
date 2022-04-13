@@ -484,7 +484,7 @@ class Ui_MainWindow(QMainWindow):
             
             self.oldCamMessage = msg
             data_out = json.dumps(msg)
-            # print(data_out)
+            print(data_out)
             self.serialCom_.sendMessage(data_out)
 
     def RobotMessageManual(self,msg):

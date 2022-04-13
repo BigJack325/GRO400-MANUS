@@ -634,13 +634,13 @@ void loop() {
     command = WAIT;
   }
   
-  Serial.println(" ");
-  Serial.println(test_variable);
-  Serial.println(command);
-  Serial.println(current_position_x);
-  Serial.println(current_position_y);
-  Serial.println(current_orientation);
-  delay(500);
+  // Serial.println(" ");
+  // Serial.println(test_variable);
+  // Serial.println(command);
+  // Serial.println(current_position_x);
+  // Serial.println(current_position_y);
+  // Serial.println(current_orientation);
+  // delay(500);
 
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
@@ -677,21 +677,21 @@ void loop() {
             {
             }
             
-            if (test_variable > 1)
-            {
-              command = MOVE_FORWARD;
-              test_variable++;
-            }
-            if (test_variable == 1)
-            {
-              command = TURN_RIGHT;
-              test_variable++;
-            }
-            if (test_variable == 0)
-            {
-              command = STAND;
-              test_variable++;
-            }
+            // if (test_variable > 1)
+            // {
+            //   command = MOVE_FORWARD;
+            //   test_variable++;
+            // }
+            // if (test_variable == 1)
+            // {
+            //   command = TURN_RIGHT;
+            //   test_variable++;
+            // }
+            // if (test_variable == 0)
+            // {
+            //   command = STAND;
+            //   test_variable++;
+            // }
 
         break;
 
@@ -1033,6 +1033,9 @@ void loop() {
                     {
                       command = MOVE_FORWARD;
                     }
+
+                
+                    
 
                     //check if object is in pickup distance                
                     if (target_distance < grab_range)
