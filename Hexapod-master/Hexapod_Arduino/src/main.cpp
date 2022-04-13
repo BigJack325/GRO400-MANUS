@@ -1168,7 +1168,7 @@ void sendMsg(){
   doc["Mode"] = operation_mode;
   doc["cur_x_map"] = cur_position_x_pixel;
   doc["cur_y_map"] = cur_position_y_pixel;
-  doc["shouldRead"] = shouldRead_;
+
 
   doc["Servo_A1"]  = A1_.read();
   doc["Servo_B1"]  = B1_.read();
