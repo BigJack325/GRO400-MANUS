@@ -452,6 +452,7 @@ int  object_aim =                      0;                 // Indicates if robot 
 float min_detect_distance =            20;                // Distance where robot can't detect when object is closer
 float grab_range =                     5;                 // How close robot has to be to be able to grab object   
 bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
+bool object_close =                    false;             // if object is closer than detection limit
 float target_distance =                1000.0;            // The distance the camera detects the object to be from the robot 
 float target_distance_not_read =       1000.0;            // Distance from target when the robot is closer than the camera can detect object
 int which_image =                      2;                 // Inidcates which of the images is being seen (0= happy 1=angry 2 = nothing)
