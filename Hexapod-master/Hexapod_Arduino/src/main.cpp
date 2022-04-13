@@ -635,7 +635,6 @@ void loop() {
   {
     command = WAIT;
   }
-  
 
 //---------------------- SWITCH CASE -------------------------------
  switch(command)
@@ -671,6 +670,7 @@ void loop() {
             if (electrical_shutdown == true)  //If electrical problem stop moving
             {
             }
+            
 
         break;
 
