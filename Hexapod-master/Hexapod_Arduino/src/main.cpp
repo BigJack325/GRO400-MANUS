@@ -410,7 +410,7 @@ bool electrical_shutdown =             false;
 
 float current_position_x =               arena_sizex/2;                 //Current position of the robot on the x axis (cm)
 float current_position_y =               arena_sizey/2;                 //Current position of the robot on the y-axis (cm)
-int current_orientation =              0;                //Current angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
+float current_orientation =              0;                //Current angle of orientation of robot (deg) in a counterclockwise rotation of x-axis
 float current_orientation_rad =          0;                //Current angle of orientation of robot (rad) in a counterclockwise rotation of x-axis
 float cur_position_x_pixel =             initial_pos_x_pixel;           //Current position of the robot on the x axis (cm)
 float cur_position_y_pixel =             initial_pos_y_pixel;           //Current position of the robot on the y-axis (cm)
@@ -916,7 +916,7 @@ void loop() {
                 
                 if (automatic_search_count == 4)
                 {
-                    go_to_angle = (current_orientation + 90) % 360;
+                  //  go_to_angle = (current_orientation + 90) % 360;
                     automatic_search_count++;
                 }
                 if (automatic_search_count == 3)
