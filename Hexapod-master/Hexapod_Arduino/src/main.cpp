@@ -457,7 +457,7 @@ float target_distance =                1000.0;            // The distance the ca
 float target_distance_not_read =       1000.0;            // Distance from target when the robot is closer than the camera can detect object
 int which_image =                      2;                 // Inidcates which of the images is being seen (0= happy 1=angry 2 = nothing)
 int image_num =                        0;
-int automatic_search_count =           0;                 // Indicates which process to do when seraching for object in automatic mode
+int automatic_search_count =           -1;                 // Indicates which process to do when seraching for object in automatic mode
 int head_orientation =                 2;                 // Indicates if the head it turned or not (1 = left) (2 = centre) (3 = right)
 float go_to_angle =                    0;                 // Indicate to which angle reach when searching in automatic mode
 int spin_until_object_aligned =        0;                 // Indicates if robot is aligning itself towards the detected object (1 = left) (2 = right)
@@ -967,7 +967,7 @@ void loop() {
                     command = TURN_LEFT;
                     if( (abs(current_orientation - go_to_angle)) <= (turn_angle * turn_error_factor/2) )
                     {
-                      automatic_search_count = 0;
+                      automatic_search_count = -1;
                       command = WAIT;
                     }  
                 }
@@ -1028,9 +1028,11 @@ void loop() {
                     command = WAIT;
                   }
                 }
-                if (automatic_search_count == 0)
+                if (automatic_search_count == -1)
                 {
                     command = AUTOMATIC_DELAY;
+                    automatic_search_count++;
+
                 }
             }
 
