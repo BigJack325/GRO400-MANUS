@@ -298,6 +298,7 @@ using namespace std;
 // 43.5 en haut en y ||    193.5 en bas y ||  gauche en x 57.5 || 197 a droite en x || centre 127 en x || centre 123.5 an y
 
 #define turn_error_factor              0.5                  // Error factor when calculating change in orientatio when turning left
+#define sidestep_error_factor          0.7
 
 #define offset_front_back              23                 // Angle of offset from middle legs of front and back legs
 #define offset_A1                      3  + offset_front_back   //ok
@@ -1361,8 +1362,8 @@ if(movement == 3) //sidestep left
  {
   step_distance_sidestep = A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C + sidestep_angle) - A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C);
 
-  current_position_x = current_position_x -  step_distance_sidestep * cos(-current_orientation_rad);
-  current_position_y = current_position_y +  step_distance_sidestep * sin(current_orientation_rad);
+  current_position_x = current_position_x -  (step_distance_sidestep * cos(-current_orientation_rad)  * sidestep_error_factor);
+  current_position_y = current_position_y +  (step_distance_sidestep * sin(current_orientation_rad) * sidestep_error_factor);
   current_orientation = current_orientation;
  } 
 
@@ -1370,8 +1371,8 @@ if(movement == 3) //sidestep left
  {
    step_distance_sidestep = A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C + sidestep_angle) - A145_.direct_kinematics(2,initial_angle_A, standing_angle_B, standing_angle_C);
 
-  current_position_x = current_position_x +  step_distance_sidestep * cos(-current_orientation_rad);
-  current_position_y = current_position_y -  step_distance_sidestep * sin(current_orientation_rad);
+  current_position_x = current_position_x +  (step_distance_sidestep * cos(-current_orientation_rad) * sidestep_error_factor);
+  current_position_y = current_position_y -  (step_distance_sidestep * sin(current_orientation_rad) * sidestep_error_factor);
   current_orientation = current_orientation;
  } 
 

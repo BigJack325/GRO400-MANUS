@@ -72,50 +72,50 @@ class Ui_MainWindow(QMainWindow):
         self.RightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Right.png")))
         self.RightButton.setIconSize(QSize(61,61))
         self.RightButton.setAutoRepeat(True)
-        self.RightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
-        self.RightButton.setAutoRepeatInterval(1000)#mseconds
+        self.RightButton.setAutoRepeatDelay(UI_UPDATE_RATE+100 )#mseconds
+        self.RightButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
         self.RotateRightButton = QPushButton(self.centralWidget)
         self.RotateRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
         self.RotateRightButton.setIconSize(QSize(61,61))
         self.RotateRightButton.setAutoRepeat(True)
-        self.RotateRightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
-        self.RotateRightButton.setAutoRepeatInterval(1000)#mseconds
+        self.RotateRightButton.setAutoRepeatDelay(UI_UPDATE_RATE+100 )#mseconds
+        self.RotateRightButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
         self.LeftButton = QPushButton(self.centralWidget)
         self.LeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Left.png")))
         self.LeftButton.setIconSize(QSize(61,61))
         self.LeftButton.setAutoRepeat(True)
-        self.LeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds        
-        self.LeftButton.setAutoRepeatInterval(1000)#mseconds
+        self.LeftButton.setAutoRepeatDelay(UI_UPDATE_RATE +100)#mseconds        
+        self.LeftButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
         self.RotateLeftButton = QPushButton(self.centralWidget)
         self.RotateLeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateL.png")))
         self.RotateLeftButton.setIconSize(QSize(61,61))
         self.RotateLeftButton.setAutoRepeat(True)
-        self.RotateLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
-        self.RotateLeftButton.setAutoRepeatInterval(1000)#mseconds
+        self.RotateLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE+100 )#mseconds
+        self.RotateLeftButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
         self.FrontButton = QPushButton(self.centralWidget)
         self.FrontButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Front.png")))
         self.FrontButton.setIconSize(QSize(61,61))
         self.FrontButton.setAutoRepeat(True)
-        self.FrontButton.setAutoRepeatDelay(4000)#mseconds  
-        self.FrontButton.setAutoRepeatInterval(4000)#mseconds
+        self.FrontButton.setAutoRepeatDelay(UI_UPDATE_RATE+100)#mseconds  
+        self.FrontButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
         self.BackButton = QPushButton(self.centralWidget)
         self.BackButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"Back.png")))
         self.BackButton.setIconSize(QSize(61,61))
         self.BackButton.setAutoRepeat(True)
-        self.BackButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds  
-        self.BackButton.setAutoRepeatInterval(1000)#mseconds
+        self.BackButton.setAutoRepeatDelay(UI_UPDATE_RATE+100 )#mseconds  
+        self.BackButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
         self.RotateHeadRightButton = QPushButton(self.centralWidget)
         self.RotateHeadRightButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateR.png")))
         self.RotateHeadRightButton.setIconSize(QSize(61,61))
         self.RotateHeadRightButton.setAutoRepeat(True)
-        self.RotateHeadRightButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
-        self.RotateHeadRightButton.setAutoRepeatInterval(1000)#mseconds
+        self.RotateHeadRightButton.setAutoRepeatDelay(UI_UPDATE_RATE+100 )#mseconds
+        self.RotateHeadRightButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
         self.RotateHeadLeftButton = QPushButton(self.centralWidget)
         self.RotateHeadLeftButton.setIcon(QIcon(os.path.join(paths['BUTTON_IMAGE_PATH'],"RotateL.png")))
         self.RotateHeadLeftButton.setIconSize(QSize(61,61))
         self.RotateHeadLeftButton.setAutoRepeat(True)
-        self.RotateHeadLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE )#mseconds
-        self.RotateHeadLeftButton.setAutoRepeatInterval(1000)#mseconds
+        self.RotateHeadLeftButton.setAutoRepeatDelay(UI_UPDATE_RATE+100 )#mseconds
+        self.RotateHeadLeftButton.setAutoRepeatInterval(UI_UPDATE_RATE+100)#mseconds
 
         self.PickDropButton = QPushButton(self.centralWidget)
 
