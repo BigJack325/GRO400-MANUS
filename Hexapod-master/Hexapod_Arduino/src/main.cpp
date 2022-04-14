@@ -297,14 +297,14 @@ using namespace std;
 
 // 43.5 en haut en y ||    193.5 en bas y ||  gauche en x 57.5 || 197 a droite en x || centre 127 en x || centre 123.5 an y
 
-#define turn_left_drift_error_factor   1                  // Error factor when calculating change in orientatio when turning left
+#define turn_error_factor              0.5                  // Error factor when calculating change in orientatio when turning left
 
-#define offset_front_back              25                 // Angle of offset from middle legs of front and back legs
+#define offset_front_back              23                 // Angle of offset from middle legs of front and back legs
 #define offset_A1                      3  + offset_front_back   //ok
-#define offset_A2                      38 + offset_front_back //ok
+#define offset_A2                      18 + offset_front_back //ok
 #define offset_A3                      2    //ok
-#define offset_A4                      -5   //ok
-#define offset_A5                      0  - offset_front_back //ok
+#define offset_A4                      -9   //ok
+#define offset_A5                      2  - offset_front_back //ok
 #define offset_A6                      -6 - offset_front_back //ok  
 #define offset_B1                      0    //ok
 #define offset_B2                      -2   //ok
@@ -326,9 +326,9 @@ using namespace std;
 #define max_current_b4_forced_stop     9.8
 #define min_battery_voltage            9.1
 
-#define dropoff_angle_tolerance        10
-#define dropoff_x_tolerance            5
-#define dropoff_y_tolerance            5
+#define dropoff_angle_tolerance        15
+#define dropoff_x_tolerance            40
+#define dropoff_y_tolerance            40
 
 //--- CASE NUMBERS ----
 #define INITIALIZATION                 0         // Initial case of the robot when turned on
@@ -347,6 +347,7 @@ using namespace std;
 #define HEAD_RIGHT                     13        // Case to turn the head to the right
 #define HEAD_CENTRE                    14        // Case to turn head back tostraight position
 #define AUTOMATIC                      15        // Case for when the robot is in automatic mode
+#define AUTOMATIC_DELAY                16
 
 // --- Class constants
 #define A                              1         // Variable to identify which motors is associated with object synchservo
@@ -424,8 +425,8 @@ float cur_position_y_pixel =             initial_pos_y_pixel;           //Curren
 bool mouvement_ok =                    false;             //Indicates if mouvement will make robot leave designated arena
 
 float distance_from_target =           300;               //Distance robot must cover to reach target object (cm)
-float drop_off1x =                      0;                //Coordinate on x-axis of object 1 drop location
-float drop_off1y =                      0;                //Coordinate on y-axis of object 1 drop location
+float drop_off1x =                      200;                //Coordinate on x-axis of object 1 drop location
+float drop_off1y =                      200;                //Coordinate on y-axis of object 1 drop location
 float drop_off2x =                      0;                //Coordinate on x-axis of object 2 drop location
 float drop_off2y =                      0;                //Coordinate on y-axis of object 2 drop location
 
@@ -447,18 +448,21 @@ float step_distance_sidestep =         0;                 // Theoretical distanc
 bool in_possession =                   false;             // Variable to indicate if target object is being grabbed by robot (Automatic mode)
 bool object_detected =                 false;             // Variable to indicate if camera is identifying the target object (automatic mode)
 int  object_aim =                      0;                 // Indicates if robot is to the left (1), dead center (2), to the right (3) of the camera, undetected (0) (mode automatic)
-float min_detect_distance =            15;                // Distance where robot can't detect when object is closer
-float grab_range =                     5;                 // How close robot has to be to be able to grab object   
+float min_detect_distance =            25;                // Distance where robot can't detect when object is closer
+float grab_range =                     8;                 // How close robot has to be to be able to grab object   
 bool in_grab_range =                   false;             // Indicates if robot is close enough to grab object
 bool object_close =                    false;             // if object is closer than detection limit
+int in_range_counter =                 0;
 float target_distance =                1000.0;            // The distance the camera detects the object to be from the robot 
 float target_distance_not_read =       1000.0;            // Distance from target when the robot is closer than the camera can detect object
 int which_image =                      2;                 // Inidcates which of the images is being seen (0= happy 1=angry 2 = nothing)
+int image_num =                        0;
 int automatic_search_count =           0;                 // Indicates which process to do when seraching for object in automatic mode
 int head_orientation =                 2;                 // Indicates if the head it turned or not (1 = left) (2 = centre) (3 = right)
 float go_to_angle =                    0;                 // Indicate to which angle reach when searching in automatic mode
 int spin_until_object_aligned =        0;                 // Indicates if robot is aligning itself towards the detected object (1 = left) (2 = right)
 bool automatic_done =                  false;             // Indicates if the automatic mode has drop the target at the dropoff point
+bool lose_detection =                  false;           
 
 int test_variable =                   0;                 // This variable can be used to conduct tests while debugging. It should not be in the code if not presently using it in a test
 /*---------------------------- Objects ---------------------------*/
@@ -608,10 +612,11 @@ void loop() {
   if(which_image != 2)
   {
     object_detected = true;
+    image_num = which_image;
   }
   else
   {
-    //object_detected = false;
+    object_detected = false;
   }
 
   // if(real_current >= max_current_b4_forced_stop)     // If current reaches limit 
@@ -634,6 +639,11 @@ void loop() {
   if(robot_is_standing == false && (command != STAND && command != INITIALIZATION))
   {
     command = WAIT;
+  }
+
+  if(operation_mode == MODE_AUTOMATIC && !robot_is_standing)
+  {
+   command = STAND;
   }
 
 //---------------------- SWITCH CASE -------------------------------
@@ -664,7 +674,7 @@ void loop() {
 
             if(operation_mode == MODE_AUTOMATIC && automatic_done == false)
             {
-              command = AUTOMATIC;
+              command = AUTOMATIC_DELAY;
             }
             
             if (electrical_shutdown == true)  //If electrical problem stop moving
@@ -855,8 +865,8 @@ void loop() {
           D2_.write(mandible_close_angle); 
           if(millis() > (t + step_delay))
             {
-              t = millis();
               command = WAIT; 
+              in_possession = true;
             }      
         break;
 
@@ -898,23 +908,39 @@ void loop() {
         break;
 
         case HEAD_LEFT :
-          D1_.write(current_head_orientation + head_turn_angle);  
-          //if(millis() > (t + 5* step_delay))
-            //{
+          if(millis() > (t + step_delay))
+            {
+              D1_.write(current_head_orientation + head_turn_angle);
               current_head_orientation = current_head_orientation + head_turn_angle;
-              head_orientation = 1;
+                 if (current_head_orientation > initial_angle_D1)
+                 {
+                   head_orientation = 1;
+                 }
+                 if (current_head_orientation == initial_angle_D1)
+                 {
+                   head_orientation = 2;
+                 }
+              
               command = WAIT; 
-            //} 
+            } 
         break;
 
         case HEAD_RIGHT :
-          D1_.write(current_head_orientation - head_turn_angle);  
-          //if(millis() > (t + 5* step_delay))
-            //{
+            
+            if(millis() > (t + step_delay))
+            {
+              D1_.write(current_head_orientation - head_turn_angle);
               current_head_orientation = current_head_orientation -head_turn_angle;
-              head_orientation = 3;
+                if (current_head_orientation < initial_angle_D1)
+                 {
+                   head_orientation = 3;
+                 }
+                 if (current_head_orientation == initial_angle_D1)
+                 {
+                   head_orientation = 2;
+                 }
               command = WAIT; 
-            //} 
+            } 
         break;
 
         case HEAD_CENTRE :
@@ -923,46 +949,51 @@ void loop() {
             {
               t = millis();
               head_orientation = 2;
+              current_head_orientation = initial_angle_D1;
               command = WAIT; 
             } 
         break;
 
         case AUTOMATIC :
 
-          if(!robot_is_standing){
-            command = STAND;
-            break;
-          }
-
           //if object is not in robots possession
           if(in_possession == false)
           {
               // if object not detected 
-              if(object_detected == false && spin_until_object_aligned == 0)
+              if(object_detected == false && spin_until_object_aligned == 0 && !object_close )
               {
                 if (automatic_search_count == 6)
                 {
-                    command = MOVE_FORWARD;
-                    automatic_search_count = 0;
-                    
-                }
-                if (automatic_search_count == 5)
-                {
                     command = TURN_LEFT;
-                    if( abs(current_orientation - go_to_angle) <= turn_angle/2 )
+                    if( (abs(current_orientation - go_to_angle)) <= (turn_angle * turn_error_factor/2) )
                     {
-                      automatic_search_count++;
+                      automatic_search_count = 0;
+                      command = WAIT;
                     }  
                 }
                 
-                if (automatic_search_count == 4)
+                if (automatic_search_count == 5)
                 {
-                    go_to_angle = (current_orientation + 90.0);
+                    go_to_angle = (current_orientation - 90.0);
                     if(go_to_angle > 360)
                     {
                       go_to_angle = go_to_angle - 360; 
                     }
+                    if(go_to_angle < 0)
+                    {
+                      go_to_angle = go_to_angle + 360; 
+                    }
                     automatic_search_count++;
+                }
+                if (automatic_search_count == 4)
+                {
+                    command = MOVE_BACKWARD;
+                    if ( (arena_sizex - current_position_x) > (arena_sizex/4) && current_position_x > (arena_sizex/4) && (arena_sizey - current_position_y) > (arena_sizey/4) && current_position_y > (arena_sizey/4) )
+                  {
+                    automatic_search_count++;
+                    command = WAIT;
+                  }
+                    
                 }
                 if (automatic_search_count == 3)
                 {
@@ -970,6 +1001,7 @@ void loop() {
                   if ( (arena_sizex - current_position_x) < (arena_sizex/4) || current_position_x < (arena_sizex/4) || (arena_sizey - current_position_y) < (arena_sizey/4) || current_position_y < (arena_sizey/4) )
                   {
                     automatic_search_count++;
+                    command = WAIT;
                   }
                 }
                 if (automatic_search_count == 2)
@@ -981,19 +1013,58 @@ void loop() {
                 if (automatic_search_count == 1)
                 {
                   command = HEAD_RIGHT;
-                  automatic_search_count++;
+                  if(current_head_orientation <= (initial_angle_D1-45))
+                  {
+                    automatic_search_count++;
+                    command = WAIT;
+                  }
                 }
                 if (automatic_search_count == 0)
                 {
                   command = HEAD_LEFT;
-                  automatic_search_count++;
+                  if(current_head_orientation >= initial_angle_D1 + 45)
+                  {
+                    automatic_search_count++;
+                    command = WAIT;
+                  }
+                }
+                if (automatic_search_count == 0)
+                {
+                    command = AUTOMATIC_DELAY;
                 }
             }
 
 
               // if object detected and head is not looking forward
-              if ((object_detected == true && head_orientation != 2) || spin_until_object_aligned != 0)
+              if (((object_detected == true && head_orientation != 2) || spin_until_object_aligned != 0) && !object_close )
               {
+                automatic_search_count = 0;   
+                if(object_detected == false)
+                {
+                lose_detection = true;
+                }
+
+                    if (spin_until_object_aligned == 1 && lose_detection == true)
+                    {
+                      command = TURN_LEFT;
+                      if(object_detected ==true)
+                      {
+                        spin_until_object_aligned = 0;
+                        command = WAIT;
+                        lose_detection = false;
+                      }
+                    }
+                     if (spin_until_object_aligned == 2 && lose_detection == true)
+                    {
+                      command = TURN_RIGHT;
+                      if(object_detected ==true)
+                      {
+                        spin_until_object_aligned = 0;
+                        command = WAIT;
+                        lose_detection = false;
+                      }
+                    }
+
                     if (head_orientation == 1)
                     {
                       spin_until_object_aligned = 1;
@@ -1001,23 +1072,6 @@ void loop() {
                     if (head_orientation == 3)
                     {
                       spin_until_object_aligned = 2;
-                    }
-
-                    if (spin_until_object_aligned == 1)
-                    {
-                      command = TURN_LEFT;
-                      if(object_detected ==true)
-                      {
-                        spin_until_object_aligned = 0;
-                      }
-                    }
-                     if (spin_until_object_aligned == 2)
-                    {
-                      command = TURN_RIGHT;
-                      if(object_detected ==true)
-                      {
-                        spin_until_object_aligned = 0;
-                      }
                     }
 
                      if(head_orientation !=2)
@@ -1028,7 +1082,7 @@ void loop() {
               
                
               // if object detected and head is looking forward
-              if(object_detected == true && head_orientation == 2 && spin_until_object_aligned == 0)
+              if((object_detected == true && head_orientation == 2 && spin_until_object_aligned == 0) || object_close == true)
               {
                 automatic_search_count = 0;
                     //check if object is left, right or center of camera
@@ -1050,34 +1104,35 @@ void loop() {
                       command = MOVE_FORWARD;
                     }
 
-                    if(target_distance < min_detect_distance )
+                    if(target_distance < min_detect_distance && !object_close )
                     {
                       object_close = true;
                       target_distance_not_read = target_distance;
                     }
 
-                    //check if object is in pickup distance                
-                    if (target_distance_not_read < grab_range)
-                    {
-                      in_grab_range = true;
-                    }
-                    else        // ------------might be a problem when comes time to grab and too close to see image
-                    {
-                      in_grab_range = false;
-                    }
+                   
+                          // ------------might be a problem when comes time to grab and too close to see image
+                    
 
-                    if( object_close == true)
+                    if( object_close == true && in_grab_range == false)
                     {
                       command = MOVE_FORWARD;
-                      step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
-                      target_distance_not_read = target_distance_not_read - 2* step_distance;
+                      in_range_counter++;
+                      //step_distance = -A145_.direct_kinematics(1,initial_angle_A + turn_angle, standing_angle_B, standing_angle_C);
+                      //target_distance_not_read = target_distance_not_read -  step_distance;
+                       //check if object is in pickup distance                
+                      //if (target_distance_not_read < grab_range)
+                      if(in_range_counter == 4)
+                      {
+                        in_grab_range = true;
+                        in_range_counter  = 0;
+                      }
                     }
 
                     //if in grab distance grab target
                     if(in_grab_range == true)
                     {
                       command = PICKUP;
-                      in_possession = true;
                       in_grab_range = false;
                     }
               }
@@ -1087,26 +1142,26 @@ void loop() {
           if(in_possession == true)
           {
             //if happy
-              if(which_image == 0)
+              if(image_num == 0)
               {
                
-              float distancex_from_dropoff = drop_off1x - current_position_x; 
-              float distancey_from_dropoff = drop_off1y - current_position_y; 
-              float angle_to_dropoff = tan(distancey_from_dropoff/distancex_from_dropoff) *360/(2*PI);
+              //float distancex_from_dropoff = drop_off1x - current_position_x; 
+              //float distancey_from_dropoff = drop_off1y - current_position_y; 
+              float angle_to_dropoff = 90;
 
                 //if not at drop off position
-                if( abs(current_position_x - drop_off1x) > dropoff_x_tolerance && abs(current_position_y - drop_off1y) > dropoff_y_tolerance)
+                if( abs(current_position_x - drop_off1x) > dropoff_x_tolerance)
                 {
                     //if not in correct orrientation to reach target: turn
                     if (abs(angle_to_dropoff - current_orientation) > dropoff_angle_tolerance)
                     {
                       if ( (angle_to_dropoff - current_orientation) < 180 && (angle_to_dropoff - current_orientation) > 0)
                       {
-                        command = TURN_LEFT;
+                        command = TURN_RIGHT;
                       }
                       else
                       {
-                        command = TURN_RIGHT;
+                        command = TURN_LEFT;
                       }
                     }
                     else // If in right orientation: walk forward
@@ -1122,26 +1177,26 @@ void loop() {
               }
 
               //if angry
-              if(which_image == 1)
+              if(image_num == 1)
               {
                
-              float distancex_from_dropoff = drop_off2x - current_position_x; 
-              float distancey_from_dropoff = drop_off2y - current_position_y; 
-              float angle_to_dropoff = tan(distancey_from_dropoff/distancex_from_dropoff) *360/(2*PI);
+              //float distancex_from_dropoff = drop_off2x - current_position_x; 
+              //float distancey_from_dropoff = drop_off2y - current_position_y; 
+              float angle_to_dropoff = -90;
 
                 //if not at drop off position
-                if( abs(current_position_x - drop_off2x) > dropoff_x_tolerance && abs(current_position_y - drop_off2y) > dropoff_y_tolerance)
+                if( abs(current_position_x - drop_off2x) > dropoff_x_tolerance)
                 {
                     //if not in correct orrientation to reach target: turn
                     if (abs(angle_to_dropoff - current_orientation) > dropoff_angle_tolerance)
                     {
                       if ( (angle_to_dropoff - current_orientation) > 0 && (angle_to_dropoff - current_orientation) < 180 )
                       {
-                        command = TURN_LEFT;
+                        command = TURN_RIGHT;
                       }
                       else
                       {
-                        command = TURN_RIGHT;
+                        command = TURN_LEFT;
                       }
                     }
                     else // If in right orientation: walk forward
@@ -1157,6 +1212,14 @@ void loop() {
                 }
               }
           }
+        break;
+
+        case AUTOMATIC_DELAY :
+           if(millis() > (t + 7* step_delay))
+              {
+                command = AUTOMATIC;
+              }
+
         break;
     }
 
@@ -1187,6 +1250,7 @@ void sendMsg(){
   doc["current"] = real_current;
   doc["voltage"] = real_voltage;
   doc["VISION_DIS"] = target_distance;
+  doc["VISION_AIM"] = object_aim;
   doc["VISION_OBJ"] = which_image;
   doc["Mode"] = operation_mode;
   doc["cur_x_map"] = cur_position_x_pixel;
@@ -1258,12 +1322,12 @@ void readMsg(){
 
   parse_msg = doc["VISION_OBJ"];
   if(!parse_msg.isNull()){
-     which_image = doc["VISION_OBJ"].as<float>();
+     which_image = doc["VISION_OBJ"].as<int>();
   }
 
-  parse_msg = doc["VISION_MOVE"];
+ parse_msg = doc["VISION_MOVE"];
   if(!parse_msg.isNull()){
-     object_aim = doc["VISION_MOVE"].as<float>();
+     object_aim = doc["VISION_MOVE"].as<int>();
   }
 
 }
@@ -1315,14 +1379,23 @@ if(movement == 3) //sidestep left
  {
   current_position_x = current_position_x;
   current_position_y = current_position_y;
-  current_orientation = current_orientation - (turn_angle * turn_left_drift_error_factor);
+  current_orientation = current_orientation - (turn_angle * turn_error_factor);
  } 
  if(movement == 6) //turn right
  {
   current_position_x = current_position_x;
   current_position_y = current_position_y;
-  current_orientation = current_orientation + (turn_angle * turn_left_drift_error_factor);
+  current_orientation = current_orientation + (turn_angle * turn_error_factor);
  } 
+if(current_orientation > 360)
+{
+  current_orientation = current_orientation - 360;
+}
+if(current_orientation < 0)
+{
+  current_orientation = current_orientation + 360;
+}
+
 return;
 }
 
