@@ -236,16 +236,9 @@ class Ui_MainWindow(QMainWindow):
         self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
         self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
-        # self.Angle_label.setGeometry(QRect(615, 735, 94, 22))
-        # self.AngleBox.setGeometry(QRect(710, 735, 124, 22))
-        # self.AngleBox.setMinimum(0)
-        # self.AngleBox.setMaximum(180)
-        # self.AngleBox.setDecimals(0)
-        # self.AngleBox.setValue(10)
-        # self.AngleBox.setSingleStep(1)
 
-        self.Json_label.setGeometry(QRect(388, 10, 218, 22))
-        self.Json_Browser.setGeometry(QRect(388, 30, 200, 201))
+        self.Json_label.setGeometry(QRect(388, 0, 218, 22))
+        self.Json_Browser.setGeometry(QRect(388, 20, 200, 208))
         font = QFont()
         font.setPointSize(9)
         self.Json_Browser.setFont(font)
@@ -257,7 +250,6 @@ class Ui_MainWindow(QMainWindow):
         self.Manual_mode.setGeometry(QRect(840, 720, 120, 50))
         self.Manual_mode.setChecked(True)
 
-        # self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
         self.setCentralWidget(self.centralWidget)
         self.retranslateUi()
         self.connectUpdateTimer(UI_UPDATE_RATE)
@@ -265,9 +257,6 @@ class Ui_MainWindow(QMainWindow):
         self.connectButtons()
         self.CamThread.ImageUpdate.connect(self.connectCamera)
         self.CamThread.ObjectDistanceMove.connect(self.connectCameraDistanceMove)
-
-
-        # QMetaObject.connectSlotsByName(Self)
 
     def retranslateUi(self):
         _translate = QCoreApplication.translate
@@ -297,22 +286,26 @@ class Ui_MainWindow(QMainWindow):
         if self.Manual_mode.checkState() == 0:
 
             
-            if self.jsondata is not None:
+            if self.serialCom_ is not None:
                 
+                try:
+                    if self.jsondata["Mode"] != 2:
 
-                if self.jsondata["Mode"] != 2:
+                        self.RobotMessageManual("AUTOMATIC")
 
-                    self.RobotMessageManual("AUTOMATIC")
-
-                self.CamThread.msg_signal.connect(self.RobotMessageAutomatic)
+                    self.CamThread.msg_signal.connect(self.RobotMessageAutomatic)
+                except:
+                    pass
 
         elif self.Manual_mode.checkState() == 2:
 
             if self.jsondata is not None:
+                try:
+                    if self.jsondata["Mode"] != 1:
 
-                if self.jsondata["Mode"] != 1:
-
-                    self.RobotMessageManual("MANUAL")
+                        self.RobotMessageManual("MANUAL")
+                except:
+                    pass
 
                 try:
                     self.CamThread.msg_signal.disconnect()
@@ -498,10 +491,11 @@ class Ui_MainWindow(QMainWindow):
     def RobotMessageAutomatic(self,msg):
 
         if self.serialCom_ is not None and self.oldCamMessage != msg:
+            msg_sent = {"VISION_MOVE":msg[0],"VISION_DIS":msg[1],"VISION_OBJ":msg[2]}
             
-            self.oldCamMessage = msg
-            data_out = json.dumps(msg)
-            print(data_out)
+            self.oldCamMessage = msg_sent
+            data_out = json.dumps(msg_sent)
+            # print(data_out)
             self.serialCom_.sendMessage(data_out)
 
     def RobotMessageManual(self,msg):
@@ -536,7 +530,7 @@ class Ui_MainWindow(QMainWindow):
 
         
         data_out = json.dumps(msg_array)
-        print(data_out)
+        # print(data_out)
         self.serialCom_.sendMessage(data_out)
 
     def checkManual(self):
@@ -649,6 +643,12 @@ class Ui_MainWindow(QMainWindow):
                             jsonBrowserText[key] = "CENTER"
                         if jsonBrowserText[key] == 3:
                             jsonBrowserText[key] = "RIGHT"
+                    if key == "Mode":
+
+                        if jsonBrowserText[key] == 1:
+                            jsonBrowserText[key] = "MANUAL"
+                        if jsonBrowserText[key] == 2:
+                            jsonBrowserText[key] = "AUTOMATIC"
           
 
                 jsondataString = json.dumps(jsonBrowserText,indent=2)
@@ -766,8 +766,11 @@ class Map(QGraphicsView):
 
     def map_movement(self,jsondata):
         if jsondata is not None:
-            self.hexapod.move(jsondata["cur_x_map"],jsondata["cur_y_map"])
-            self.hexapod.rotate(jsondata["cur_angle"])
+            try:
+                self.hexapod.move(jsondata["cur_x_map"],jsondata["cur_y_map"])
+                self.hexapod.rotate(jsondata["cur_angle"])
+            except:
+                pass
 
 class Robot(QGraphicsPixmapItem):
     def __init__(self):
@@ -808,7 +811,8 @@ class Target(QGraphicsPixmapItem):
 
 class VideoTracking(QThread):
 
-    msg_signal = pyqtSignal(str)
+    # msg_signal = pyqtSignal(str)
+    msg_signal = pyqtSignal(list)
     ImageUpdate = pyqtSignal(QImage)
     ObjectDistanceMove = pyqtSignal(list)
 
@@ -917,23 +921,27 @@ class VideoTracking(QThread):
 
         return xmax-xmin
 
-    def VisionMessage(self,move,distance,object):
+    def VisionMessage(self,move,distance,obj):
 
-        if self.oldDistance != distance:
-            msg_array = {"VISION_MOVE":move,"VISION_DIS":distance,"VISION_OBJ":object}
+        # if self.oldDistance != distance:
 
-            self.msg_signal.emit(str(msg_array))
+        msg_array = [move,distance,obj]
+
+        self.msg_signal.emit(msg_array)
 
 
     def vision(self,frame):
 
         frame = cv2.flip(frame,0)
+        frame = cv2.flip(frame,1)
+
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
         res = self.detect_objects(self.interpreter, img, 0.5)
         # print(res)
 
         if not res:
+            
             self.VisionMessage(0,0.0,2)
 
 
@@ -963,7 +971,7 @@ class VideoTracking(QThread):
                 
             self.ObjectDistanceMove.emit([str(round(distance,2)),int(movetodo)])
 
-            self.VisionMessage(int(movetodo),round(distance,2),int(result['class_id']))
+            self.VisionMessage(int(movetodo),round(float(distance),2),int(result['class_id']))
 
         imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
