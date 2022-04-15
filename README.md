@@ -82,8 +82,7 @@ Our HMI shows:
 - a graphic that shows the the value of a variable over time
 - buttons to move the robots
 
-![image](https://user-images.githubusercontent.com/48064854/163049332-fb5af359-9492-4097-8c6c-b21095a80209.png)
-
+![image](https://user-images.githubusercontent.com/72100463/163627116-94ac9185-56dc-4deb-b193-00c6d286847d.png)
 
 ## <a id="Ressources"></a>External ressources
 
