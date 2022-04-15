@@ -5,7 +5,7 @@ jobs:
         - "3.9"
 
       env:
-        - PLATFORMIO_PROJECT_DIR=Hexapod-master/Hexapod_Arduino
+        - PLATFORMIO_PROJECT_DIR= Hexapod-master/Hexapod_Arduino
 
       install:
         - pip install -U https://github.com/platformio/platformio/archive/develop.zip
