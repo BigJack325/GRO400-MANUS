@@ -5,6 +5,13 @@
     <h1>ManUS</h1>
     <h3>Hexapod Robot : Upgraded Version | Promo66-UdeS-GRO</h3>
 </div>
+<div id="badges" align="center">
+    
+[![build status](https://img.shields.io/travis/gabrielcabana21/HexaphobUS/master?logo=Travis&style=flat-square)](https://travis-ci.com/gabrielcabana21/HexaphobUS)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://github.com/EDP325/GRO400-MANUS/blob/main/LICENSE) 
+
+</div>
 
 **This academic project is based on an older academic project from robotic engineering undergraduates at Université de Sherbrooke. "Manu" is an hexapod robot able to interact with his environments. Along with 6 legs comes a camera mounted on a 3D printed head, elevating Manu to a whole new level of robotic hexapod. It can walk, look around and chase targets all around him in a restrained area/arena.**
 
