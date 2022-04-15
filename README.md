@@ -47,7 +47,7 @@ cd ./Hexapod-Master/Hexapod_Qt
 <br/>
 <b>Step 4.</b> Connect the hexapod's microcontroller (Arduino) to Raspberry Pi;
 <br/>
-<b>Step 5.</b> Open the file ```main.cpp``` in the *./Hexapod-Master/Hexapod_Arduino/src* folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
+<b>Step 5.</b> Open the file ```main.cpp``` in the <pre>./Hexapod-Master/Hexapod_Arduino/src</pre> folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
 <br/>
 <b>Step 5.</b> Upload the ```main.cpp``` in the Arduino;
 <br/>
