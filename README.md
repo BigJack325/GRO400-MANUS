@@ -36,37 +36,24 @@
 
 #### <a id="SetupUsers"></a>Setup for Users
 
-## Steps
-<br />
-<b>Step 1.</b> Clone this repository: https://github.com/nicknochnack/TFODCourse
+<b>Step 1.</b> Connect Raspberry Pi camera to the Raspberry Pi before booting it up;
 <br/><br/>
-<b>Step 2.</b> Create a new virtual environment 
+<b>Step 2.</b> Clone this repository: https://github.com/EDP325/GRO400-MANUS.git
+<b>Step 3.</b> Create a new virtual environment, install dependencies, and add virtual environment to the Python Kernel by running in terminal:
 <pre>
-python -m venv tfod
+cd ./Hexapod-Master/Hexapod_Qt
+./install_venv_pi.sh
 </pre> 
 <br/>
-<b>Step 3.</b> Activate your virtual environment
-<pre>
-source tfod/bin/activate # Linux
-.\tfod\Scripts\activate # Windows 
-</pre>
+<b>Step 4.</b> Connect the hexapod's microcontroller (Arduino) to Raspberry Pi;
 <br/>
-<b>Step 4.</b> Install dependencies and add virtual environment to the Python Kernel
-<pre>
-python -m pip install --upgrade pip
-pip install ipykernel
-python -m ipykernel install --user --name=tfodj
-</pre>
+<b>Step 5.</b> Open the file ```main.cpp``` in the *./Hexapod-Master/Hexapod_Arduino/src* folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
 <br/>
-
-- Connect Raspberry Pi camera to the Raspberry Pi before booting it up;
-- Clone or download the repository to the Raspberry Pi;
-- Run ```./install_venv_pi.sh```in the *./Hexapod-Master/Hexapod_Qt* path  ```More details in the Hexapod_Qt path```;
-- Connect the hexapod's microcontroller (Arduino) to Raspberry Pi;
-- Open the file ```main.cpp``` in the *./Hexapod-Master/Hexapod_Arduino/src* folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
-- Upload the ```main.cpp``` in the Arduino;
-- Run the file ```MANUS_QT``` in the *./Hexapod-Master/Hexapod_Qt* folder;
-- Initialize the serial communication.
+<b>Step 5.</b> Upload the ```main.cpp``` in the Arduino;
+<br/>
+<b>Step 6.</b> Run the file ```MANUS_QT``` in the *./Hexapod-Master/Hexapod_Qt* folder;
+<br/>
+<b>Step 7.</b> Initialize the serial communication.
 
 ## <a id="Documentation"></a>Documentation
 #### <a id = "Servosclassification">Classification of the robot servos:</a>
