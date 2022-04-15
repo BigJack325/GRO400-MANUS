@@ -37,10 +37,10 @@
 #### <a id="SetupUsers"></a>Setup for Users
 
 - Clone or download the repository;
-- Connect the hexapod's microcontroller (Arduino) to your computer;
-- Open the file ```main.cpp``` in the *./Hexapod-Master/Hexapod_Arduino/src* folder, and build the code into the microcontroller with your favorite IDE;
-- Disconnect the microcontroller from the computer and connect to the on-board computer (Raspberry Pi);
-- Verify your Python version (3.5 and above) and verify if the OpenCV and PyQt5 librairies are present in the Raspberry Pi with ```Import``` command ;
+- Run ```./install_venv_pi.sh```in the *./Hexapod-Master/Hexapod_Qt* folder  ```More details in the Hexapod_Qt path```
+- Connect the hexapod's microcontroller (Arduino) to Raspberry-Pi
+- Open the file ```main.cpp``` in the *./Hexapod-Master/Hexapod_Arduino/src* folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
+- Upload the ```main.cpp``` in the Arduino;
 - Run the file ```MANUS_QT``` in the *./Hexapod-Master/Hexapod_Qt* folder;
 - Initialize the serial communication.
 
@@ -75,12 +75,14 @@ The robot has a vision algorithm that detects these two images:
 
 #### <a id="Controls"></a>HMI And Robot Controls
 Our HMI shows:
-- the current view of the cam
-- the position of all the servos;
-- a map of the arena with the position of the hexapod;
-- informations for the camera and messages from the Arduino
-- a graphic that shows the the value of a variable over time
-- buttons to move the robots
+- The current view of the cam with TensorFlow AI detection;
+- The angles of all the servos;
+- A map of the arena with the position of the hexapod;
+- Informations for the camera and messages from the Arduino
+- Information about battery voltage percentage
+- A graphic that shows the the value of a variable over time
+- A ComboBox to see every connected ports to initialize serial communication
+- Buttons to move the robots
 
 ![image](https://user-images.githubusercontent.com/72100463/163627116-94ac9185-56dc-4deb-b193-00c6d286847d.png)
 
