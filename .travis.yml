@@ -7,7 +7,7 @@ cache:
     - "~/.platformio"
 
 env:
-  - PLATFORMIO_CI_SRC=src/main.cpp
+  - PLATFORMIO_CI_SRC=Hexapod-master/Hexapod_Arduino/src/main.cpp
 
 install:
   - pip install -U platformio
