@@ -36,6 +36,29 @@
 
 #### <a id="SetupUsers"></a>Setup for Users
 
+## Steps
+<br />
+<b>Step 1.</b> Clone this repository: https://github.com/nicknochnack/TFODCourse
+<br/><br/>
+<b>Step 2.</b> Create a new virtual environment 
+<pre>
+python -m venv tfod
+</pre> 
+<br/>
+<b>Step 3.</b> Activate your virtual environment
+<pre>
+source tfod/bin/activate # Linux
+.\tfod\Scripts\activate # Windows 
+</pre>
+<br/>
+<b>Step 4.</b> Install dependencies and add virtual environment to the Python Kernel
+<pre>
+python -m pip install --upgrade pip
+pip install ipykernel
+python -m ipykernel install --user --name=tfodj
+</pre>
+<br/>
+
 - Connect Raspberry Pi camera to the Raspberry Pi before booting it up;
 - Clone or download the repository to the Raspberry Pi;
 - Run ```./install_venv_pi.sh```in the *./Hexapod-Master/Hexapod_Qt* path  ```More details in the Hexapod_Qt path```;
