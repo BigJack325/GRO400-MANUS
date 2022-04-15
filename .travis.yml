@@ -13,4 +13,4 @@ install:
   - pip install -U platformio
 
 script:
-  - platformio ci --project-conf= Hexapod-master/Hexapod_Arduino/platformio.ini
+  - platformio ci --project-conf= /Hexapod-master/Hexapod_Arduino/platformio.ini
