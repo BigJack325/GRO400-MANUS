@@ -37,8 +37,9 @@
 #### <a id="SetupUsers"></a>Setup for Users
 
 <b>Step 1.</b> Connect Raspberry Pi camera to the Raspberry Pi before booting it up;
-<br/><br/>
+<br/>
 <b>Step 2.</b> Clone this repository: https://github.com/EDP325/GRO400-MANUS.git
+<br/>
 <b>Step 3.</b> Create a new virtual environment, install dependencies, and add virtual environment to the Python Kernel by running in terminal:
 <pre>
 cd ./Hexapod-Master/Hexapod_Qt
@@ -47,11 +48,11 @@ cd ./Hexapod-Master/Hexapod_Qt
 <br/>
 <b>Step 4.</b> Connect the hexapod's microcontroller (Arduino) to Raspberry Pi;
 <br/>
-<b>Step 5.</b> Open the file ```main.cpp``` in the <pre>./Hexapod-Master/Hexapod_Arduino/src</pre> folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
+<b>Step 5.</b> Open the file <b>main.cpp</b> in the <b>./Hexapod-Master/Hexapod_Arduino/src</b> folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
 <br/>
-<b>Step 5.</b> Upload the ```main.cpp``` in the Arduino;
+<b>Step 5.</b> Upload the <b>main.cpp</b> in the Arduino;
 <br/>
-<b>Step 6.</b> Run the file ```MANUS_QT``` in the *./Hexapod-Master/Hexapod_Qt* folder;
+<b>Step 6.</b> Run the file <b>MANUS_QT</b> in the <b>./Hexapod-Master/Hexapod_Qt</b> folder;
 <br/>
 <b>Step 7.</b> Initialize the serial communication.
 
