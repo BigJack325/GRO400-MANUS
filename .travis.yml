@@ -2,7 +2,8 @@ jobs:
   include:
    - language: python
       python:
-        - "3.9"
+        - "2.7"
+        - "3.6"
 
       env:
         - PLATFORMIO_PROJECT_DIR= Hexapod-master/Hexapod_Arduino
