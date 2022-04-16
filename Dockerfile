@@ -1,4 +1,4 @@
-FROM raspbian/desktop
+FROM ubuntu20.04
 
 RUN apt-get update
 RUN apt-get install python3 -y
