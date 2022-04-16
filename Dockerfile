@@ -10,12 +10,12 @@ RUN apt-get install -y \
     libqt5serialport5 \
     python3-pyqt5.qtserialport \
     python3-pyqt5.qtchart
-RUN apt-get remove python-PyQt5
 
 
 RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-venv -y
+RUN apt-get remove python3-PyQt5
 
 RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
