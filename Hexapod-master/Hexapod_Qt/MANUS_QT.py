@@ -7,8 +7,12 @@ import time
 from cv2 import VideoCapture
 import numpy as np
 import imutils
-# from tflite_runtime.interpreter import Interpreter
-import tensorflow as tf
+
+try:
+    from tflite_runtime.interpreter import Interpreter
+except:
+    pass
+
 from imutils.video import VideoStream
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
@@ -818,40 +822,39 @@ class VideoTracking(QThread):
         super().__init__()
 
         try:
-            self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
-            self.PiCam = True
-        except:
-            self.capwebcam = VideoCapture(0)
-            self.PiCam = False
+            try:
+                self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
+            except:
+                pass
             
-        self.camTimer = QTimer()
+            self.camTimer = QTimer()
 
-        self.oldDistance = 0.0
-        
-        self.new_width = 320
-        self.real_img_width = 5.7
-        self.real_distance = 50.0
-        self.font = cv2.FONT_HERSHEY_COMPLEX
+            self.oldDistance = 0.0
+            
+            self.new_width = 320
+            self.real_img_width = 5.7
+            self.real_distance = 50.0
+            self.font = cv2.FONT_HERSHEY_COMPLEX
 
-        self.labels = self.load_labels()
-        self.interpreter = tf.lite.Interpreter(model_path=os.path.join(paths['TFLITE_PATH'],"detect.tflite"))
-        self.interpreter.allocate_tensors()
-        self.input_height= self.interpreter.get_input_details()[0]['shape'][1]
-        self.input_width= self.interpreter.get_input_details()[0]['shape'][2]
+            self.labels = self.load_labels()
+            self.interpreter = Interpreter(model_path=os.path.join(paths['TFLITE_PATH'],"detect.tflite"))
+            self.interpreter.allocate_tensors()
+            self.input_height= self.interpreter.get_input_details()[0]['shape'][1]
+            self.input_width= self.interpreter.get_input_details()[0]['shape'][2]
 
-        self.pixel_width = self.pixel_width_finder(cv2.imread(paths['TF_DISTANCE_IMG_PATH']))
-        self.focal_length = self.Focal_Length_Finder(self.real_distance,self.real_img_width,self.pixel_width)
+            self.pixel_width = self.pixel_width_finder(cv2.imread(paths['TF_DISTANCE_IMG_PATH']))
+            self.focal_length = self.Focal_Length_Finder(self.real_distance,self.real_img_width,self.pixel_width)
 
-        time.sleep(1)
-        self.camTimer.timeout.connect(self.OnPeriodicEvent)
-        self.camTimer.start(CAM_UPDATE_RATE)
+            time.sleep(1)
+            self.camTimer.timeout.connect(self.OnPeriodicEvent)
+            self.camTimer.start(CAM_UPDATE_RATE)
+        except:
+            print("Connection to PiCam has not been found. Try reconnecting it or reboot the Pi")
 
 
     def OnPeriodicEvent(self):
-        if self.PiCam:
-            frame = self.capwebcam.read()
-        else:
-            _,frame = self.capwebcam.read()
+
+        frame = self.capwebcam.read()
 
         self.vision(frame)
 
@@ -938,9 +941,9 @@ class VideoTracking(QThread):
 
 
     def vision(self,frame):
-        if self.PiCam:
-            frame = cv2.flip(frame,0)
-            frame = cv2.flip(frame,1)
+        
+        frame = cv2.flip(frame,0)
+        frame = cv2.flip(frame,1)
 
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
@@ -994,12 +997,3 @@ if __name__ == "__main__":
     app.aboutToQuit.connect(ui.cleanUp)
 
     sys.exit(app.exec_())
-
-    '''
-    bool object_detected
-    int object_aim  centrer=2,gauche=1,droite=3,non vue=0
-    int angry_or_happy
-    float distance_objet
-
-    
-    '''
