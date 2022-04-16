@@ -4,7 +4,6 @@ from lib2to3.pgen2.pgen import ParserGenerator
 import cv2
 import re
 import time
-from cv2 import VideoCapture
 import numpy as np
 import imutils
 
@@ -822,11 +821,9 @@ class VideoTracking(QThread):
         super().__init__()
 
         try:
-            try:
-                self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
-            except:
-                pass
-            
+
+            self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
+ 
             self.camTimer = QTimer()
 
             self.oldDistance = 0.0
