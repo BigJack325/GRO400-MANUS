@@ -10,6 +10,7 @@ RUN apt-get install -y \
     libqt5serialport5 \
     python3-pyqt5.qtserialport \
     python3-pyqt5.qtchart
+RUN apt-get remove python3-PyQt5
 
 
 RUN apt-get install python3 -y
