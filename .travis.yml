@@ -34,7 +34,7 @@ jobs:
       - docker
 
     before_script:
-      - docker image build .
+      - docker image build --platform linux/arm/v7 .
 
     script:
       - docker run -it make check
