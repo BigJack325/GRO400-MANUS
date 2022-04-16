@@ -1,5 +1,5 @@
 opencv-python-headless
-PyQtChart == 5.15.2
+PyQtChart
 wget
 imutils
 ipykernel
