@@ -1,9 +1,15 @@
 FROM ubuntu
 
 RUN apt-get update
-RUN apt-get -y upgrade
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
+RUN apt-get install -y \
+        qtbase5-dev \
+        libqt5charts5 \
+        libqt5charts5-dev \
+        libqt5serialport5 \
+        libqt5serialport5-dev \
+        python3-pyqt5.qtserialport
 
 
 RUN apt-get install python3 -y
@@ -23,9 +29,6 @@ RUN pip install -r "pip_requirements.txt"
 RUN pip install --upgrade PyQt5
 
 RUN pip list
-
-RUN apt-get install -y \
-    python3-pyqt5.qtserialport
 
 # Run the application:
 RUN python3 MANUS_QT.py
