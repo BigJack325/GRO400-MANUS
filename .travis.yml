@@ -31,7 +31,7 @@ jobs:
     sudo: required
     
     env:
-    - IMGNAME=balenalib/raspberry-pi:latest
+    - IMGNAME=sedden/rpi-raspbian-qemu:wheezy
 
     services:
       - docker
