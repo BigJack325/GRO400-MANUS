@@ -28,7 +28,7 @@ jobs:
     sudo: required
     
     env:
-    - IMGNAME=resin/rpi-raspbian:latest
+    - IMGNAME=balenalib/raspberry-pi:latest
 
     services:
       - docker
