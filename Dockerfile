@@ -29,7 +29,7 @@ RUN apt-get install -y \
     python3-pyqt5 \
 #     pyqt5-dev-tools \
 #     qttools5-dev-tools \
-    python3-pyqt5.qtserialport \
+    python3-pyqt5.qtserialport
 #     python3-pyqt5.qtchart
 
 # Run the application:
