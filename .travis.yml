@@ -25,6 +25,9 @@ jobs:
   - stage: Qt
     name: "Qt"
     
+    arch:
+    - arm64
+    
     sudo: required
     
     env:
