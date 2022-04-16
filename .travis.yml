@@ -22,19 +22,22 @@ jobs:
     script:
       - platformio run -d $PLATFORMIO_CI_SRC
       
-  - stage: Qt
-    name: "Qt"
     
-    arch:
-    - armv71
+#    Qt doesn't work because armv7docker image couldn't be found
+      
+#   - stage: Qt
+#     name: "Qt"
     
-    sudo: required
+#     arch:
+#     - armv71
+    
+#     sudo: required
 
-    services:
-      - docker
+#     services:
+#       - docker
 
-    before_script:
-      - docker image build --platform linux/arm/v7 .
+#     before_script:
+#       - docker image build --platform linux/arm/v7 .
 
-    script:
-      - docker run -it make check
+#     script:
+#       - docker run -it make check
