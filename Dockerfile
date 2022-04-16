@@ -26,7 +26,5 @@ RUN apt-get install -y \
     python3-pyqt5.qtserialport
 #     python3-pyqt5.qtchart
 
-RUN pip list
-
 # Run the application:
 RUN python3 MANUS_QT.py
