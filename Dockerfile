@@ -15,7 +15,7 @@ RUN apt-get install -y \
 RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-venv -y
-RUN apt-get remove python3-PyQt5
+RUN apt remove python3-PyQt5
 
 RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
