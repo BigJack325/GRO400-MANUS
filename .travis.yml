@@ -1,16 +1,14 @@
-jobs:
-  include:
-   - language: python
-      python:
-        - "2.7"
-        - "3.6"
+language: python
+python:
+  - "2.7"
+  - "3.6"
 
-      env:
-        - PLATFORMIO_PROJECT_DIR= Hexapod-master/Hexapod_Arduino
+env:
+  - PLATFORMIO_PROJECT_DIR=Hexapod-master/Hexapod_Arduino
 
-      install:
-        - pip install -U https://github.com/platformio/platformio/archive/develop.zip
-        - pio pkg install --global --platform symlink://.
+install:
+  - pip install -U https://github.com/platformio/platformio/archive/develop.zip
+  - pio pkg install --global --platform symlink://.
 
-      script:
-        - platformio run -d $PLATFORMIO_PROJECT_DIR
+script:
+  - platformio run -d $PLATFORMIO_PROJECT_DIR
