@@ -15,5 +15,4 @@ ENV VIRTUAL_ENV=/Qt_venv
 ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
 
 # Run the application:
-COPY MANUS_QT.py .
-CMD [“python3”, “myapp.py”]
+RUN python3 MANUS_QT.py
