@@ -8,7 +8,6 @@ RUN apt-get install python3-venv -y
 RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
 WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
-RUN apt-get install -y "apt_requirements_pi.txt"
 RUN chmod u+x install_venv.sh
 RUN ./install_venv.sh
 
