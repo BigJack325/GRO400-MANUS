@@ -26,7 +26,7 @@ jobs:
     name: "Qt"
     
     arch:
-    - arm64
+    - armv71
     
     sudo: required
     
