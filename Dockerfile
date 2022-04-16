@@ -1,7 +1,8 @@
 FROM ubuntu
 
+RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
     qtbase5-dev \
     libqt5charts5-dev \
     libqt5serialport5-dev \
