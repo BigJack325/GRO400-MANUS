@@ -28,13 +28,14 @@ jobs:
   - stage: Qt
     name: "Qt"
     
-    sudo: required
-
-    services:
-      - docker
-
-    before_script:
-      - docker build .
-
+    language: python
+    python:
+      - "3.9"
+      - "3.9-dev"  # 3.9 development branch
+      - "nightly"  # nightly build
+    # command to install dependencies
+    install:
+      - pip install -r Hexapod-master/Hexapod_Qt/pip_requirements.txt
+    # command to run tests
     script:
-      - docker run -it MANUS_QT.py
+      - Hexapod-master/Hexapod_Qt/MANUS_QT.py
