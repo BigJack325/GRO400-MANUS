@@ -3,7 +3,7 @@ FROM ubuntu
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
-# RUN apt-get install -y \
+RUN apt-get install -y \
 #     qtbase5-dev \
 #     libqt5charts5-dev \
 #     libqt5charts5 \
@@ -12,8 +12,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 #     python3-pyqt5 \
 #     pyqt5-dev-tools \
 #     qttools5-dev-tools \
-#     python3-pyqt5.qtserialport \
-#     python3-pyqt5.qtchart
+    python3-pyqt5.qtserialport \
+    python3-pyqt5.qtchart
 
 
 RUN apt-get install python3 -y
