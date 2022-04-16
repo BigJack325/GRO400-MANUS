@@ -25,8 +25,10 @@ WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
 ENV VIRTUAL_ENV=/opt/Qt_venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
-RUN pip install -r "pip_requirements.txt"
+
 RUN pip install --upgrade PyQt5
+RUN pip install -r "pip_requirements.txt"
+
 
 RUN pip list
 
