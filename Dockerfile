@@ -1,4 +1,4 @@
-FROM balenalib/raspberry-pi:latest
+FROM sedden/rpi-raspbian-qemu:wheezy
 
 RUN apt-get update
 RUN apt-get install python3 -y
