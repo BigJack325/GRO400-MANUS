@@ -27,7 +27,7 @@ WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
 # RUN ./install_venv.sh
 
 ENV VIRTUAL_ENV=/opt/Qt_venv
-RUN python3 -m Qt_venv $VIRTUAL_ENV
+RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
 RUN pip3 install -r "pip_requirements.txt"
 
