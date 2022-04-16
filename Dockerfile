@@ -23,10 +23,10 @@ RUN pip3 install -r "pip_requirements.txt"
 RUN apt-get install -y \
 #     qtbase5-dev \
 #     libqt5charts5-dev \
-#     libqt5charts5 \
+    libqt5charts5 \
 #     libqt5serialport5-dev \
-#     libqt5serialport5 \
-#     python3-pyqt5 \
+    libqt5serialport5 \
+    python3-pyqt5 \
 #     pyqt5-dev-tools \
 #     qttools5-dev-tools \
     python3-pyqt5.qtserialport
