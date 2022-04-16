@@ -40,6 +40,4 @@ jobs:
       - docker image build -t ${IMGNAME} .
 
     script:
-      - docker build -t Qt/test Qt
-      - docker run -it Qt/test uname -a
-      - docker run -it Qt/test make check
+      - docker run -it make check
