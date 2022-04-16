@@ -29,15 +29,12 @@ jobs:
     - armv71
     
     sudo: required
-    
-    env:
-    - IMGNAME=ubuntu:18.04
 
     services:
       - docker
 
     before_script:
-      - docker image build -t ${IMGNAME} .
+      - docker image build .
 
     script:
       - docker run -it make check
