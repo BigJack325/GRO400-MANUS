@@ -12,17 +12,7 @@ before_script:
 
 jobs:
   include:
-  - stage: Qt
-    name: "Qt"
-
-    
-    script:
-      - bash Qt/Hexapod_Qt/install_venv_pi.sh
-      - docker build -t Qt/test Qt
-      - docker run -it Qt/test uname -a
-      - docker run -it Qt/test go version
-      - docker run -it Qt/test make check
-      
+  
   - stage: Arduino
     name: "Arduino"
     
@@ -44,6 +34,16 @@ jobs:
     script:
       - platformio run -d $PLATFORMIO_CI_SRC
 
+      - docker build -t Qt/test Qt
+      - docker run -it Qt/test uname -a
+      - docker run -it Qt/test go version
+      - docker run -it Qt/test make check
+  - stage: Qt
+    name: "Qt"
+
+    
+    script:
+      - bash Qt/Hexapod_Qt/install_venv_pi.sh
       - docker build -t Qt/test Qt
       - docker run -it Qt/test uname -a
       - docker run -it Qt/test go version
