@@ -25,7 +25,7 @@ COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
 WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
 # RUN chmod u+x install_venv.sh
 # RUN ./install_venv.sh
-RUN pip install -r "pip_requirements.txt"
+RUN pip3 install -r "pip_requirements.txt"
 
 # Run the application:
 RUN python3 MANUS_QT.py
