@@ -15,16 +15,13 @@ RUN apt-get install -y \
 RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-venv -y
-RUN apt remove python3-PyQt5
 
 RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
 WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
-RUN chmod u+x install_venv.sh
-RUN ./install_venv.sh
-
-ENV VIRTUAL_ENV=/Qt_venv
-ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
+# RUN chmod u+x install_venv.sh
+# RUN ./install_venv.sh
+RUN pip install -r "pip_requirements.txt"
 
 # Run the application:
 RUN python3 MANUS_QT.py
