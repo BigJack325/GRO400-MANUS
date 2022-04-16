@@ -1,15 +1,17 @@
 language: python
 python:
   - "2.7"
-  - "3.6"
+  
+cache:
+  directories:
+    - "~/.platformio"
 
 env:
-  - PLATFORMIO_PROJECT_DIR=Hexapod-master/Hexapod_Arduino
+  - PLATFORMIO_CI_SRC=Hexapod-master/Hexapod_Arduino
+
 
 install:
-  - pip install -U https://github.com/platformio/platformio/archive/develop.zip
-  - pio pkg install --global --platform symlink://.
+  - pip install -U platformio
 
 script:
-  - platformio run -d $PLATFORMIO_PROJECT_DIR
-
+  - platformio ci --board=TYPE_1 --board=TYPE_2 --board=TYPE_N
