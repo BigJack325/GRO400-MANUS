@@ -31,7 +31,7 @@ jobs:
     sudo: required
     
     env:
-    - IMGNAME=ubuntu:20.04
+    - IMGNAME=ubuntu:18.04
 
     services:
       - docker
