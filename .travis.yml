@@ -1,15 +1,3 @@
-sudo: required
-
-services:
-  - docker
-  
-before_script:
-  - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
-  - echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-arm-static:' | sudo tee -a /proc/sys/fs/binfmt_misc/register
-  - docker pull sedden/rpi-raspbian-qemu:wheezy
-
-
-
 jobs:
   include:
   
@@ -40,8 +28,17 @@ jobs:
       - docker run -it Qt/test make check
   - stage: Qt
     name: "Qt"
-
     
+    sudo: required
+
+    services:
+      - docker
+
+    before_script:
+      - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+      - echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-arm-static:' | sudo tee -a /proc/sys/fs/binfmt_misc/register
+      - docker pull resin/rpi-raspbian
+
     script:
       - bash Qt/Hexapod_Qt/install_venv_pi.sh
       - docker build -t Qt/test Qt
