@@ -1,7 +1,7 @@
 FROM ubuntu
 
 RUN apt-get update
-RUN apt-get upgrade
+RUN apt-get -y upgrade
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 
