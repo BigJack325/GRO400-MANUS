@@ -38,6 +38,6 @@ jobs:
       - pip install -r Hexapod-master/Hexapod_Qt/pip_requirements.txt
     # command to run tests
     before script:
-      -cd Hexapod-master/Hexapod_Qt
+      -cd Hexapod_Qt
     script:
       - MANUS_QT.py
