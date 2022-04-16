@@ -37,7 +37,6 @@ jobs:
       - docker image build -t ${IMGNAME} .
 
     script:
-      - docker run -it  Qt/Hexapod_Qt/install_venv_pi.sh
       - docker build -t Qt/test Qt
       - docker run -it Qt/test uname -a
       - docker run -it Qt/test make check
