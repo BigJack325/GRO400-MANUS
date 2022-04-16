@@ -1,6 +1,10 @@
 FROM balenalib/raspberry-pi:latest
 
-RUN apt-get update && apt-get install -y make golang
+RUN apt-get update
+RUN apt-get install python3 -y
+RUN apt-get install python3-pip -y
+
 RUN mkdir -p /home/Qt
 ADD Hexapod_Qt /home/Qt
 WORKDIR /home/Qt/Hexapod_Qt
+RUN ./install_venv_pi.sh
