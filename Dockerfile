@@ -2,7 +2,7 @@ FROM ubuntu
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
-RUN DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 RUN apt-get install -y \
     qtbase5-dev \
     libqt5charts5-dev \
