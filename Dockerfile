@@ -1,4 +1,4 @@
-FROM arm32v7/ubuntu
+FROM ubuntu:18.04
 
 # RUN apt-get update
 RUN apt-get install python3 -y
