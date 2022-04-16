@@ -4,9 +4,11 @@ from lib2to3.pgen2.pgen import ParserGenerator
 import cv2
 import re
 import time
+from cv2 import VideoCapture
 import numpy as np
 import imutils
-from tflite_runtime.interpreter import Interpreter
+# from tflite_runtime.interpreter import Interpreter
+import tensorflow as tf
 from imutils.video import VideoStream
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QMainWindow, QLabel,
@@ -35,7 +37,7 @@ DISTANCE_IMAGE = 'Distance.jpg'
 paths = {
     'DISPLAY_IMAGE_PATH': os.path.join('Qt_Images','Display'),
     'BUTTON_IMAGE_PATH': os.path.join('Qt_Images', 'Buttons'),
-    'TFLITE_PATH': os.path.join('Tensorflow', 'workspace','models',CUSTOM_MODEL_NAME,'tfliteexport'),
+    'TFLITE_PATH': os.path.join('Tensorflow', 'workspace','tflite_used_model'),
     'TF_DISTANCE_IMG_PATH': os.path.join('Tensorflow', 'workspace','images','distance',DISTANCE_IMAGE),
 
  }
@@ -142,9 +144,6 @@ class Ui_MainWindow(QMainWindow):
         self.CamDistance_label = QLabel(self.centralWidget)
         self.CamDistanceText = QPlainTextEdit(self.centralWidget)
 
-        # self.Angle_label = QLabel(self.centralWidget)
-        # self.AngleBox = QDoubleSpinBox(self.centralWidget)
-
         self.Json_label = QLabel(self.centralWidget)
         self.Json_Browser = QTextBrowser(self.centralWidget)
 
@@ -231,8 +230,8 @@ class Ui_MainWindow(QMainWindow):
         self.Graph_label.setGeometry(QRect(620, 10, 218, 22))
         self.graphView.setGeometry(QRect(620, 30, 341, 211))
 
-        self.Cam_label.setGeometry(QRect(0, 170, 50, 22))
-        self.CamImage.setGeometry(QRect(0, 160, 320, 320))
+        self.Cam_label.setGeometry(QRect(0, 100, 50, 22))
+        self.CamImage.setGeometry(QRect(0, 120, 320, 320))
         self.CamDistance_label.setGeometry(QRect(388, 230, 218, 22))
         self.CamDistanceText.setGeometry(QRect(388, 250, 200, 151))
 
@@ -267,7 +266,6 @@ class Ui_MainWindow(QMainWindow):
         self.StandLayButton.setText(_translate("MainWindow", "STAND"))
         self.Port_label.setText(_translate("MainWindow", "Port:"))
         self.Donnees_label.setText(_translate("MainWindow", "Donnees brutes:"))
-        # self.Angle_label.setText(_translate("MainWindow", "Angle[0,360]"))
         self.Json_label.setText(_translate("MainWindow", "Messages Json de l\'Arduino:"))
         self.Graph_label.setText(_translate("MainWindow", "Graphique:"))
         self.CamDistance_label.setText(_translate("MainWindow", "Distance Cam:"))
@@ -819,7 +817,13 @@ class VideoTracking(QThread):
     def __init__(self):
         super().__init__()
 
-        self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
+        try:
+            self.capwebcam = VideoStream(src=0,usePiCamera=True).start()
+            self.PiCam = True
+        except:
+            self.capwebcam = VideoCapture(0)
+            self.PiCam = False
+            
         self.camTimer = QTimer()
 
         self.oldDistance = 0.0
@@ -830,7 +834,7 @@ class VideoTracking(QThread):
         self.font = cv2.FONT_HERSHEY_COMPLEX
 
         self.labels = self.load_labels()
-        self.interpreter = Interpreter(model_path=os.path.join(paths['TFLITE_PATH'],"detect.tflite"))
+        self.interpreter = tf.lite.Interpreter(model_path=os.path.join(paths['TFLITE_PATH'],"detect.tflite"))
         self.interpreter.allocate_tensors()
         self.input_height= self.interpreter.get_input_details()[0]['shape'][1]
         self.input_width= self.interpreter.get_input_details()[0]['shape'][2]
@@ -844,8 +848,11 @@ class VideoTracking(QThread):
 
 
     def OnPeriodicEvent(self):
+        if self.PiCam:
+            frame = self.capwebcam.read()
+        else:
+            _,frame = self.capwebcam.read()
 
-        frame = self.capwebcam.read()
         self.vision(frame)
 
     def stop(self):
@@ -931,9 +938,9 @@ class VideoTracking(QThread):
 
 
     def vision(self,frame):
-
-        frame = cv2.flip(frame,0)
-        frame = cv2.flip(frame,1)
+        if self.PiCam:
+            frame = cv2.flip(frame,0)
+            frame = cv2.flip(frame,1)
 
         img = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (320,320))
 
@@ -973,10 +980,9 @@ class VideoTracking(QThread):
 
             self.VisionMessage(int(movetodo),round(float(distance),2),int(result['class_id']))
 
-        imageframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        imageframe = QImage(imageframe,imageframe.shape[1],imageframe.shape[0],imageframe.strides[0],QImage.Format_RGB888)
+        Pic = QImage(img,img.shape[1],img.shape[0],img.strides[0],QImage.Format_RGB888)
 
-        self.ImageUpdate.emit(imageframe)
+        self.ImageUpdate.emit(Pic)
 
 if __name__ == "__main__":
 

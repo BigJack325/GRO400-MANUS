@@ -5,3 +5,4 @@ wget
 imutils
 ipykernel
 lxml
+tensorflow
