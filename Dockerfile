@@ -6,10 +6,8 @@ RUN apt-get update && apt-get install -y \
     libqt5charts5-dev \
     libqt5serialport5 \
     libqt5serialport5-dev \
-    python3-pyqt5.qtserialport \
-    libhdf5-dev \
-    libhdf5-serial-dev \
-    libatlas-base-dev
+    python3-pyqt5.qtserialport
+
 
 RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
