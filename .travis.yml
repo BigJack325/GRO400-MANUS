@@ -25,19 +25,19 @@ jobs:
     
 #    Qt doesn't work because armv7docker image couldn't be found
       
-#   - stage: Qt
-#     name: "Qt"
+  - stage: Qt
+    name: "Qt"
     
-#     arch:
-#     - armv71
+    arch:
+    - armv71
     
-#     sudo: required
+    sudo: required
 
-#     services:
-#       - docker
+    services:
+      - docker
 
-#     before_script:
-#       - docker image build --platform linux/arm/v7 .
+    before_script:
+      - docker buildx build --platform linux/arm/v7 .
 
-#     script:
-#       - docker run -it make check
+    script:
+      - docker run -it make check
