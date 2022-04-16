@@ -22,9 +22,11 @@ ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
 RUN pip install -r "pip_requirements.txt"
 RUN pip install --upgrade PyQt5
 
+RUN pip list
+
 RUN apt-get install -y \
     python3-pyqt5.qtserialport
-#     python3-pyqt5.qtchart
+    python3-pyqt5.qtchart
 
 # Run the application:
 RUN python3 MANUS_QT.py
