@@ -12,8 +12,8 @@ RUN apt-get install -y \
 #     python3-pyqt5 \
 #     pyqt5-dev-tools \
 #     qttools5-dev-tools \
-    python3-pyqt5.qtserialport \
-    python3-pyqt5.qtchart
+    python3-pyqt5.qtserialport
+#     python3-pyqt5.qtchart
 
 
 RUN apt-get install python3 -y
