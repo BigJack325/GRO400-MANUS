@@ -19,13 +19,14 @@ WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
 ENV VIRTUAL_ENV=/opt/Qt_venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
-RUN pip3 install -r "pip_requirements.txt"
+RUN pip install -r "pip_requirements.txt"
+RUN pip install --upgrade PyQt5
 
 RUN apt-get install -y \
     python3-pyqt5.qtserialport
 #     python3-pyqt5.qtchart
+
 RUN pip list
-RUN which python
 
 # Run the application:
 RUN python3 MANUS_QT.py
