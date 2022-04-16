@@ -7,7 +7,6 @@
 </div>
 <div id="badges" align="center">
     
-[![build status](https://img.shields.io/travis/gabrielcabana21/HexaphobUS/master?logo=Travis&style=flat-square)](https://travis-ci.com/gabrielcabana21/HexaphobUS)
 [![Build Status](https://app.travis-ci.com/EDP325/GRO400-MANUS.svg?branch=master)](https://app.travis-ci.com/EDP325/GRO400-MANUS)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://github.com/EDP325/GRO400-MANUS/blob/main/LICENSE) 
