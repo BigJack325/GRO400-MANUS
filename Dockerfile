@@ -19,7 +19,7 @@ ENV VIRTUAL_ENV=/opt/Qt_venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
 
-RUN pip install PyQt5 == 5.15.5
+RUN python3 -m pip install PyQt5==5.15.5
 
 RUN apt-get install -y \
         qtbase5-dev \
