@@ -37,4 +37,4 @@ jobs:
       - docker build .
 
     script:
-      - docker run -it make check
+      - docker run -it MANUS_QT.py
