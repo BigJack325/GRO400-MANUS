@@ -12,3 +12,4 @@ install:
 
 script:
   - platformio run -d $PLATFORMIO_PROJECT_DIR
+
