@@ -31,7 +31,7 @@ jobs:
     sudo: required
     
     env:
-    - IMGNAME=raspbian/desktop
+    - IMGNAME=ubuntu:20.04
 
     services:
       - docker
