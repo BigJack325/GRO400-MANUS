@@ -17,15 +17,15 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Install dependencies:
-RUN pip install -r "pip_requirements.txt"
-
 RUN apt-get install -y \
 
-        python3-pyqt5.qtserialport
-     
+       libqt5charts5 \
+       libqt5charts5-dev \
+       libqt5serialport5 \
+       libqt5serialport5-dev
 
-RUN pip list
+# Install dependencies:
+RUN pip install -r "pip_requirements.txt"
 
 # Run the application:
 RUN python3 MANUS_QT.py
