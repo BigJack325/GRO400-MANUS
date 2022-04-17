@@ -17,9 +17,9 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+RUN apt install -y ibqt5gui5
 
 RUN apt-get install -y \
-       ibqt5gui5 \
        libqt5charts5 \
        libqt5charts5-dev \
        libqt5serialport5 \
