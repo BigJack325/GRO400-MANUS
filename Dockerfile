@@ -19,15 +19,11 @@ ENV VIRTUAL_ENV=/opt/Qt_venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
 
-RUN python3 -m pip install PyQt5==5.15.5
-
 RUN apt-get install -y \
-        qtbase5-dev \
         libqt5charts5 \
-        libqt5charts5-dev \
-        libqt5serialport5 \
-        libqt5serialport5-dev \
         python3-pyqt5.qtserialport
+
+RUN python3 -m pip install PyQt5==5.15.5
         
 RUN pip install -r "pip_requirements.txt"
 
