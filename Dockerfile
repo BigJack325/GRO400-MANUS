@@ -17,6 +17,8 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+RUN apt-get purge --auto-remove pyqt5-dev
+
 # RUN apt-get install -y \
 #        qtbase5-dev \
 #        libqt5charts5 \
