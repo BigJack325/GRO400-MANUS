@@ -13,11 +13,12 @@ RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
 WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
 
-RUN python3 -m venv Qt_venv
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m virtualenv --python=/usr/bin/python3 $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install dependencies:
-.
-RUN . Qt_venv/bin/activate && pip install -r "pip_requirements.txt"
+RUN pip install -r "pip_requirements.txt"
 
 RUN apt-get install -y \
         libqt5charts5 \
