@@ -7,7 +7,7 @@
 </div>
 <div id="badges" align="center">
     
-![Arduino Build](https://github.com/EDP325/GRO400-MANUS/workflows/Arduino_tests.yml/badge.svg)](https://github.com/EDP325/GRO400-MANUS/actions)
+![Arduino Build](https://github.com/EDP325/GRO400-MANUS/.github/workflows/Arduino_tests.yml/badge.svg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://github.com/EDP325/GRO400-MANUS/blob/main/LICENSE) 
 
