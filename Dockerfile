@@ -17,14 +17,14 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN apt-get purge --auto-remove pyqt5-dev
+RUN apt-get purge --auto-remove pyqt5
 
-# RUN apt-get install -y \
-#        qtbase5-dev \
-#        libqt5charts5 \
-#        libqt5charts5-dev \
-#        libqt5serialport5 \
-#        libqt5serialport5-dev
+RUN apt-get install -y \
+       qtbase5-dev \
+       libqt5charts5 \
+       libqt5charts5-dev \
+       libqt5serialport5 \
+       libqt5serialport5-dev
 
 # Install dependencies:
 RUN pip install -r "pip_requirements.txt"
