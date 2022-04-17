@@ -8,7 +8,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-venv -y
-RUN apt-get purge --auto-remove pyqt5
 
 RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
@@ -27,7 +26,7 @@ RUN apt-get install -y \
        libqt5serialport5-dev
 
 # Install dependencies:
-RUN pip install -r "pip_requirements.txt"
+RUN pip3 install -r "pip_requirements.txt"
 
 # Run the application:
 RUN python3 MANUS_QT.py
