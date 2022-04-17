@@ -30,6 +30,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install --upgrade platformio
     - name: Run PlatformIO
-      run: pio ci --board=<ID_1> --board=<ID_2> --board=<ID_N>
       env:
         PLATFORMIO_CI_SRC: ${{ matrix.example }}
+        
+      run: platformio run -d $PLATFORMIO_CI_SRC
+
