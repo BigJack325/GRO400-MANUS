@@ -9,7 +9,7 @@ RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-venv -y
 RUN apt-get install libqt5serialport5 -y
-RUN apt install qtcreator
+RUN apt install qtcreator -y
 
 RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
