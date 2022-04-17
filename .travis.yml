@@ -1,36 +1,36 @@
 jobs:
   include:
   
-  - stage: Arduino
-    name: "Arduino"
+#   - stage: Arduino
+#     name: "Arduino"
     
-    language: python
-    python:
-      - "3.9"
+#     language: python
+#     python:
+#       - "3.9"
 
-    cache:
-      directories:
-        - "~/.platformio"
+#     cache:
+#       directories:
+#         - "~/.platformio"
 
-    env:
-      - PLATFORMIO_CI_SRC=Hexapod-master/Hexapod_Arduino
+#     env:
+#       - PLATFORMIO_CI_SRC=Hexapod-master/Hexapod_Arduino
 
 
-    install:
-      - pip install -U platformio
+#     install:
+#       - pip install -U platformio
 
-    script:
-      - platformio run -d $PLATFORMIO_CI_SRC
+#     script:
+#       - platformio run -d $PLATFORMIO_CI_SRC
       
     
 #    Qt doesn't work because armv7docker image couldn't be found
       
-#   - stage: Qt
-#     name: "Qt"
+  - stage: Qt
+    name: "Qt"
     
 
-#     services:
-#       - docker
+    services:
+      - docker
 
-#     before_install:
-#     - docker build .
+    before_install:
+    - docker build .
