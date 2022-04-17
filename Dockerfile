@@ -22,7 +22,8 @@ ENV PATH=”$VIRTUAL_ENV/bin:$PATH”
 RUN apt-get install -y \
         libqt5charts5 \
         python3-pyqt5.qtserialport
-
+        
+RUN pip remove PyQt5
 RUN python3 -m pip install PyQt5==5.15.5
         
 RUN pip install -r "pip_requirements.txt"
