@@ -18,7 +18,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN apt-get install -y \
-
+       qtbase5-dev \
        libqt5charts5 \
        libqt5charts5-dev \
        libqt5serialport5 \
