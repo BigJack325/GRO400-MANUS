@@ -16,7 +16,7 @@ WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
 # ENV VIRTUAL_ENV=/opt/venv
 # RUN python3 -m venv $VIRTUAL_ENV
 # ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
+RUN pip3 install --upgrade PyQt5
 RUN apt-get install -y \
     python3-pyqt5.qtserialport
 
