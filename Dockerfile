@@ -14,7 +14,7 @@ COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
 WORKDIR /home/Qt/Hexapod-master/Hexapod_Qt
 
 ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv --python=/usr/bin/python3 $VIRTUAL_ENV
+RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install dependencies:
