@@ -20,6 +20,8 @@ RUN apt install -y \
         libdbus-1-3 \
         libxkbcommon-x11-0
         
+RUN export DISPLAY=:0.0
+        
 # RUN apt install -y libgl1-mesa-glx 
 # RUN apt install -y libgl1
     
