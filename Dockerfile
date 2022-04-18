@@ -14,6 +14,7 @@ RUN apt install -y \
         libxcb-render-util0 \
         libxcb-xkb1 \
         libfontconfig1 \
+        libxcb-shape0 \
         libxkbcommon-x11-0
         
 # RUN apt-get install ffmpeg libsm6 libxext6  -y
