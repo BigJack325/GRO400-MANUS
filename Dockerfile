@@ -6,6 +6,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 
 RUN apt-get install -y --no-install-recommends apt-utils
 
+RUN apt-get install ffmpeg libsm6 libxext6  -y
+
 RUN apt install -y \
         libxcb-xinerama0 \
         libxcb-image0 \
@@ -18,7 +20,6 @@ RUN apt install -y \
         libdbus-1-3 \
         libxkbcommon-x11-0
         
-# RUN apt-get install ffmpeg libsm6 libxext6  -y
 # RUN apt install -y libgl1-mesa-glx 
 # RUN apt install -y libgl1
     
