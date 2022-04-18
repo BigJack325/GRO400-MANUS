@@ -20,13 +20,14 @@ RUN apt install -y \
         libdbus-1-3 \
         libxkbcommon-x11-0
         
-RUN export DISPLAY=:0.0
+RUN apt-get install -y '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev 
+
         
 # RUN apt install -y libgl1-mesa-glx 
 # RUN apt install -y libgl1
     
 ENV QT_DEBUG_PLUGINS=1
-ENV QT_QPA_PLATFORM=xcb
+# ENV QT_QPA_PLATFORM=xcb
 # ENV QT_QPA_PLATFORM_PLUGIN_PATH=/opt/Qt/${QT_VERSION}/gcc_64/plugins
 # ENV QT_PLUGIN_PATH=/opt/Qt/${QT_VERSION}/gcc_64/plugins
 # ENV DISPLAY=:1
