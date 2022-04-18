@@ -17,9 +17,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 #     libglu1-mesa \
 #     libglu1-mesa-dev
 
-RUN apt install libxcb-xinerama0 -y
+RUN apt install libxcb-xinerama0 libxcb-image0 libxcb-icccm4 -y
 RUN apt-get install ffmpeg libsm6 libxext6  -y
-RUN apt install libxcb-icccm4 -y
     
 # RUN Xvfb :1 -screen 0 1024x768x16 &
     
