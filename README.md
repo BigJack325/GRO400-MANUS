@@ -80,8 +80,8 @@ Photo to be inserted here.
 
 #### <a id="Codeexplication">Code Overview</a>
 
-The code is divided in two main sections.  The first one is all about the robot movment and is directly written in the Arduino.  This code is written in switch case depending one the manuel/automatic mode and which movment to do.
-The second section  includes the vision algorithm and the HMI.  It is written in the Raspberry Pi.  It is made to detect the chosen images and display some variable on the HMI, a screen connected to the Pi.  We chose to use VNCviewer to have a remote connection to the hexapod.
+The code is divided in two main sections. The first one is all about the robot's movment and is written in C++ and is run on the Arduino.  This code uses switch cases depending one the manuel/automatic mode and which movment to do.
+The second section  includes the vision algorithm and the HMI.  It is written in Python and is run on the Raspberry Pi.  It is made to detect the chosen images and display  the HMI, a screen connected to the Pi.  We chose to use VNCviewer to connect to the Raspberry Pi through Wifi to have a remote connection to the hexapod.
 
 ## <a id="Operation"></a>Robot Operation
 
