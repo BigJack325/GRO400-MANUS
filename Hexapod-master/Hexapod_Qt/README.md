@@ -1,5 +1,5 @@
 
-Installation on Raspberry-Pi:
+## Installation on Raspberry-Pi:
 
 <b>Step 1.</b> Activate Raspberry-Pi VNC and  legacy camera using <b>sudo raspy-config</b>  in the interface options selection
 <br/>
@@ -12,14 +12,15 @@ sudo apt-get code
 cd ./Hexapod-Master/Hexapod_Qt
 ./install_venv_pi.sh
 </pre> 
-<b>WARNING: PyQt5 installation takes up to 1-2h to compile metadata</b>
+<b>WARNING: PyQt5 installation takes up to 1-2h to compile metadata</b><br>
+<br>
 <b>Step 4.</b> Enter the virtual environment using
 <pre>
 source Qt_venv/bin/activate
 </pre> 
 NOTE: Interpreter in VSCode should automatically change to the virtual environnement
 
-Installation for TensorFlow(Windows computer is strongly advised):
+## Installation for TensorFlow(Windows computer is strongly advised):
 
 <b>Step 1.</b> Download [Anaconda](https://www.anaconda.com/products/distribution) and the [Repo](https://github.com/EDP325/GRO400-MANUS.git) on your computer, <b> not Raspberry Pi </b>, then open a terminal. You should see a virtual environnement (base) in the terminal.<br>
 ![Screen Shot 2022-04-17 at 11 45 03 PM](https://user-images.githubusercontent.com/72100463/163751224-2b0fb61f-1e87-4eee-8caf-9cedb23b2161.png)<br>
