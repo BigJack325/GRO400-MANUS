@@ -4,18 +4,6 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 
-# RUN apt-get install -y xserver-xorg xinit
-# RUN apt-get install -y \
-#     mesa-utils \
-#     libegl1-mesa \
-#     libegl1-mesa-dev \
-#     libgbm-dev \
-#     libgbm1 \
-#     libgl1-mesa-dev \
-#     libgl1-mesa-dri \
-#     libgl1-mesa-glx \
-#     libglu1-mesa \
-#     libglu1-mesa-dev
 RUN apt-get install -y --no-install-recommends apt-utils
 
 RUN apt install -y \
@@ -25,11 +13,12 @@ RUN apt install -y \
         libxcb-keysyms1 \
         libxcb-render-util0 \
         libxcb-xkb1 \
+        libfontconfig1 \
         libxkbcommon-x11-0
         
 # RUN apt-get install ffmpeg libsm6 libxext6  -y
-RUN apt install -y libgl1-mesa-glx   
-# RUN Xvfb :1 -screen 0 1024x768x16 &
+# RUN apt install -y libgl1-mesa-glx 
+RUN apt install -y libgl1
     
 ENV QT_DEBUG_PLUGINS=1
 ENV QT_QPA_PLATFORM=xcb
