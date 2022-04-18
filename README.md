@@ -53,7 +53,6 @@
 cd ./Hexapod-Master/Hexapod_Qt
 ./install_venv_pi.sh
 </pre> 
-<br/>
 <b>Step 4.</b> Connect the hexapod's microcontroller (Arduino) to Raspberry Pi;
 <br/>
 <b>Step 5.</b> Open the file <b>main.cpp</b> in the <b>./Hexapod-Master/Hexapod_Arduino/src</b> folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
