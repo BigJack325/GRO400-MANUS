@@ -16,6 +16,8 @@ RUN apt-get install -y \
     libgl1-mesa-glx \
     libglu1-mesa \
     libglu1-mesa-dev
+
+RUN apt install libxcb-xinerama0
     
 RUN Xvfb :1 -screen 0 1024x768x16 &
     
