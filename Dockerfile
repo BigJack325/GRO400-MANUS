@@ -19,7 +19,7 @@ RUN apt install -y \
         libxkbcommon-x11-0
         
 # RUN apt-get install ffmpeg libsm6 libxext6  -y
-RUN apt install -y libgl1-mesa-glx 
+# RUN apt install -y libgl1-mesa-glx 
 # RUN apt install -y libgl1
     
 ENV QT_DEBUG_PLUGINS=1
