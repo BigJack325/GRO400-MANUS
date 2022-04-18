@@ -24,8 +24,8 @@ RUN apt install -y \
         libxcb-icccm4 \
         libxcb-keysyms1 \
         libxcb-render-util0 \
-        libxcb-xkb1 \
-        libxkbcommon-x11-0
+        libxcb-xkb1
+#         libxkbcommon-x11-0
         
 RUN apt-get install ffmpeg libsm6 libxext6  -y
     
