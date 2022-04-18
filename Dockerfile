@@ -18,7 +18,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 #     libglu1-mesa-dev
 
 RUN apt install libxcb-xinerama0 -y
-RUN apt install libgl1-mesa-glx y
+RUN apt install libgl1-mesa-glx -y
     
 # RUN Xvfb :1 -screen 0 1024x768x16 &
     
