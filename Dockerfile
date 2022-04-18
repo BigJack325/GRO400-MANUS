@@ -29,9 +29,9 @@ RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-venv -y
 RUN apt-get install libqt5serialport5 -y
-RUN apt-get install qt5-default -y
-RUN apt-get install build-essential -y
-RUN apt-get install mesa-common-dev -y
+# RUN apt-get install qt5-default -y
+# RUN apt-get install build-essential -y
+# RUN apt-get install mesa-common-dev -y
 
 RUN mkdir -p /home/Qt
 COPY Hexapod-master/Hexapod_Qt /home/Qt/Hexapod-master/Hexapod_Qt
