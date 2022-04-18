@@ -16,8 +16,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 #     libgl1-mesa-glx \
 #     libglu1-mesa \
 #     libglu1-mesa-dev
+RUN apt-get install -y --no-install-recommends apt-utils
 
-RUN apt install libxcb-xinerama0 libxcb-image0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 -y
+RUN apt install libxcb-xinerama0 libxcb-image0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-xkb1 -y
 RUN apt-get install ffmpeg libsm6 libxext6  -y
     
 # RUN Xvfb :1 -screen 0 1024x768x16 &
