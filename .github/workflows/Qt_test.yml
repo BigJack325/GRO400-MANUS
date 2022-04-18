@@ -1,21 +1,21 @@
-# This action has been commented because it doesn't work. Testing a GUI is very hard
+# This action doesn't work. Testing a GUI is very hard
 
-# name: Qt CI
+name: Qt CI
 
-# on:
-#   push:
-#     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
-# jobs:
+jobs:
 
-#   build:
+  build:
 
-#     runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Build Qt image
-#       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build Qt image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
