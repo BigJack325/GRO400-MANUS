@@ -4,7 +4,7 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
 
-RUN apt-get install -y xserver-xorg xinit
+# RUN apt-get install -y xserver-xorg xinit
 # RUN apt-get install -y \
 #     mesa-utils \
 #     libegl1-mesa \
