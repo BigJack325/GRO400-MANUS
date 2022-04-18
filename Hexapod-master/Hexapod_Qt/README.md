@@ -3,7 +3,10 @@ Installation on Raspberry-Pi:
 
 <b>Step 1.</b> Activate Raspberry-Pi VNC and  legacy camera using <b>sudo raspy-config</b>  in the interface options selection;
 <br/>
-<b>Step 2.</b> Install VSCode using <b>sudo apt-get code</b>
+<b>Step 2.</b> Install VSCode using
+<pre>
+sudo apt-get code
+</pre>
 <br/>
 <b>Step 3.</b> Execute the <b>./install_venv_pi.sh</b> in terminal in Hexapod-master/Hexapod_Qt path WARNING: PyQt5 installation takes up to 1-2h to compile metadata
 <pre>
