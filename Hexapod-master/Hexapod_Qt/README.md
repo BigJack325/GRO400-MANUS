@@ -20,7 +20,7 @@ source Qt_venv/bin/activate
 </pre> 
 NOTE: Interpreter in VSCode should automatically change to the virtual environnement
 
-## Installation for TensorFlow(Windows computer is strongly advised):
+## Installation for TensorFlow(NVIDIA GPU strongly advised):
 
 <b>Step 1.</b> Download [Anaconda](https://www.anaconda.com/products/distribution) and the [Repo](https://github.com/EDP325/GRO400-MANUS.git) on your computer, <b> not Raspberry Pi </b>, then open a terminal. You should see a virtual environnement (base) in the terminal.<br>
 ![Screen Shot 2022-04-17 at 11 45 03 PM](https://user-images.githubusercontent.com/72100463/163751224-2b0fb61f-1e87-4eee-8caf-9cedb23b2161.png)<br>
