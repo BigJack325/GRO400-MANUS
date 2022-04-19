@@ -57,11 +57,11 @@ cd ./Hexapod-Master/Hexapod_Qt
 <br/>
 <b>Step 5.</b> Open the file <b>main.cpp</b> in the <b>./Hexapod-Master/Hexapod_Arduino/src</b> folder, and build the code into the microcontroller with your favorite IDE with PlatformIO;
 <br/>
-<b>Step 5.</b> Upload the <b>main.cpp</b> in the Arduino;
+<b>Step 6.</b> Upload the <b>main.cpp</b> in the Arduino;
 <br/>
-<b>Step 6.</b> Run the file <b>MANUS_QT</b> in the <b>./Hexapod-Master/Hexapod_Qt</b> folder;
+<b>Step 7.</b> Run the file <b>MANUS_QT</b> in the <b>./Hexapod-Master/Hexapod_Qt</b> folder;
 <br/>
-<b>Step 7.</b> Initialize the serial communication.
+<b>Step 8.</b> Initialize the serial communication.
 
 ## <a id="Documentation"></a>Documentation
 #### <a id = "Servosclassification">Classification of the robot servos:</a>
