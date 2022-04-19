@@ -73,7 +73,7 @@ You need to 3D print the necessary parts that you can find in the *./CAD* folder
 We have a complete assembly guide [here](https://github.com/EDP325/GRO400-MANUS/wiki):
 
 #### <a id = "electricalschematic"> Electrical Schematic</a>
-![Schema fritzing](https://user-images.githubusercontent.com/73359212/163904025-a9d60a8c-0cc2-4274-9145-cc87d7b85b30.png)
+![Schema fritzing](https://user-images.githubusercontent.com/73359212/163906944-4fcdb2f2-8cd9-452b-8582-67459c08b33d.png)
 #### <a id= "electrical">Electrical Diagram of the Shield: </a>
 ![image](https://user-images.githubusercontent.com/48064854/163028957-0d5c8229-0cb9-4d3b-a6ca-b984c7e7bd09.png)
 
