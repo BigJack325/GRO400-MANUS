@@ -8,7 +8,6 @@
 <div id="badges" align="center">
     
 [![Arduino Build](https://github.com/EDP325/GRO400-MANUS/workflows/PlatformIO%20CI/badge.svg)](https://github.com/EDP325/GRO400-MANUS/actions)
-[![Qt Build](https://github.com/EDP325/GRO400-MANUS/workflows/Qt%20CI/badge.svg)](https://github.com/EDP325/GRO400-MANUS/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://github.com/EDP325/GRO400-MANUS/blob/main/LICENSE) 
 
